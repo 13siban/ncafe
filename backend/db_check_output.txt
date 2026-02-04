@@ -1,0 +1,11 @@
+Connection successful!
+Sample row found!
+Column: id, Value: 1
+Column: kor_name, Value: 아메리카노
+Column: eng_name, Value: Americano
+Column: description, Value: 진한 에스프레소의 맛
+Column: price, Value: 3500.00
+Column: category_id, Value: 1
+Column: is_available, Value: true
+Column: created_at, Value: 2026-01-26 20:49:57.307704
+Column: updated_at, Value: 2026-01-26 20:49:57.307704

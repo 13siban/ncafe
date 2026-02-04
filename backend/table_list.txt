@@ -1,0 +1,2 @@
+Table: categories (Schema: public)
+Table: menus (Schema: public)

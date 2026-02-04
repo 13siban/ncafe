@@ -1,0 +1,53 @@
+# Project Rules: NCafe Admin Frontend
+
+## Admin Page Structure Pattern
+When creating or modifying pages in `frontend/app/admin/`:
+
+1. **Global Layout Integration**
+   - **NEVER** use or import `<AdminHeader />` in individual page files (`page.tsx`).
+   - The header is managed globally in `frontend/app/admin/layout.tsx`.
+   - **REQUIRED ACTION**: When adding a new page, you **MUST** update the `getPageConfig` function in `frontend/app/admin/layout.tsx` to define the page's `title` and `breadcrumbs` based on the URL path.
+
+2. **Directory & File Structure**
+   - Follow this file structure for new features:
+     ```
+     app/admin/[feature]/
+     ├── page.tsx           # Logic Container (State, Handlers, Data Fetching)
+     ├── page.module.css    # Page-specific styles
+     └── _components/       # Feature-specific components
+         ├── FeatureActionBar/
+         │   ├── FeatureActionBar.tsx
+         │   └── FeatureActionBar.module.css
+         ├── FeatureList/
+         │   ├── FeatureList.tsx
+         │   └── FeatureList.module.css
+         └── ...
+     ```
+
+3. **Component Design Principles**
+   - **Page Component (`page.tsx`)**:
+     - Acts as the **Controller**.
+     - Manages all state (`useState`), derived state (`useMemo`), and event handlers.
+     - Wraps the main content in `<main className={styles.container}>`.
+     - Passes data and handlers down to child components.
+     - **DO NOT** write complex UI markup directly in `page.tsx`; compose it using components from `_components`.
+   
+   - **Child Components (`_components/`)**:
+     - Acts as **Presentational** components.
+     - Focus on UI rendering.
+     - Receive data and callbacks via props.
+     - Keep components small and focused (e.g., Search/Filter bars, Data Lists, Tabs).
+
+4. **Styling Guidelines**
+   - Use **CSS Modules** (`*.module.css`) for all component styling.
+   - **Aesthetics**:
+     - Use the existing design tokens (colors, spacing).
+     - Standard container style: `styles.container` (usually with appropriate padding/margin).
+     - Clean, white/gray backgrounds with subtle shadows for depth.
+
+## Example Checklist for a New Page
+- [ ] Created `app/admin/[feature]/page.tsx`
+- [ ] Created `app/admin/[feature]/_components/` directory
+- [ ] Added route configuration to `getPageConfig` in `app/admin/layout.tsx`
+- [ ] Implemented state logic in `page.tsx`
+- [ ] Moved UI parts into `_components/[ComponentName]`
