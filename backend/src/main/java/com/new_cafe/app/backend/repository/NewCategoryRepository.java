@@ -24,7 +24,7 @@ public class NewCategoryRepository implements CategoryRepository {
 
     public List<Category> findAll() {
         List<Category> categories = new ArrayList<>();
-        String sql = "SELECT * FROM categories";
+        String sql = "SELECT * FROM categories order by sort_order";
 
         try (Connection conn = dataSource.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -41,6 +41,8 @@ public class NewCategoryRepository implements CategoryRepository {
                     Category category = Category.builder() //lombok builder 사용
                             .id(rs.getLong("id"))
                             .name(rs.getString("name"))
+                            .icon(rs.getString("icon"))
+                            .sortOrder(rs.getInt("sort_order"))
                             .build();
                     categories.add(category);
                 }
@@ -65,6 +67,8 @@ public class NewCategoryRepository implements CategoryRepository {
                     category = Category.builder()
                             .id(rs.getLong("id"))
                             .name(rs.getString("name"))
+                            .icon(rs.getString("icon"))
+                            .sortOrder(rs.getInt("sort_order"))
                             .build();
                 }
             }
