@@ -1,0 +1,86 @@
+/* components/common/Card/Card.module.css */
+
+.card {
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  transition: all var(--transition-base);
+}
+
+.elevated {
+  box-shadow: var(--shadow-md);
+}
+
+.outlined {
+  border: 1px solid var(--color-gray-200);
+}
+
+.interactive {
+  cursor: pointer;
+}
+
+.interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.interactive:active {
+  transform: translateY(-2px);
+}
+
+/* Card Image */
+.cardImage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background-color: var(--color-gray-100);
+}
+
+.cardImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.interactive:hover .cardImage img {
+  transform: scale(1.05);
+}
+
+/* Card Body */
+.cardBody {
+  padding: var(--space-4);
+}
+
+/* Card Header */
+.cardHeader {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.cardTitle {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-gray-900);
+  margin: 0;
+}
+
+/* Card Footer */
+.cardFooter {
+  padding: var(--space-4);
+  border-top: 1px solid var(--color-gray-100);
+}
+
+/* Padding Variants */
+.noPadding .cardBody {
+  padding: 0;
+}
+
+.compact .cardBody {
+  padding: var(--space-3);
+}
+
+.spacious .cardBody {
+  padding: var(--space-6);
+}

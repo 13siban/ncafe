@@ -1,0 +1,26 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-gray-700);
+}
+
+.label.required::after {
+  content: ' *';
+  color: var(--color-error);
+}
+
+.inputContainer {
+  width: 100%;
+}
+
+.error {
+  font-size: 0.8rem;
+  color: var(--color-error);
+}

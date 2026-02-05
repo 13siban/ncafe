@@ -1,0 +1,74 @@
+.container {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+}
+
+.emptyContainer {
+  background: var(--color-gray-50);
+  border-radius: var(--radius-lg);
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-gray-400);
+}
+
+.mainImageWrapper {
+  position: relative;
+  aspect-ratio: 1;
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background-color: var(--color-gray-50);
+  margin-bottom: 1rem;
+}
+
+.mainImage {
+  object-fit: cover;
+}
+
+.primaryBadge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: var(--text-xs);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  backdrop-filter: blur(4px);
+}
+
+.thumbnailList {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.thumbnailButton {
+  border: 2px solid transparent;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.thumbnailButton.active {
+  border-color: var(--color-primary-500);
+  transform: translateY(-2px);
+}
+
+.thumbnailImage {
+  display: block;
+  object-fit: cover;
+  width: 80px;
+  height: 80px;
+}

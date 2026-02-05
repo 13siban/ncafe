@@ -1,0 +1,29 @@
+/* app/admin/layout.module.css */
+
+.adminLayout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.mainContent {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  background-color: var(--bg-secondary);
+  min-height: 100vh;
+  transition: margin-left var(--transition-base);
+}
+
+.pageContent {
+  padding: var(--space-6);
+  max-width: 1400px;
+}
+
+@media (max-width: 768px) {
+  .mainContent {
+    margin-left: 0;
+  }
+
+  .pageContent {
+    padding: var(--space-4);
+  }
+}

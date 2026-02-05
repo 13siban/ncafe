@@ -1,0 +1,92 @@
+.uploader {
+  width: 100%;
+}
+
+.dropzone {
+  border: 2px dashed var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  background-color: var(--bg-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 200px;
+}
+
+.dropzone:hover, .dropzoneActive {
+  border-color: var(--color-primary-500);
+  background-color: var(--color-primary-50);
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+  color: var(--color-gray-500);
+}
+
+.dropzone:hover .icon, .dropzoneActive .icon {
+  color: var(--color-primary-500);
+}
+
+.text {
+  text-align: center;
+  color: var(--color-gray-500);
+}
+
+.highlight {
+  color: var(--color-primary-600);
+  font-weight: 500;
+}
+
+.previewGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.previewItem {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-gray-200);
+}
+
+.previewImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.removeButton {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  padding: 0;
+}
+
+.removeButton:hover {
+  background-color: var(--color-error);
+}
+
+.error {
+  color: var(--color-error);
+  font-size: var(--text-sm);
+  margin-top: var(--space-2);
+}
