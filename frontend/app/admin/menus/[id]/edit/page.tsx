@@ -17,7 +17,7 @@ export default function EditMenuPage() {
     const loadData = async () => {
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      const menu = menus.find(m => m.id === id);
+      const menu = menus.find(m => m.id === Number(id));
       if (menu) {
         setInitialValues({
           korName: menu.korName,

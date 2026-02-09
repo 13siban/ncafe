@@ -2,17 +2,17 @@
 import { Menu, MenuCategory } from '@/types/menu';
 
 export const categories: MenuCategory[] = [
-  { id: 'all', korName: '전체', engName: 'All', sortOrder: 0 },
-  { id: 'coffee', korName: '커피', engName: 'Coffee', icon: '☕', sortOrder: 1 },
-  { id: 'beverage', korName: '음료', engName: 'Beverage', icon: '🥤', sortOrder: 2 },
-  { id: 'tea', korName: '티', engName: 'Tea', icon: '🍵', sortOrder: 3 },
-  { id: 'dessert', korName: '디저트', engName: 'Dessert', icon: '🍰', sortOrder: 4 },
-  { id: 'bakery', korName: '베이커리', engName: 'Bakery', icon: '🥐', sortOrder: 5 },
+  { id: 0, korName: '전체', engName: 'All', sortOrder: 0 },
+  { id: 1, korName: '커피', engName: 'Coffee', icon: '☕', sortOrder: 1 },
+  { id: 2, korName: '음료', engName: 'Beverage', icon: '🥤', sortOrder: 2 },
+  { id: 3, korName: '티', engName: 'Tea', icon: '🍵', sortOrder: 3 },
+  { id: 4, korName: '디저트', engName: 'Dessert', icon: '🍰', sortOrder: 4 },
+  { id: 5, korName: '베이커리', engName: 'Bakery', icon: '🥐', sortOrder: 5 },
 ];
 
 export const menus: Menu[] = [
   {
-    id: '1',
+    id: 1,
     korName: '아메리카노',
     engName: 'Americano',
     description: '깊고 진한 에스프레소에 시원한 물을 더해 묵직한 바디감을 느낄 수 있는 커피',
@@ -49,7 +49,7 @@ export const menus: Menu[] = [
     updatedAt: new Date('2024-01-20'),
   },
   {
-    id: '2',
+    id: 2,
     korName: '카페라떼',
     engName: 'Cafe Latte',
     description: '풍부한 에스프레소와 부드러운 우유가 어우러진 클래식한 라떼',
@@ -77,7 +77,7 @@ export const menus: Menu[] = [
     updatedAt: new Date('2024-01-20'),
   },
   {
-    id: '3',
+    id: 3,
     korName: '바닐라 라떼',
     engName: 'Vanilla Latte',
     description: '달콤한 바닐라 시럽과 에스프레소, 우유의 완벽한 조화',
@@ -105,7 +105,7 @@ export const menus: Menu[] = [
     updatedAt: new Date('2024-01-20'),
   },
   {
-    id: '4',
+    id: 4,
     korName: '카라멜 마끼아또',
     engName: 'Caramel Macchiato',
     description: '에스프레소, 바닐라 시럽, 스팀밀크에 달콤한 카라멜 드리즐을 얹은 음료',
@@ -122,7 +122,7 @@ export const menus: Menu[] = [
     updatedAt: new Date('2024-01-20'),
   },
   {
-    id: '5',
+    id: 5,
     korName: '딸기 스무디',
     engName: 'Strawberry Smoothie',
     description: '신선한 딸기와 요거트가 어우러진 상큼한 스무디',
@@ -139,7 +139,7 @@ export const menus: Menu[] = [
     updatedAt: new Date('2024-01-20'),
   },
   {
-    id: '6',
+    id: 6,
     korName: '자몽 에이드',
     engName: 'Grapefruit Ade',
     description: '상큼한 자몽과 탄산의 청량한 조합',
@@ -156,7 +156,7 @@ export const menus: Menu[] = [
     updatedAt: new Date('2024-01-20'),
   },
   {
-    id: '7',
+    id: 7,
     korName: '얼그레이',
     engName: 'Earl Grey',
     description: '베르가못 향이 가미된 클래식한 홍차',
@@ -173,7 +173,7 @@ export const menus: Menu[] = [
     updatedAt: new Date('2024-01-20'),
   },
   {
-    id: '8',
+    id: 8,
     korName: '캐모마일',
     engName: 'Chamomile',
     description: '은은한 꽃향기로 마음을 편안하게 해주는 허브티',
@@ -190,7 +190,7 @@ export const menus: Menu[] = [
     updatedAt: new Date('2024-01-20'),
   },
   {
-    id: '9',
+    id: 9,
     korName: '티라미수 케이크',
     engName: 'Tiramisu Cake',
     description: '에스프레소에 적신 스펀지와 마스카포네 크림의 클래식 이탈리안 디저트',
@@ -207,7 +207,7 @@ export const menus: Menu[] = [
     updatedAt: new Date('2024-01-20'),
   },
   {
-    id: '10',
+    id: 10,
     korName: '크로와상',
     engName: 'Croissant',
     description: '겉은 바삭하고 속은 부드러운 프랑스식 페이스트리',
@@ -224,7 +224,7 @@ export const menus: Menu[] = [
     updatedAt: new Date('2024-01-20'),
   },
   {
-    id: '11',
+    id: 11,
     korName: '소금빵',
     engName: 'Salt Bread',
     description: '버터 풍미가 가득한 바삭하고 촉촉한 소금빵',
@@ -241,7 +241,7 @@ export const menus: Menu[] = [
     updatedAt: new Date('2024-01-20'),
   },
   {
-    id: '12',
+    id: 12,
     korName: '콜드브루',
     engName: 'Cold Brew',
     description: '12시간 이상 저온 추출하여 부드럽고 깔끔한 맛의 커피',
