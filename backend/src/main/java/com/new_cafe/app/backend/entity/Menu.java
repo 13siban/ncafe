@@ -23,8 +23,7 @@ public class Menu {
     private Long categoryId;
     // private String imageSrc;
     private Boolean isAvailable;
-    // private Boolean isSoldOut;
-    // private Integer sortOrder;
+    private Boolean isSoldOut;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

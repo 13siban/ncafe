@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import com.new_cafe.app.backend.dto.MenuCreateRequest;
 import com.new_cafe.app.backend.dto.MenuCreateResponse;
 import com.new_cafe.app.backend.dto.MenuDetailResponse;
+import com.new_cafe.app.backend.dto.MenuImageListResponse;
+import com.new_cafe.app.backend.dto.MenuImageResponse;
 import com.new_cafe.app.backend.dto.MenuListRequest;
 import com.new_cafe.app.backend.dto.MenuListResponse;
 import com.new_cafe.app.backend.dto.MenuResponse;
@@ -78,7 +80,28 @@ public class NewMenuService implements MenuService {
 
     @Override
     public MenuDetailResponse getMenu(Long id) {
-        return null;
+        Menu menu = menuRepository.findById(id);
+        if (menu == null) {
+            return null;
+        }
+
+        Category category = categoryRepository.findById(menu.getCategoryId());
+        String categoryName = (category != null) ? category.getName() : "미지정";
+        List<MenuImage> images = menuImageRepository.findAllByMenuId(menu.getId());
+        String imageSrc = images.isEmpty() ? "blank.png" : images.get(0).getSrcUrl();
+
+        return MenuDetailResponse.builder()
+                .id(menu.getId())
+                .korName(menu.getKorName())
+                .engName(menu.getEngName())
+                .description(menu.getDescription())
+                .price(menu.getPrice())
+                .categoryName(categoryName)
+                .isAvailable(menu.getIsAvailable())
+                .isSoldOut(false)
+                .createdAt(menu.getCreatedAt())
+                .updatedAt(menu.getUpdatedAt())
+                .build();
     }
 
     @Override
@@ -93,5 +116,27 @@ public class NewMenuService implements MenuService {
 
     @Override
     public void deleteMenu(Long id) {
+    }
+
+    @Override
+    public MenuImageListResponse getImages(Long id) {
+        Menu menu = menuRepository.findById(id);
+        String korName = (menu != null) ? menu.getKorName() : "알 수 없는 메뉴";
+
+        List<MenuImage> images = menuImageRepository.findAllByMenuId(id);
+        
+        List<MenuImageResponse> imageResponses = images.stream()
+            .map(img -> MenuImageResponse.builder()
+                .id(img.getId())
+                .menuId(img.getMenuId())
+                .srcUrl(img.getSrcUrl())
+                .sortOrder(img.getSortOrder())
+                .altText(korName)
+                .build())
+            .toList();
+
+        return MenuImageListResponse.builder()
+            .images(imageResponses)
+            .build();
     }
 }

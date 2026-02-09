@@ -54,19 +54,25 @@
 }
 
 .tabCount {
-  padding: var(--space-1) var(--space-2);
-  background-color: var(--color-gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  min-width: 20px;
+  padding: 0 var(--space-1);
+  background-color: var(--color-gray-100);
   border-radius: var(--radius-full);
-  font-size: var(--text-xs);
-  font-weight: var(--font-semibold);
-  color: var(--color-gray-600);
-  min-width: 24px;
-  text-align: center;
+  font-size: 10px;
+  font-weight: var(--font-bold);
+  color: var(--color-gray-500);
+  border: 1px solid var(--color-gray-200);
+  transition: all var(--transition-fast);
 }
 
 .tabActive .tabCount {
-  background-color: var(--color-primary-200);
-  color: var(--color-primary-700);
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-600);
+  border-color: var(--color-primary-200);
 }
 
 /* Loading & Error States */

@@ -5,11 +5,11 @@ export interface CategoryResponseDto {
     id: number;
     name: string;
     icon: string;
+    menuCount: number;
 }
 
 export interface CategoryListResponseDto {
     categories: CategoryResponseDto[];
-    totalCount: number;
 }
 
 

@@ -40,7 +40,7 @@ public class NewMenuImageRepository implements MenuImageRepository {
                             .menuId(rs.getLong("menu_id")) // 메뉴 FK
                             .srcUrl(rs.getString("src_url")) // 이미지 URL
                             .sortOrder(rs.getInt("sort_order")) // 정렬 순서
-                            .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                            // .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
                             .build();
                     menuImages.add(menuImage);
                 } // 끝나면 자동 반납

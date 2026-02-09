@@ -67,7 +67,7 @@
 }
 
 .price {
-  font-size: var(--text-xl);
+  font-size: var(--text-2xl);
   font-weight: 600;
   color: var(--color-primary-600);
 }
@@ -110,3 +110,17 @@
   font-size: var(--text-sm);
   color: var(--color-gray-900);
 }
+
+.loading, .error {
+  padding: 2rem;
+  text-align: center;
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  color: var(--color-gray-500);
+}
+
+.error {
+  color: var(--color-error);
+}
+

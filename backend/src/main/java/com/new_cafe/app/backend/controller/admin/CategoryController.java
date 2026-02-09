@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.new_cafe.app.backend.dto.CategoryResponse;
 import com.new_cafe.app.backend.entity.Category;
 import com.new_cafe.app.backend.service.CategoryService;
 
@@ -21,7 +22,7 @@ public class CategoryController {
 
     // 목록 조회 데이터 반환
     @GetMapping("/admin/categories")
-    public List<Category> list() {
+    public List<CategoryResponse> list() {
         return categoryService.getAll();
     }
 

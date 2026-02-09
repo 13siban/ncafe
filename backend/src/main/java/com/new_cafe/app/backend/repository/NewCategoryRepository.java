@@ -10,6 +10,7 @@ import javax.sql.DataSource;
 
 import org.springframework.stereotype.Repository;
 
+import com.new_cafe.app.backend.dto.CategoryResponse;
 import com.new_cafe.app.backend.entity.Category;
 
 @Repository
@@ -22,9 +23,15 @@ public class NewCategoryRepository implements CategoryRepository {
 
     @Override
 
-    public List<Category> findAll() {
-        List<Category> categories = new ArrayList<>();
-        String sql = "SELECT * FROM categories order by sort_order";
+    public List<CategoryResponse> findAllWithMenuCount() {
+        List<CategoryResponse> categories = new ArrayList<>();
+        String sql = """
+            SELECT c.id, c.name, c.icon, c.sort_order, COUNT(m.id) as menu_count 
+            FROM categories c 
+            LEFT JOIN menus m ON c.id = m.category_id 
+            GROUP BY c.id 
+            ORDER BY c.sort_order
+        """;
 
         try (Connection conn = dataSource.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -38,11 +45,12 @@ public class NewCategoryRepository implements CategoryRepository {
                     // );
                     // categories.add(category);
                     
-                    Category category = Category.builder() //lombok builder 사용
+                    CategoryResponse category = CategoryResponse.builder() //lombok builder 사용
                             .id(rs.getLong("id"))
                             .name(rs.getString("name"))
                             .icon(rs.getString("icon"))
                             .sortOrder(rs.getInt("sort_order"))
+                            .menuCount(rs.getInt("menu_count"))
                             .build();
                     categories.add(category);
                 }

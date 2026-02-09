@@ -151,4 +151,34 @@ public class NewMenuRepository implements MenuRepository {
         }
         return menus;
     }
+
+    @Override
+    public Menu findById(Long id) {
+        String sql = "SELECT * FROM menus WHERE id = ?";
+
+        try (Connection conn = dataSource.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setLong(1, id);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return Menu.builder()
+                            .id(rs.getLong("id"))
+                            .korName(rs.getString("kor_name"))
+                            .engName(rs.getString("eng_name"))
+                            .price(rs.getInt("price"))
+                            .categoryId(rs.getLong("category_id"))
+                            .description(rs.getString("description"))
+                            .isAvailable(rs.getBoolean("is_available"))
+                            .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                            .updatedAt(rs.getTimestamp("updated_at").toLocalDateTime())
+                            .build();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

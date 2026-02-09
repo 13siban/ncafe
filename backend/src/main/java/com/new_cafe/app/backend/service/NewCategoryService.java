@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.new_cafe.app.backend.dto.CategoryResponse;
 import com.new_cafe.app.backend.entity.Category;
 import com.new_cafe.app.backend.repository.CategoryRepository;
 
@@ -16,8 +17,8 @@ public class NewCategoryService implements CategoryService {
     }
 
     @Override
-    public List<Category> getAll() {
-        List<Category> list = categoryRepository.findAll();
+    public List<CategoryResponse> getAll() {
+        List<CategoryResponse> list = categoryRepository.findAllWithMenuCount();
         return list;
     }
 

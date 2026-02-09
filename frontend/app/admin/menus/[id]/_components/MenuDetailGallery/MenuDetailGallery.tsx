@@ -1,17 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { MenuImage } from '@/types/menu';
 import styles from './MenuDetailGallery.module.css';
+import { useMenuImages } from './useMenuImages';
 
 interface MenuDetailGalleryProps {
-  images: MenuImage[];
-  korName: string;
+  menuID: number;
 }
 
-export const MenuDetailGallery = ({ images, korName }: MenuDetailGalleryProps) => {
-  const [selectedImage, setSelectedImage] = useState<MenuImage | null>(
-    images.find(img => img.isPrimary) || images[0] || null
-  );
+export const MenuDetailGallery = ({ menuID }: MenuDetailGalleryProps) => {
+  const { images, korName, isLoading, error } = useMenuImages(menuID);
+  const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
+
+  // 이미지 목록이 로드되면 첫 번째 이미지를 선택
+  useEffect(() => {
+    if (images.length > 0 && selectedImageId === null) {
+      setSelectedImageId(images[0].id);
+    }
+  }, [images, selectedImageId]);
+
+  if (isLoading) return <div className={styles.emptyContainer}>로딩 중...</div>;
+  if (error) return <div className={styles.emptyContainer}>{error}</div>;
+
+  const selectedImage = images.find(img => img.id === selectedImageId) || images[0];
 
   if (!selectedImage) {
     return (
@@ -21,18 +31,25 @@ export const MenuDetailGallery = ({ images, korName }: MenuDetailGalleryProps) =
     );
   }
 
+  // 백엔드 서버 주소를 포함한 전체 이미지 URL 반환
+  const getImageUrl = (srcUrl: string) => {
+    if (!srcUrl) return '';
+    if (srcUrl.startsWith('http')) return srcUrl;
+    return `http://localhost:8080/${srcUrl}`;
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.mainImageWrapper}>
          <Image 
-            src={selectedImage.url} 
-            alt={korName} 
+            src={getImageUrl(selectedImage.srcUrl)} 
+            alt={selectedImage.altText || "메뉴 이미지"} 
             fill
             className={styles.mainImage}
             sizes="(max-width: 768px) 100vw, 50vw"
             priority
          />
-         {selectedImage.isPrimary && <span className={styles.primaryBadge}>대표</span>}
+         {selectedImage.sortOrder === 1 && <span className={styles.primaryBadge}>대표</span>}
       </div>
       
       {images.length > 1 && (
@@ -41,15 +58,16 @@ export const MenuDetailGallery = ({ images, korName }: MenuDetailGalleryProps) =
             <button 
               key={img.id} 
               className={`${styles.thumbnailButton} ${selectedImage.id === img.id ? styles.active : ''}`}
-              onClick={() => setSelectedImage(img)}
+              onClick={() => setSelectedImageId(img.id)}
             >
               <Image 
-                src={img.url} 
-                alt={`${korName} thumbnail`} 
+                src={getImageUrl(img.srcUrl)} 
+                alt={img.altText || "썸네일"} 
                 width={80} 
                 height={80} 
                 className={styles.thumbnailImage}
               />
+              <div className={styles.overlay} />
             </button>
           ))}
         </div>
@@ -57,3 +75,4 @@ export const MenuDetailGallery = ({ images, korName }: MenuDetailGalleryProps) =
     </div>
   );
 };
+

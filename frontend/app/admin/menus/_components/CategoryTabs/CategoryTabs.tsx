@@ -40,6 +40,9 @@ export default function CategoryTabs(
 
 
 
+  // 전체 메뉴 개수 합산
+  const totalCount = categories.reduce((sum, cat) => sum + (cat.menuCount || 0), 0);
+
   return (
     <div className={styles.tabsContainer}>
       <div className={styles.tabsList} role="tablist">
@@ -51,6 +54,7 @@ export default function CategoryTabs(
           onClick={() => onSelect(null)}
         >
           <span>전체</span>
+          <span className={styles.tabCount}>{totalCount}</span>
         </button>
 
         {/* 카테고리 탭들 */}
@@ -64,6 +68,7 @@ export default function CategoryTabs(
           >
             {category.icon && <span className={styles.tabIcon}>{category.icon}</span>}
             <span>{category.name}</span>
+            <span className={styles.tabCount}>{category.menuCount}</span>
           </button>
         ))}
       </div>
