@@ -23,7 +23,7 @@ export const useMenuDetail = (id: number) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`http://localhost:8080/admin/menus/${id}`);
+      const response = await fetch(`/api/admin/menus/${id}`);
       if (!response.ok) {
         throw new Error('메뉴 정보를 불러오는데 실패했습니다.');
       }

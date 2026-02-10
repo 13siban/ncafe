@@ -12,7 +12,7 @@ export default function MenusPage() {
     useEffect(() => {
         // http://localhost:8080/admin/menus
         const fetchMenus = async () => {
-            const url = new URL("http://localhost:8080/admin/menus");
+            const url = new URL('/api/admin/menus', window.location.origin);
             const params = url.searchParams;
             if (category) {
                 params.set("cid", category.id);

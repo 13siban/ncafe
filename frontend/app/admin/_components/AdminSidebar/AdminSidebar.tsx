@@ -41,8 +41,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen = true, onClo
     const fetchData = async () => {
       try {
         const [menusRes, catsRes] = await Promise.all([
-          fetch('http://localhost:8080/admin/menus'),
-          fetch('http://localhost:8080/admin/categories')
+          fetch('/api/admin/menus'),
+          fetch('/api/admin/categories')
         ]);
 
         if (menusRes.ok) {

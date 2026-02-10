@@ -35,7 +35,7 @@ export const MenuDetailGallery = ({ menuID }: MenuDetailGalleryProps) => {
   const getImageUrl = (srcUrl: string) => {
     if (!srcUrl) return '';
     if (srcUrl.startsWith('http')) return srcUrl;
-    return `http://localhost:8080/${srcUrl}`;
+    return `/images/${srcUrl}`;
   };
 
   return (

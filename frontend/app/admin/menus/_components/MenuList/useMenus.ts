@@ -38,7 +38,7 @@ export const useMenus = ({ categoryId, searchQuery }: MenuListRequest) => {
       setIsLoading(true);
       setError(null);
 
-      const url = new URL('http://localhost:8080/admin/menus');
+      const url = new URL('/api/admin/menus', window.location.origin);
 
       const params = url.searchParams;
       if (categoryId !== null) {

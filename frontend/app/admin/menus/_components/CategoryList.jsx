@@ -8,7 +8,7 @@ export default function CategoryList({ onActiveCategory }) {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await fetch('http://localhost:8080/admin/categories');
+                const response = await fetch('/api/admin/categories');
                 const data = await response.json();
                 console.log(data);
                 setCategories(data);

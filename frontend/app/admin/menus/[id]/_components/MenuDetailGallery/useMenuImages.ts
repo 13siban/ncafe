@@ -27,7 +27,7 @@ export const useMenuImages = (menuId: number) => {
     setError(null);
     
     try {
-      const response = await fetch(`http://localhost:8080/admin/menus/${menuId}/menu-images`);
+      const response = await fetch(`/api/admin/menus/${menuId}/menu-images`);
       if (!response.ok) {
         throw new Error('메뉴 이미지를 불러오는데 실패했습니다.');
       }

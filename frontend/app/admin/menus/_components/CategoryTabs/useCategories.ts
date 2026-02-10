@@ -28,7 +28,7 @@ export const useCategories = () => {
             setError(null);
 
             try {
-                const response = await fetch('http://localhost:8080/admin/categories');
+                const response = await fetch('/api/admin/categories');
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);

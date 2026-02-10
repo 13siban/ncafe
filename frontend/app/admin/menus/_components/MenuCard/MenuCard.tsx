@@ -72,7 +72,7 @@ export const MenuCard: React.FC<MenuCardProps & {
       >
         {imageSrc ? (
           <Image
-            src={"http://localhost:8080/"+imageSrc}
+            src={`/images/${imageSrc}`}
             alt={menu.korName}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
