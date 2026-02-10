@@ -1,78 +1,111 @@
 /* app/admin/menus/_components/CategoryTabs/CategoryTabs.module.css */
 
 .tabsContainer {
-  position: relative;
-  margin-bottom: var(--space-6);
+  width: 260px; /* Increased width to accommodate larger text */
+  flex-shrink: 0;
+  margin-right: 40px; /* Space between tabs and menu list */
+  margin-bottom: 0;
 }
 
 .tabsList {
   display: flex;
-  gap: var(--space-2);
-  overflow-x: auto;
-  padding-bottom: var(--space-2);
-  scrollbar-width: none;
+  flex-direction: column; /* Vertical layout */
+  gap: var(--space-2); /* Increased gap for larger items */
+  padding-bottom: 0;
 }
 
-.tabsList::-webkit-scrollbar {
-  display: none;
+/* Header Style */
+.header {
+  margin-bottom: 40px;
 }
 
+.title {
+  font-size: 14px;
+  color: #c5a47e; /* Gold color */
+  font-weight: 600;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  font-family: serif;
+  font-size: 56px; /* Increased from 48px */
+  font-weight: 400;
+  color: #1a1a1a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+
+/* Tab Item Style - Mimic Checkbox List */
 .tab {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-5);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--color-gray-500);
-  background-color: transparent;
-  border: 1px solid var(--color-gray-200);
-  border-radius: var(--radius-full);
-  white-space: nowrap;
-  transition: all var(--transition-fast);
+  gap: 16px; /* Increased gap */
+  padding: 8px 0; /* Add some vertical padding */
+  background: none;
+  border: none;
   cursor: pointer;
+  width: 100%;
+  text-align: left;
 }
 
-.tab:hover {
-  color: var(--color-gray-700);
-  background-color: var(--color-gray-100);
-}
-
-.tabActive {
-  color: var(--color-primary-700);
-  background-color: var(--color-primary-50);
-  border-color: var(--color-primary-200);
-}
-
-.tabActive:hover {
-  color: var(--color-primary-700);
-  background-color: var(--color-primary-100);
-}
-
-.tabIcon {
-  font-size: var(--text-base);
-}
-
-.tabCount {
+.checkbox {
+  width: 32px; /* Increased from 24px */
+  height: 32px; /* Increased from 24px */
+  border: 1px solid #e5e5e5;
+  border-radius: 6px; /* Slightly larger radius */
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 20px;
-  min-width: 20px;
-  padding: 0 var(--space-1);
-  background-color: var(--color-gray-100);
-  border-radius: var(--radius-full);
-  font-size: 10px;
-  font-weight: var(--font-bold);
-  color: var(--color-gray-500);
-  border: 1px solid var(--color-gray-200);
-  transition: all var(--transition-fast);
+  transition: all 0.2s;
+  flex-shrink: 0;
+  color: transparent;
+}
+
+.tab:hover .checkbox {
+  border-color: #c5a47e;
+}
+
+.tabActive .checkbox {
+  border-color: #c5a47e;
+  background-color: #fdf8f6; /* Subtle glow */
+  color: #c5a47e;
+}
+
+.tabText {
+  font-size: var(--text-xl); /* Requested size */
+  font-weight: 700; /* Bolder for larger size */
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tabActive .tabText {
+  color: #1a1a1a;
+}
+
+/* Icon and Count - Scaled up */
+.tabIcon {
+  font-size: 18px; /* Increased from 16px */
+  color: #666;
+  width: 28px;
+  line-height: -1;
+  display: flex;
+  justify-content: center;
+}
+
+.tabCount {
+  margin-left: auto;
+  font-size: 16px; /* Increased from 12px */
+  color: #999;
+  font-weight: 500;
 }
 
 .tabActive .tabCount {
-  background-color: var(--color-primary-100);
-  color: var(--color-primary-600);
-  border-color: var(--color-primary-200);
+  color: #c5a47e;
+  font-weight: 700;
 }
 
 /* Loading & Error States */
@@ -81,10 +114,4 @@
   padding: var(--space-4);
   font-size: var(--text-sm);
   color: var(--color-gray-500);
-  text-align: center;
 }
-
-.errorState {
-  color: var(--color-red-500);
-}
-

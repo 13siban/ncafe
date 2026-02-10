@@ -17,7 +17,7 @@ interface MenuListProps {
     // viewMode: ViewMode;
 }
 
-const ITEMS_PER_PAGE = 8;
+const ITEMS_PER_PAGE = 9;
 
 
 export const MenuList = ({
@@ -99,16 +99,6 @@ export const MenuList = ({
         <div className={styles.container}>
             {menus.length > 0 ? (
                 <div className={viewMode === 'grid' ? styles.grid : styles.list}>
-                    {/* {menus.map((menu) => (
-                        <div key={menu.id}>
-                            <div>{menu.korName}</div>
-                            <div>{menu.engName}</div>
-                            <p style={{ color: 'gray', fontSize: '10px' }}>{`<${menu.categoryName}>`}</p>
-                            <p style={{ color: 'gray', fontSize: '10px' }}>{menu.description}</p>
-                            <div>{menu.price}</div>
-                            <div>{menu.isAvailable}</div>
-                        </div>
-                    ))} */}
                     {paginatedMenus.map((menu) => (
                         <MenuCard
                             key={menu.id}

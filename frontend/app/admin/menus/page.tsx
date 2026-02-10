@@ -22,24 +22,25 @@ export default function MenusPage() {
 
   return (
     <main className={styles.container}>
-      {/* 상단 액션 바 */}
-      <MenuActionBar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
-      
-      {/* 카테고리 탭 */}
+      {/* 카테고리 탭 (사이드바) */}
       <CategoryTabs
         selected={selectedCategory}
         onSelect={setSelectedCategory}
       />
 
-      {/* 메뉴 목록 */}
-      {/* 셀렉트카테고리 property를MenuList로 전달 */}
-      <MenuList
-        selectedCategory={selectedCategory}
-        searchQuery={searchQuery}
-      />
+      <div style={{ flex: 1 }}>
+        {/* 상단 액션 바 */}
+        <MenuActionBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
+
+        {/* 메뉴 목록 */}
+        <MenuList
+          selectedCategory={selectedCategory}
+          searchQuery={searchQuery}
+        />
+      </div>
     </main>
   );
 }

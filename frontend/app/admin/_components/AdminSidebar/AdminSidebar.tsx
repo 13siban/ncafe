@@ -10,7 +10,6 @@ import {
   ShoppingBag, 
   Settings, 
   LogOut,
-  ChevronRight
 } from 'lucide-react';
 import styles from './AdminSidebar.module.css';
 
@@ -32,27 +31,18 @@ interface AdminSidebarProps {
   onClose?: () => void;
 }
 
-export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen = true, onClose }) => {
+  export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen = true, onClose }) => {
   const pathname = usePathname();
   const [menuCount, setMenuCount] = React.useState<number>(0);
-  const [categories, setCategories] = React.useState<any[]>([]);
 
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const [menusRes, catsRes] = await Promise.all([
-          fetch('/api/admin/menus'),
-          fetch('/api/admin/categories')
-        ]);
+        const menusRes = await fetch('/api/admin/menus');
 
         if (menusRes.ok) {
           const menus = await menusRes.json();
           setMenuCount(menus.length);
-        }
-
-        if (catsRes.ok) {
-          const cats = await catsRes.json();
-          setCategories(cats);
         }
       } catch (error) {
         console.error('Sidebar data fetch error:', error);
@@ -69,10 +59,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen = true, onClo
       href: '/admin/menus', 
       icon: <UtensilsCrossed size={20} />, 
       badge: menuCount > 0 ? menuCount : undefined,
-      subItems: categories.map(cat => ({
-        label: cat.name || cat.korName,
-        href: `/admin/menus?cid=${cat.id}`
-      }))
     },
     { label: '주문 관리', href: '/admin/orders', icon: <ShoppingBag size={20} /> },
   ];
@@ -127,30 +113,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen = true, onClo
                     <span className={styles.navIcon}>{item.icon}</span>
                     <span>{item.label}</span>
                     {item.badge && <span className={styles.navBadge}>{item.badge}</span>}
-                    {item.subItems && item.subItems.length > 0 && (
-                      <ChevronRight 
-                        size={16} 
-                        className={`${styles.chevron} ${isBaseActive(item.href) ? styles.chevronOpen : ''}`} 
-                      />
-                    )}
                   </Link>
-                  
-                  {/* Submenu for categories */}
-                  {item.subItems && item.subItems.length > 0 && isBaseActive(item.href) && (
-                    <ul className={styles.subList}>
-                      {item.subItems.map((sub) => (
-                        <li key={sub.href}>
-                          <Link
-                            href={sub.href}
-                            className={`${styles.subItem} ${pathname === sub.href ? styles.subItemActive : ''}`}
-                            onClick={onClose}
-                          >
-                            {sub.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
                 </li>
               ))}
             </ul>

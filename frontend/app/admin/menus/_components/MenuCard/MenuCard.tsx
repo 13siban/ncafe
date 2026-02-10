@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Edit2, Trash2, Eye, GripVertical, UtensilsCrossed } from 'lucide-react';
+import { Edit2, Trash2, Eye, UtensilsCrossed } from 'lucide-react';
 import styles from './MenuCard.module.css';
 import { MenuResponse } from '../MenuList/useMenus';
 
@@ -14,23 +14,18 @@ interface MenuCardProps {
   onDelete?: (menuId: number) => void;
 }
 
-export const MenuCard: React.FC<MenuCardProps & { 
-  dragAttributes?: any; 
-  dragListeners?: any; 
-}> = ({
+export const MenuCard = ({
   menu,
   onAvailableToggle,
   onDelete,
-  dragAttributes,
-  dragListeners,
-}) => {
+}: MenuCardProps) => {
   const router = useRouter();
   
   const imageSrc = menu?.imageSrc || '';
 
   const formatPrice = (price: number) => {
-    if (price === undefined || price === null) return '0원';
-    return new Intl.NumberFormat('ko-KR').format(price) + '원';
+    const formatted = new Intl.NumberFormat('ko-KR').format(price || 0);
+    return `₩\u00A0\u00A0${formatted}\u00A0\u00A0KRW`;
   };
 
   const handleToggle = (e: React.MouseEvent) => {
@@ -95,21 +90,12 @@ export const MenuCard: React.FC<MenuCardProps & {
             <span className={`${styles.badge} ${styles.hiddenBadge}`}>숨김</span>
           )}
         </div>
+        
+
 
         {/* Action Buttons */}
         <div className={styles.actions}>
-          {dragAttributes && dragListeners && (
-            <button
-              className={`${styles.actionButton} ${styles.dragHandle}`}
-              {...dragAttributes}
-              {...dragListeners}
-              title="순서 변경"
-              onClick={(e) => e.preventDefault()}
-              style={{ cursor: 'grab', touchAction: 'none' }}
-            >
-              <GripVertical size={18} />
-            </button>
-          )}
+
           <Link
             href={`/admin/menus/${menu.id}`}
             className={styles.actionButton}
@@ -138,15 +124,17 @@ export const MenuCard: React.FC<MenuCardProps & {
 
       {/* Content Section */}
       <div className={styles.content}>
-        <div className={styles.header}>
+        <div className={styles.infoBlock}>
           <div className={styles.names}>
             <h3 className={styles.korName}>{menu.korName}</h3>
             <p className={styles.engName}>{menu.engName}</p>
           </div>
-          <span className={styles.price}>{formatPrice(menu.price)}</span>
+          <p className={styles.description}>{menu.description}</p>
         </div>
         
-        <p className={styles.description}>{menu.description}</p>
+        <div className={styles.priceRow}>
+          <span className={styles.price}>{formatPrice(menu.price)}</span>
+        </div>
 
         {/* Footer */}
         <div className={styles.footer}>

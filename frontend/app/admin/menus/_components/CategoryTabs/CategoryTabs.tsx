@@ -2,62 +2,59 @@
 
 import React from 'react';
 import { useState } from 'react';
+import { Check } from 'lucide-react';
 import { useCategories } from './useCategories';
 import styles from './CategoryTabs.module.css';
-
 
 export default function CategoryTabs(
   { selected, onSelect } : { 
     selected: number | null;
     onSelect: (categoryId: number | null) => void;
   }
-
 ) {
-  console.log('[CategoryTabs] Props로 받은 selectedCategory:', selected);
-
   const { categories, isLoading, error } = useCategories();
-  // const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  // let [selectCategory, setSelectCategory] = useState<number | null>(null);
 
-
-  // 로딩 상태
   if (isLoading) {
     return (
-      <div className={styles.tabsContainer}>
-        <div className={styles.loadingState}>카테고리 로딩 중...</div>
-      </div>
+      <aside className={styles.tabsContainer}>
+        <div className={styles.loadingState}>Loading...</div>
+      </aside>
     );
   }
 
-  // 에러 상태
   if (error) {
     return (
-      <div className={styles.tabsContainer}>
-        <div className={styles.errorState}>카테고리 로딩 실패</div>
-      </div>
+      <aside className={styles.tabsContainer}>
+        <div className={styles.errorState}>Failed to load categories</div>
+      </aside>
     );
   }
 
-
-
-  // 전체 메뉴 개수 합산
-  const totalCount = categories.reduce((sum, cat) => sum + (cat.menuCount || 0), 0);
-
   return (
-    <div className={styles.tabsContainer}>
+    <aside className={styles.tabsContainer}>
+      <div className={styles.header}>
+        <h3 className={styles.title}>OUR COFFEE</h3>
+        <h1 className={styles.subtitle}>Menu</h1>
+      </div>
+
       <div className={styles.tabsList} role="tablist">
-        {/* 전체 탭 */}
+        {/* ALL Tab */}
         <button
           role="tab"
           aria-selected={selected === null}
           className={`${styles.tab} ${selected === null ? styles.tabActive : ''}`}
           onClick={() => onSelect(null)}
         >
-          <span>전체</span>
-          <span className={styles.tabCount}>{totalCount}</span>
+          <div className={styles.checkbox}>
+            <Check size={16} strokeWidth={3} />
+          </div>
+          <span className={styles.tabText}>전체</span>
+          <span className={styles.tabCount}>
+            {categories.reduce((acc, cat) => acc + (cat.menuCount || 0), 0)}
+          </span>
         </button>
 
-        {/* 카테고리 탭들 */}
+        {/* Categories */}
         {categories.map((category) => (
           <button
             key={category.id}
@@ -66,13 +63,16 @@ export default function CategoryTabs(
             className={`${styles.tab} ${selected === category.id ? styles.tabActive : ''}`}
             onClick={() => onSelect(category.id)}
           >
+            <div className={styles.checkbox}>
+              <Check size={16} strokeWidth={3} />
+            </div>
+            <span className={styles.tabText}>{category.name}</span>
             {category.icon && <span className={styles.tabIcon}>{category.icon}</span>}
-            <span>{category.name}</span>
-            <span className={styles.tabCount}>{category.menuCount}</span>
+            <span className={styles.tabCount}>{category.menuCount || 0}</span>
           </button>
         ))}
       </div>
-    </div>
+    </aside>
   );
 }
 
