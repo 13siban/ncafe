@@ -28,7 +28,7 @@ export default function MenusPage() {
         onSelect={setSelectedCategory}
       />
 
-      <div style={{ flex: 1 }}>
+      <div className={styles.contentArea}>
         {/* 상단 액션 바 */}
         <MenuActionBar
           searchQuery={searchQuery}

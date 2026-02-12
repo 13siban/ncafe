@@ -1,16 +1,23 @@
 /* app/admin/menus/_components/CategoryTabs/CategoryTabs.module.css */
 
 .tabsContainer {
-  width: 260px; /* Increased width to accommodate larger text */
+  width: 260px;
+  /* Increased width to accommodate larger text */
   flex-shrink: 0;
-  margin-right: 40px; /* Space between tabs and menu list */
+  margin-right: 40px;
+  /* Space between tabs and menu list */
   margin-bottom: 0;
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-6));
+  height: fit-content;
 }
 
 .tabsList {
   display: flex;
-  flex-direction: column; /* Vertical layout */
-  gap: var(--space-2); /* Increased gap for larger items */
+  flex-direction: column;
+  /* Vertical layout */
+  gap: var(--space-2);
+  /* Increased gap for larger items */
   padding-bottom: 0;
 }
 
@@ -21,7 +28,8 @@
 
 .title {
   font-size: 14px;
-  color: #c5a47e; /* Gold color */
+  color: #c5a47e;
+  /* Gold color */
   font-weight: 600;
   letter-spacing: 2px;
   margin-bottom: 8px;
@@ -30,7 +38,8 @@
 
 .subtitle {
   font-family: serif;
-  font-size: 56px; /* Increased from 48px */
+  font-size: 56px;
+  /* Increased from 48px */
   font-weight: 400;
   color: #1a1a1a;
   margin: 0;
@@ -42,8 +51,10 @@
 .tab {
   display: flex;
   align-items: center;
-  gap: 16px; /* Increased gap */
-  padding: 8px 0; /* Add some vertical padding */
+  gap: 16px;
+  /* Increased gap */
+  padding: 8px 0;
+  /* Add some vertical padding */
   background: none;
   border: none;
   cursor: pointer;
@@ -52,10 +63,13 @@
 }
 
 .checkbox {
-  width: 32px; /* Increased from 24px */
-  height: 32px; /* Increased from 24px */
+  width: 32px;
+  /* Increased from 24px */
+  height: 32px;
+  /* Increased from 24px */
   border: 1px solid #e5e5e5;
-  border-radius: 6px; /* Slightly larger radius */
+  border-radius: 6px;
+  /* Slightly larger radius */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -70,13 +84,16 @@
 
 .tabActive .checkbox {
   border-color: #c5a47e;
-  background-color: #fdf8f6; /* Subtle glow */
+  background-color: #fdf8f6;
+  /* Subtle glow */
   color: #c5a47e;
 }
 
 .tabText {
-  font-size: var(--text-xl); /* Requested size */
-  font-weight: 700; /* Bolder for larger size */
+  font-size: var(--text-xl);
+  /* Requested size */
+  font-weight: 700;
+  /* Bolder for larger size */
   color: #1a1a1a;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -88,7 +105,8 @@
 
 /* Icon and Count - Scaled up */
 .tabIcon {
-  font-size: 18px; /* Increased from 16px */
+  font-size: 18px;
+  /* Increased from 16px */
   color: #666;
   width: 28px;
   line-height: -1;
@@ -98,7 +116,8 @@
 
 .tabCount {
   margin-left: auto;
-  font-size: 16px; /* Increased from 12px */
+  font-size: 16px;
+  /* Increased from 12px */
   color: #999;
   font-weight: 500;
 }

@@ -108,7 +108,7 @@
 /* Grid View */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, max(260px));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 260px));
   gap: 30px;
   /* Vertical 80px, Horizontal 60px */
 }
