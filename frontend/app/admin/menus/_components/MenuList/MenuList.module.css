@@ -108,8 +108,9 @@
 /* Grid View */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 30px; /* Vertical 80px, Horizontal 60px */
+  grid-template-columns: repeat(auto-fill, max(260px));
+  gap: 30px;
+  /* Vertical 80px, Horizontal 60px */
 }
 
 /* List View */
@@ -175,6 +176,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -210,12 +212,12 @@
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .toolbar {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .searchContainer {
     max-width: none;
   }

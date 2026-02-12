@@ -8,14 +8,15 @@
 .mainContent {
   flex: 1;
   margin-left: var(--sidebar-width);
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-primary);
   min-height: 100vh;
   transition: margin-left var(--transition-base);
 }
 
 .pageContent {
   padding: var(--space-6);
-  max-width: 1400px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 @media (max-width: 768px) {
