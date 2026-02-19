@@ -5,7 +5,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: ncafe-backend
+    container_name: young-ncafe-backend
     ports:
       - "8031:8031"  # 외부 8031 -> 내부 8031
     environment:
@@ -21,7 +21,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: ncafe-frontend
+    container_name: young-ncafe-frontend
     ports:
       - "3031:3031"
     environment:
