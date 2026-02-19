@@ -19,7 +19,7 @@ export default function MenusPage() {
     console.log('MenusPage');
 
     useEffect(() => {
-        // http://localhost:8080/admin/menus
+        // http://localhost:8031/admin/menus
         const fetchMenus = async () => {
 
             const url = new URL('/api/admin/menus', window.location.origin);
@@ -31,14 +31,14 @@ export default function MenusPage() {
 
             const response = await fetch(url);
             const data = await response.json();
-            
+
             // 배열이 아닐때 예외처리
             if (!Array.isArray(data)) {
                 console.error("패치데이터가 배열이 아님:", data);
                 setMenus([]); // 안전하게 빈 배열로 초기화
                 return;
             }
-            
+
             // 정상실행
             setMenus(data);
         };
@@ -57,8 +57,8 @@ export default function MenusPage() {
 
     return (
         <main>
-            <CategoryList onActiveCategory={handleCategoryChange}/>
-            
+            <CategoryList onActiveCategory={handleCategoryChange} />
+
             <p>선택된 카테고리 ID: {category}</p>
 
             <section>

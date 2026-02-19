@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ncafe-backend
+    ports:
+      - "8031:8031"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    volumes:
+      - /home/young/dist/ncafe/upload:/app/upload
+    networks:
+      - ncafe-network
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ncafe-frontend
+    ports:
+      - "3031:3031"
+    environment:
+      - BACKEND_URL=http://backend:8031
+      - PORT=3031
+      - HOSTNAME=0.0.0.0
+    depends_on:
+      - backend
+    networks:
+      - ncafe-network
+    restart: always
+
+networks:
+  ncafe-network:
+    driver: bridge
