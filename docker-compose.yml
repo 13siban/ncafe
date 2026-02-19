@@ -1,11 +1,12 @@
 version: '3.8'
+name: young-ncafe
 
 services:
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: young-ncafe-backend
+    # container_name: young-ncafe-backend (removed for automatic naming)
     ports:
       - "8031:8031"  # 외부 8031 -> 내부 8031
     environment:
@@ -21,7 +22,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: young-ncafe-frontend
+    # container_name: young-ncafe-frontend (removed for automatic naming)
     ports:
       - "3031:3031"
     environment:
