@@ -15,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Column;
+import jakarta.persistence.Transient;
 
 @Data
 @Builder
@@ -36,8 +37,7 @@ public class Menu {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id", insertable = false, updatable = false)
+    @Transient
     private Category category;
 
 }
