@@ -11,10 +11,7 @@ services:
       - "8031:8031" # 외부 8031 -> 내부 8031
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SERVER_PORT=8031
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/ncafedb
-      - SPRING_DATASOURCE_USERNAME=ncafe
-      - SPRING_DATASOURCE_PASSWORD=1234
+      - SERVER_PORT=8031 # [추가] 스프링 내부 포트를 8031로 강제 지정
     volumes:
       - /home/young/dist/ncafe/upload:/app/upload
     networks:
