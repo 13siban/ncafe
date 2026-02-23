@@ -3,13 +3,15 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  Coffee, 
-  LayoutDashboard, 
-  UtensilsCrossed, 
-  ShoppingBag, 
-  Settings, 
+import {
+  Coffee,
+  LayoutDashboard,
+  UtensilsCrossed,
+  ShoppingBag,
+  Settings,
   LogOut,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import styles from './AdminSidebar.module.css';
 
@@ -29,9 +31,16 @@ const settingsNavItems: NavItem[] = [
 interface AdminSidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
-  export const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen = true, onClose }) => {
+export const AdminSidebar: React.FC<AdminSidebarProps> = ({
+  isOpen = true,
+  onClose,
+  isCollapsed = false,
+  onToggleCollapse
+}) => {
   const pathname = usePathname();
   const [menuCount, setMenuCount] = React.useState<number>(0);
 
@@ -54,10 +63,10 @@ interface AdminSidebarProps {
 
   const navItems = [
     { label: '대시보드', href: '/admin', icon: <LayoutDashboard size={20} /> },
-    { 
-      label: '메뉴 관리', 
-      href: '/admin/menus', 
-      icon: <UtensilsCrossed size={20} />, 
+    {
+      label: '메뉴 관리',
+      href: '/admin/menus',
+      icon: <UtensilsCrossed size={20} />,
       badge: menuCount > 0 ? menuCount : undefined,
     },
     { label: '주문 관리', href: '/admin/orders', icon: <ShoppingBag size={20} /> },
@@ -79,13 +88,22 @@ interface AdminSidebarProps {
   return (
     <>
       {/* Mobile Overlay */}
-      <div 
+      <div
         className={`${styles.overlay} ${isOpen ? styles.overlayVisible : ''}`}
         onClick={onClose}
       />
-      
+
       {/* Sidebar */}
-      <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}>
+      <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''} ${isCollapsed ? styles.sidebarCollapsed : ''}`}>
+        {/* Collapse Toggle Button (Desktop) */}
+        <button
+          className={styles.collapseButton}
+          onClick={onToggleCollapse}
+          aria-label={isCollapsed ? "사이드바 펼치기" : "사이드바 접기"}
+        >
+          {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+        </button>
+
         {/* Logo */}
         <div className={styles.logo}>
           <div className={styles.logoIcon}>

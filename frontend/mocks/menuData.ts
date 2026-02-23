@@ -3,11 +3,11 @@ import { Menu, MenuCategory } from '@/types/menu';
 
 export const categories: MenuCategory[] = [
   { id: 0, korName: '전체', engName: 'All', sortOrder: 0 },
-  { id: 1, korName: '커피', engName: 'Coffee', icon: '☕', sortOrder: 1 },
-  { id: 2, korName: '음료', engName: 'Beverage', icon: '🥤', sortOrder: 2 },
-  { id: 3, korName: '티', engName: 'Tea', icon: '🍵', sortOrder: 3 },
-  { id: 4, korName: '디저트', engName: 'Dessert', icon: '🍰', sortOrder: 4 },
-  { id: 5, korName: '베이커리', engName: 'Bakery', icon: '🥐', sortOrder: 5 },
+  { id: 1, korName: '커피', engName: 'Coffee', sortOrder: 1 },
+  { id: 2, korName: '음료', engName: 'Beverage', sortOrder: 2 },
+  { id: 3, korName: '티', engName: 'Tea', sortOrder: 3 },
+  { id: 4, korName: '디저트', engName: 'Dessert', sortOrder: 4 },
+  { id: 5, korName: '베이커리', engName: 'Bakery', sortOrder: 5 },
 ];
 
 export const menus: Menu[] = [

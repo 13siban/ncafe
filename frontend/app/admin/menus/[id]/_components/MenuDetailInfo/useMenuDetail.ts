@@ -8,7 +8,14 @@ export interface MenuDetailResponse {
   price: number;
   categoryName: string;
   isAvailable: boolean;
+  isOrderable: boolean;
   isSoldOut: boolean;
+  images?: Array<{
+    id: number;
+    srcUrl: string;
+    sortOrder: number;
+    altText?: string;
+  }>;
   createdAt: string;
   updatedAt: string;
 }

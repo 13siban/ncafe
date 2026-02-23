@@ -11,7 +11,8 @@ interface AdminLayoutProps {
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile
+  const [isCollapsed, setIsCollapsed] = useState(false); // Desktop
   const pathname = usePathname();
 
   const getPageConfig = (path: string) => {
@@ -31,7 +32,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     if (path.startsWith('/admin/menus/')) {
       const parts = path.split('/');
       // /admin/menus/[id]
-      if (parts.length === 4) { 
+      if (parts.length === 4) {
         return {
           title: '메뉴 상세',
           breadcrumbs: [{ label: '홈' }, { label: '메뉴 관리' }, { label: '메뉴 상세' }]
@@ -56,14 +57,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const closeSidebar = () => setSidebarOpen(false);
+  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
   return (
     <div className={styles.adminLayout}>
-      <AdminSidebar isOpen={sidebarOpen} onClose={closeSidebar} />
-      
+      <AdminSidebar
+        isOpen={sidebarOpen}
+        onClose={closeSidebar}
+        isCollapsed={isCollapsed}
+        onToggleCollapse={toggleCollapse}
+      />
+
       <div className={styles.mainContent}>
-        <AdminHeader 
-          onMenuClick={toggleSidebar} 
+        <AdminHeader
+          onMenuClick={isCollapsed ? toggleCollapse : toggleSidebar}
           title={title}
           breadcrumbs={breadcrumbs}
         />

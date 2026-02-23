@@ -25,7 +25,7 @@ export default function CategoryList({ onActiveCategory }) {
         <section>
             <h1>카테고리블록</h1>
             <div>
-                <button onClick={() => onActiveCategory?.(null)}>전체</button>
+                <button onClick={() => onActiveCategory?.(null)}>ALL</button>
                 {categories.map((category) => (
                     <button
                         key={category.id}

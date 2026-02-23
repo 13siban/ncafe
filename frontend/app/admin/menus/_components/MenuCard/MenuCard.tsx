@@ -10,7 +10,7 @@ import { MenuResponse } from '../MenuList/useMenus';
 
 interface MenuCardProps {
   menu: MenuResponse;
-  onAvailableToggle?: (menuId: number, isAvailable: boolean) => void;
+  onAvailableToggle?: (menuId: number, isOrderable: boolean) => void;
   onDelete?: (menuId: number) => void;
 }
 
@@ -20,7 +20,7 @@ export const MenuCard = ({
   onDelete,
 }: MenuCardProps) => {
   const router = useRouter();
-  
+
   const imageSrc = menu?.imageSrc || '';
 
   const formatPrice = (price: number) => {
@@ -31,7 +31,7 @@ export const MenuCard = ({
   const handleToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    onAvailableToggle?.(menu.id, !menu.isAvailable);
+    onAvailableToggle?.(menu.id, !menu.isOrderable);
   };
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -52,9 +52,9 @@ export const MenuCard = ({
   };
 
   return (
-    <div className={`${styles.menuCard} ${!menu.isAvailable ? styles.soldOutOverlay : ''}`}>
+    <div className={`${styles.menuCard} ${!menu.isOrderable ? styles.soldOutOverlay : ''}`}>
       {/* Image Section */}
-      <div 
+      <div
         className={styles.imageContainer}
         onClick={handleImageClick}
         role="button"
@@ -80,17 +80,17 @@ export const MenuCard = ({
             <UtensilsCrossed size={40} strokeWidth={1.5} />
           </div>
         )}
-        
+
         {/* Badges */}
         <div className={styles.badges}>
           {menu.isSoldOut && (
             <span className={`${styles.badge} ${styles.soldOutBadge}`}>품절</span>
           )}
-          {!menu.isAvailable && (
+          {!menu.isOrderable && (
             <span className={`${styles.badge} ${styles.hiddenBadge}`}>숨김</span>
           )}
         </div>
-        
+
 
 
         {/* Action Buttons */}
@@ -126,12 +126,12 @@ export const MenuCard = ({
       <div className={styles.content}>
         <div className={styles.infoBlock}>
           <div className={styles.names}>
-            <h3 className={styles.korName}>{menu.korName}</h3>
-            <p className={styles.engName}>{menu.engName}</p>
+            <h3 className={styles.engName}>{menu.engName}</h3>
+            <p className={styles.korName}>{menu.korName}</p>
           </div>
           <p className={styles.description}>{menu.description}</p>
         </div>
-        
+
         <div className={styles.priceRow}>
           <span className={styles.price}>{formatPrice(menu.price)}</span>
         </div>
@@ -146,9 +146,9 @@ export const MenuCard = ({
           <div className={styles.toggleWrapper}>
             <span className={styles.toggleLabel}>판매중</span>
             <button
-              className={`${styles.toggle} ${menu.isAvailable ? styles.toggleActive : ''}`}
+              className={`${styles.toggle} ${menu.isOrderable ? styles.toggleActive : ''}`}
               onClick={handleToggle}
-              aria-label={menu.isAvailable ? '숨김으로 변경' : '판매중으로 변경'}
+              aria-label={menu.isOrderable ? '숨김으로 변경' : '판매중으로 변경'}
             >
               <span className={styles.toggleThumb} />
             </button>

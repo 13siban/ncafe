@@ -12,4 +12,10 @@ import lombok.NoArgsConstructor;
 public class MenuListRequest {
     private Long categoryId;
     private String searchQuery;
+    
+    // 추가 파라미터
+    private Integer page;
+    private Integer size;
+    private String sortBy;
+    private Boolean onlyAvailable;
 }

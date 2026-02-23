@@ -1,174 +1,84 @@
 package com.new_cafe.app.backend.menu.adapter.out.persistence;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.DataSource;
-
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 import com.new_cafe.app.backend.menu.application.port.out.MenuRepositoryPort;
 import com.new_cafe.app.backend.menu.domain.model.Menu;
 
+import jakarta.persistence.criteria.Predicate;
+import lombok.RequiredArgsConstructor;
+
 @Repository
+@RequiredArgsConstructor
 public class MenuPersistenceAdapter implements MenuRepositoryPort {
 
-    private final DataSource dataSource;
-
-    public MenuPersistenceAdapter(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
+    private final MenuJpaRepository menuJpaRepository;
 
     @Override
     public List<Menu> findAll() {
-        return findAllByCategoryId(null);
+        return findPagedMenus(null, null, null, null, "sort_order", null);
     }
 
     @Override
     public List<Menu> findAllByCategoryId(Long categoryId) {
-        List<Menu> menus = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT * FROM menus");
-
-        if (categoryId != null) {
-            sql.append(" WHERE category_id = ?");
-        }
-
-        sql.append(" ORDER BY id ASC");
-
-        try (Connection conn = dataSource.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
-
-            if (categoryId != null) {
-                pstmt.setLong(1, categoryId);
-            }
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Menu menu = Menu.builder()
-                            .id(rs.getLong("id"))
-                            .korName(rs.getString("kor_name"))
-                            .engName(rs.getString("eng_name"))
-                            .price(rs.getInt("price"))
-                            .categoryId(rs.getLong("category_id"))
-                            .description(rs.getString("description"))
-                            .isAvailable(rs.getBoolean("is_available"))
-                            .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
-                            .updatedAt(rs.getTimestamp("updated_at").toLocalDateTime())
-                            .category(null)
-                            .build();
-                    menus.add(menu);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return menus;
+        return findPagedMenus(categoryId, null, null, null, "sort_order", null);
     }
 
     @Override
     public List<Menu> findAllByName(String name) {
-        List<Menu> menus = new ArrayList<>();
-        String sql = "SELECT * FROM menus ORDER BY id ASC";
-
-        try (Connection conn = dataSource.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql);
-                ResultSet rs = pstmt.executeQuery()) {
-
-            while (rs.next()) {
-                String keyword = rs.getString("kor_name");
-                if (keyword != null && keyword.contains(name)) {
-                    Menu menu = Menu.builder()
-                            .id(rs.getLong("id"))
-                            .korName(rs.getString("kor_name"))
-                            .engName(rs.getString("eng_name"))
-                            .price(rs.getInt("price"))
-                            .categoryId(rs.getLong("category_id"))
-                            .description(rs.getString("description"))
-                            .isAvailable(rs.getBoolean("is_available"))
-                            .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
-                            .updatedAt(rs.getTimestamp("updated_at").toLocalDateTime())
-                            .category(null)
-                            .build();
-                    menus.add(menu);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return menus;
+        return findPagedMenus(null, name, null, null, "sort_order", null);
     }
 
     @Override
     public List<Menu> findAllByCategoryAndSearchQuery(Long categoryId, String searchQuery) {
-        List<Menu> menus = new ArrayList<>();
-        String sql = "SELECT * FROM menus WHERE 1=1";
+        return findPagedMenus(categoryId, searchQuery, null, null, "sort_order", null);
+    }
 
-        if (categoryId != null)
-            sql += " AND category_id=" + categoryId;
+    @Override
+    public List<Menu> findPagedMenus(Long categoryId, String searchQuery, Integer page, Integer size, String sortBy, Boolean onlyAvailable) {
+        Specification<Menu> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
 
-        if (searchQuery != null && !searchQuery.isEmpty())
-            sql += " AND kor_name LIKE '%" + searchQuery + "%'";
-
-        sql += " ORDER BY id ASC";
-
-        try (Connection conn = dataSource.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Menu menu = Menu.builder()
-                            .id(rs.getLong("id"))
-                            .korName(rs.getString("kor_name"))
-                            .engName(rs.getString("eng_name"))
-                            .price(rs.getInt("price"))
-                            .categoryId(rs.getLong("category_id"))
-                            .description(rs.getString("description"))
-                            .isAvailable(rs.getBoolean("is_available"))
-                            .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
-                            .updatedAt(rs.getTimestamp("updated_at").toLocalDateTime())
-                            .category(null)
-                            .build();
-                    menus.add(menu);
-                }
+            if (categoryId != null) {
+                predicates.add(cb.equal(root.get("categoryId"), categoryId));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            if (searchQuery != null && !searchQuery.isEmpty()) {
+                predicates.add(cb.like(root.get("korName"), "%" + searchQuery + "%"));
+            }
+            if (Boolean.TRUE.equals(onlyAvailable)) {
+                predicates.add(cb.isTrue(root.get("isAvailable")));
+                predicates.add(cb.isFalse(root.get("isSoldOut")));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Sort sort = Sort.by(Sort.Direction.ASC, "sortOrder", "id");
+        if ("price_asc".equals(sortBy)) {
+            sort = Sort.by(Sort.Direction.ASC, "price");
+        } else if ("price_desc".equals(sortBy)) {
+            sort = Sort.by(Sort.Direction.DESC, "price");
+        } else if ("newest".equals(sortBy)) {
+            sort = Sort.by(Sort.Direction.DESC, "createdAt");
         }
-        return menus;
+
+        if (page != null && size != null) {
+            Pageable pageable = PageRequest.of(page - 1, size, sort);
+            return menuJpaRepository.findAll(spec, pageable).getContent();
+        } else {
+            return menuJpaRepository.findAll(spec, sort);
+        }
     }
 
     @Override
     public Menu findById(Long id) {
-        String sql = "SELECT * FROM menus WHERE id = ?";
-
-        try (Connection conn = dataSource.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setLong(1, id);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return Menu.builder()
-                            .id(rs.getLong("id"))
-                            .korName(rs.getString("kor_name"))
-                            .engName(rs.getString("eng_name"))
-                            .price(rs.getInt("price"))
-                            .categoryId(rs.getLong("category_id"))
-                            .description(rs.getString("description"))
-                            .isAvailable(rs.getBoolean("is_available"))
-                            .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
-                            .updatedAt(rs.getTimestamp("updated_at").toLocalDateTime())
-                            .build();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        return menuJpaRepository.findById(id).orElse(null);
     }
 }

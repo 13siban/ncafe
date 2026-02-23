@@ -7,7 +7,7 @@ import { useCategories } from './useCategories';
 import styles from './CategoryTabs.module.css';
 
 export default function CategoryTabs(
-  { selected, onSelect } : { 
+  { selected, onSelect }: {
     selected: number | null;
     onSelect: (categoryId: number | null) => void;
   }
@@ -48,7 +48,7 @@ export default function CategoryTabs(
           <div className={styles.checkbox}>
             <Check size={16} strokeWidth={3} />
           </div>
-          <span className={styles.tabText}>전체</span>
+          <span className={styles.tabText}>ALL</span>
           <span className={styles.tabCount}>
             {categories.reduce((acc, cat) => acc + (cat.menuCount || 0), 0)}
           </span>
@@ -67,7 +67,6 @@ export default function CategoryTabs(
               <Check size={16} strokeWidth={3} />
             </div>
             <span className={styles.tabText}>{category.name}</span>
-            {category.icon && <span className={styles.tabIcon}>{category.icon}</span>}
             <span className={styles.tabCount}>{category.menuCount || 0}</span>
           </button>
         ))}

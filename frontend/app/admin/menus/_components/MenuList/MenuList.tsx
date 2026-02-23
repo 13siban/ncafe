@@ -49,10 +49,10 @@ export const MenuList = ({
     /**
      * 메뉴 노출 상태 변경 핸들러
      */
-    const handleAvailableToggle = (menuId: number, isAvailable: boolean) => {
+    const handleAvailableToggle = (menuId: number, isOrderable: boolean) => {
         setMenus((prevMenus) =>
             prevMenus.map((menu) =>
-                menu.id === menuId ? { ...menu, isAvailable } : menu
+                menu.id === menuId ? { ...menu, isOrderable } : menu
             )
         );
         // TODO: 백엔드 API 호출하여 상태 동기화

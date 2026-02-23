@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 export interface CategoryResponseDto {
     id: number;
     name: string;
-    icon: string;
     menuCount: number;
 }
 
@@ -16,7 +15,7 @@ export interface CategoryListResponseDto {
 
 export const useCategories = () => {
 
-    
+
 
     const [categories, setCategories] = useState<CategoryResponseDto[]>([]);
     const [isLoading, setIsLoading] = useState(true);

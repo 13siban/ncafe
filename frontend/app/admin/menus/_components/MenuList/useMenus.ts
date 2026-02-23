@@ -15,7 +15,7 @@ export interface MenuResponse {
   price: number;
   categoryName: string;
   imageSrc: string;
-  isAvailable: boolean;
+  isOrderable: boolean;
   isSoldOut: boolean;
   sortOrder: number;
   createdAt: string;
@@ -50,11 +50,11 @@ export const useMenus = ({ categoryId, searchQuery }: MenuListRequest) => {
 
       try {
         const menusResponse = await fetch(url.toString());
-        
+
         if (!menusResponse.ok) {
           throw new Error('데이터 로드 중 오류가 발생했습니다.');
         }
-        
+
         const menusData: MenuListResponse = await menusResponse.json();
 
         if (!menusData || !Array.isArray(menusData.menus)) {
@@ -74,7 +74,6 @@ export const useMenus = ({ categoryId, searchQuery }: MenuListRequest) => {
         //       id: Number(cat.id),
         //       korName: cat.name || cat.korName || '',
         //       engName: cat.engName || '',
-        //       icon: cat.icon || '',
         //       sortOrder: cat.sortOrder || 0
         //     });
         //   });
@@ -83,7 +82,7 @@ export const useMenus = ({ categoryId, searchQuery }: MenuListRequest) => {
         // // 백엔드 데이터를 프론트엔드 Menu 타입에 맞게 매핑하면서 카테고리 정보 결합
         // const mappedMenus: MenuResponse[] = menusData.map((item: any) => {
         //   const catInfo = categoryMap.get(Number(item.categoryId));
-          
+
         //   return {
         //     id: String(item.id),
         //     korName: item.korName || '',

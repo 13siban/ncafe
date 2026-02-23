@@ -30,9 +30,9 @@
   font-size: 14px;
   color: #c5a47e;
   /* Gold color */
-  font-weight: 600;
-  letter-spacing: 2px;
-  margin-bottom: 8px;
+  font-weight: var(--font-semithin);
+  letter-spacing: 1px;
+  margin-bottom: 30px;
   text-transform: uppercase;
 }
 
@@ -40,7 +40,7 @@
   font-family: serif;
   font-size: 56px;
   /* Increased from 48px */
-  font-weight: 400;
+  font-weight: var(--font-semithin);
   color: #1a1a1a;
   margin: 0;
   line-height: 1.2;
@@ -90,9 +90,9 @@
 }
 
 .tabText {
-  font-size: var(--text-xl);
+  font-size: var(--text-base);
   /* Requested size */
-  font-weight: 700;
+  font-weight: var(--font-medium);
   /* Bolder for larger size */
   color: #1a1a1a;
   text-transform: uppercase;
@@ -103,17 +103,7 @@
   color: #1a1a1a;
 }
 
-/* Icon and Count - Scaled up */
-.tabIcon {
-  font-size: 18px;
-  /* Increased from 16px */
-  color: #666;
-  width: 28px;
-  line-height: -1;
-  display: flex;
-  justify-content: center;
-}
-
+/* Count - Scaled up */
 .tabCount {
   margin-left: auto;
   font-size: 16px;

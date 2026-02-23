@@ -1,0 +1,126 @@
+/* app/admin/menus/_components/CategoryTabs/CategoryTabs.module.css */
+
+.tabsContainer {
+  width: 260px;
+  /* Increased width to accommodate larger text */
+  flex-shrink: 0;
+  margin-right: 0;
+  /* Space between tabs and menu list is handled by parent container gap */
+  margin-bottom: 0;
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-6));
+  height: fit-content;
+}
+
+.tabsList {
+  display: flex;
+  flex-direction: column;
+  /* Vertical layout */
+  gap: var(--space-2);
+  /* Increased gap for larger items */
+  padding-bottom: 0;
+}
+
+/* Header Style */
+.header {
+  margin-bottom: 40px;
+}
+
+.title {
+  font-size: 14px;
+  color: #c5a47e;
+  /* Gold color */
+  font-weight: var(--font-semithin);
+  letter-spacing: 1px;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  font-family: serif;
+  font-size: 56px;
+  /* Increased from 48px */
+  font-weight: var(--font-semithin);
+  color: #1a1a1a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+
+/* Tab Item Style - Mimic Checkbox List */
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  /* Increased gap */
+  padding: 8px 0;
+  /* Add some vertical padding */
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.checkbox {
+  width: 32px;
+  /* Increased from 24px */
+  height: 32px;
+  /* Increased from 24px */
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  /* Slightly larger radius */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  color: transparent;
+}
+
+.tab:hover .checkbox {
+  border-color: #c5a47e;
+}
+
+.tabActive .checkbox {
+  border-color: #c5a47e;
+  background-color: #fdf8f6;
+  /* Subtle glow */
+  color: #c5a47e;
+}
+
+.tabText {
+  font-size: var(--text-base);
+  /* Requested size */
+  font-weight: var(--font-medium);
+  /* Bolder for larger size */
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tabActive .tabText {
+  color: #1a1a1a;
+}
+
+/* Count - Scaled up */
+.tabCount {
+  margin-left: auto;
+  font-size: 16px;
+  /* Increased from 12px */
+  color: #999;
+  font-weight: 500;
+}
+
+.tabActive .tabCount {
+  color: #c5a47e;
+  font-weight: 700;
+}
+
+/* Loading & Error States */
+.loadingState,
+.errorState {
+  padding: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-gray-500);
+}

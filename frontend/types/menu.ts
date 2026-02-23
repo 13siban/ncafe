@@ -42,7 +42,6 @@ export interface MenuCategory {
   id: number;
   korName: string;
   engName: string;
-  icon?: string;
   sortOrder: number;
 }
 

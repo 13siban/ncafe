@@ -4,9 +4,8 @@ export interface MenuImageResponse {
   id: number;
   menuId: number;
   srcUrl: string;
-  createdAt: string;
   sortOrder: number;
-  altText: string;
+  altText?: string;
 }
 
 export interface MenuImageListResponse {
@@ -22,16 +21,16 @@ export const useMenuImages = (menuId: number) => {
 
   const fetchImages = useCallback(async () => {
     if (!menuId) return;
-    
+
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await fetch(`/api/admin/menus/${menuId}/menu-images`);
       if (!response.ok) {
         throw new Error('메뉴 이미지를 불러오는데 실패했습니다.');
       }
-      
+
       const data: MenuImageListResponse = await response.json();
       setImages(data.images || []);
       setKorName(data.korName || '');
