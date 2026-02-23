@@ -8,7 +8,7 @@ services:
       dockerfile: Dockerfile
     # container_name: young-ncafe-backend (removed for automatic naming)
     ports:
-      - "8031:8031"  # 외부 8031 -> 내부 8031
+      - "8031:8031" # 외부 8031 -> 내부 8031
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SERVER_PORT=8031
@@ -33,25 +33,26 @@ services:
       - PORT=3031
       - HOSTNAME=0.0.0.0
     stdin_open: true # [추가] 컨테이너가 바로 종료되는 것 방지
-    tty: true        # [추가] 터미널 환경 활성화
+    tty: true # [추가] 터미널 환경 활성화
     depends_on:
       - backend
     networks:
       - ncafe-network
     restart: always
-    
+
   db:
-      image: postgres:17
-      container_name: ${USER_ID:-ncafe}-db
-      environment:
-        POSTGRES_DB: ncafedb
-        POSTGRES_USER: ncafe
-        POSTGRES_PASSWORD: 1234
-      ports:
-        - "${DB_PORT:-5432}:5432"
-      volumes:
-        - /home/young/dist/ncafe/data:/var/lib/postgresql/data
-      restart: unless-stopped
+    image: postgres:17
+    # profiles: [ "with-db" ] # 이 프로필을 지정해야만 실행됨
+    container_name: ${USER_ID:-ncafe}-db
+    environment:
+      POSTGRES_DB: ncafedb
+      POSTGRES_USER: ncafe
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - /home/young/dist/ncafe/data:/var/lib/postgresql/data
+    restart: unless-stopped
 
 networks:
   ncafe-network:
