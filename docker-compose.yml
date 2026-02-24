@@ -102,7 +102,7 @@ services:
     profiles: [ "with-db" ]
     container_name: ${USER_ID:-ncafe}-db
     environment:
-      POSTGRES_DB: postgres
+      POSTGRES_DB: ncafedb
       POSTGRES_USER: ncafe
       POSTGRES_PASSWORD: 1234
     ports:
