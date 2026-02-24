@@ -42,7 +42,7 @@ services:
 
   db:
     image: postgres:17
-    # profiles: [ "with-db" ] # 이 프로필을 지정해야만 실행됨
+    profiles: [ "with-db" ] # 이 프로필을 지정해야만 실행됨
     container_name: dev-postgres
     environment:
       POSTGRES_DB: ncafe
@@ -53,6 +53,3 @@ services:
     volumes:
       - /home/young/dist/ncafe/data:/var/lib/postgresql/data
     restart: unless-stopped
-    networks:
-      ncafe-network:
-        driver: bridge
