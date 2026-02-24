@@ -53,3 +53,6 @@ services:
     volumes:
       - /home/young/dist/ncafe/data:/var/lib/postgresql/data
     restart: unless-stopped
+    
+volumes:
+  ncafe-db-data:
