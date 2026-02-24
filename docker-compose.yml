@@ -76,7 +76,7 @@ services:
     volumes:
       - /home/young/dist/ncafe/upload:/app/upload
     environment:
-      - DB_HOST=postgres
+      - DB_HOST=db
       - DB_PORT=5432
       - DB_USERNAME=ncafe
       - DB_PASSWORD=1234
