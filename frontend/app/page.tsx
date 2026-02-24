@@ -61,7 +61,7 @@ export default function HomePage() {
             <span>NCafe</span>
           </div>
           <div className={styles.navLinks}>
-            <Link href="/menu">Menu</Link>
+            <Link href="/menus">Menu</Link>
             <Link href="/about">About</Link>
             <Link href="/locations">Locations</Link>
           </div>
