@@ -79,6 +79,9 @@ services:
       - DB_PORT=5432
       - DB_USERNAME=ncafe
       - DB_PASSWORD=1234
+    # [추가] DB가 먼저 떠야 백엔드가 살 수 있습니다.
+    depends_on:
+      - db
     restart: unless-stopped
 
   # ── 프론트엔드 (Next.js) ──
@@ -90,7 +93,7 @@ services:
     ports:
       - "3031:3031"
     environment:
-      - BACKEND_URL=http://young-ncafe-backend:8031
+      - BACKEND_URL=http://backend:8031
     depends_on:
       - backend
     restart: unless-stopped
@@ -98,7 +101,6 @@ services:
   # ── 데이터베이스 (PostgreSQL) ──
   db:
     image: postgres:17
-    profiles: [ "with-db" ]
     container_name: ${USER_ID:-ncafe}-db
     environment:
       POSTGRES_DB: ncafedb

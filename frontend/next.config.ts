@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8031';
+    const backendUrl = process.env.BACKEND_URL || 'http://backend:8031';
     return [
       {
         // 1. 브라우저가 호출하는 주소
