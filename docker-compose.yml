@@ -12,7 +12,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SERVER_PORT=8031 # [추가] 스프링 내부 포트를 8031로 강제 지정
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/ncafedb
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/ncafe
       - SPRING_DATASOURCE_USERNAME=ncafe
       - SPRING_DATASOURCE_PASSWORD=1234
     volumes:
@@ -43,13 +43,13 @@ services:
   db:
     image: postgres:17
     # profiles: [ "with-db" ] # 이 프로필을 지정해야만 실행됨
-    container_name: ${USER_ID:-ncafe}-db
+    container_name: dev-postgres
     environment:
-      POSTGRES_DB: ncafedb
+      POSTGRES_DB: ncafe
       POSTGRES_USER: ncafe
       POSTGRES_PASSWORD: 1234
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "5432:5432"
     volumes:
       - /home/young/dist/ncafe/data:/var/lib/postgresql/data
     restart: unless-stopped
