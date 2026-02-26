@@ -102,7 +102,10 @@ services:
 
   # ── 데이터베이스 (PostgreSQL) ──
   db:
-    image: young-ncafe-db-image
+    build:
+      context: ./db  # Dockerfile이 있는 폴더 경로
+      dockerfile: Dockerfile
+    image: young-ncafe-db-image # 빌드 후 생성될 이름
     container_name: young-ncafe-db
     environment:
       POSTGRES_DB: ncafedb
