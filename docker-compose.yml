@@ -69,6 +69,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile  
+    image: young-ncafe-backend-image
     container_name: young-ncafe-backend
     ports:
       - "8031:8031"
@@ -89,6 +90,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    image: young-ncafe-frontend-image
     container_name: young-ncafe-frontend
     ports:
       - "3031:3031"
@@ -100,8 +102,8 @@ services:
 
   # ── 데이터베이스 (PostgreSQL) ──
   db:
-    image: postgres:17
-    container_name: ${USER_ID:-ncafe}-db
+    image: young-ncafe-db-image
+    container_name: young-ncafe-db
     environment:
       POSTGRES_DB: ncafedb
       POSTGRES_USER: ncafe
