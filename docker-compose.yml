@@ -62,6 +62,7 @@
 # 2. 빌드 및 실행: docker compose up -d --build
 # 3. DB 포함 실행: docker compose --profile with-db up -d --build
 # =================================================================
+name: young-ncafe
 
 services:
   # ── 백엔드 (Spring Boot) ──
