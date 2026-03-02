@@ -17,6 +17,18 @@ public class MenuImagePersistenceAdapter implements MenuImageRepositoryPort {
 
     @Override
     public List<MenuImage> findAllByMenuId(Long menuId) {
-        return menuImageJpaRepository.findAllByMenuIdOrderBySortOrderAsc(menuId);
+        return menuImageJpaRepository.findAllByMenuIdOrderBySortOrderAsc(menuId).stream()
+                .map(this::toDomain)
+                .toList();
+    }
+
+    private MenuImage toDomain(MenuImageJpaEntity entity) {
+        return MenuImage.builder()
+                .id(entity.getId())
+                .menuId(entity.getMenuId())
+                .srcUrl(entity.getSrcUrl())
+                .sortOrder(entity.getSortOrder())
+                .createdAt(entity.getCreatedAt())
+                .build();
     }
 }

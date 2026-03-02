@@ -1,0 +1,339 @@
+
+> Task :compileJava FAILED
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:89: error: method findById(Long) is already defined in class AdminMenuPersistenceAdapter
+    public MenuImage findById(Long id) {
+                     ^
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuImagePersistenceAdapter.java:24: error: incompatible types: invalid method reference
+                .map(this::toDomain)
+                     ^
+    incompatible types: AdminMenuImageJpaEntity cannot be converted to MenuImageJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuImagePersistenceAdapter.java:31: error: incompatible types: invalid method reference
+                .map(this::toDomain)
+                     ^
+    incompatible types: AdminMenuImageJpaEntity cannot be converted to MenuImageJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuImagePersistenceAdapter.java:38: error: method save in interface CrudRepository<T,ID> cannot be applied to given types;
+        return toDomain(adminMenuImageJpaRepository.save(entity));
+                                                   ^
+  required: S
+  found:    MenuImageJpaEntity
+  reason: inference variable S has incompatible bounds
+    upper bounds: AdminMenuImageJpaEntity
+    lower bounds: MenuImageJpaEntity
+  where S,T,ID are type-variables:
+    S extends AdminMenuImageJpaEntity declared in method <S>save(S)
+    T extends Object declared in interface CrudRepository
+    ID extends Object declared in interface CrudRepository
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuImagePersistenceAdapter.java:46: error: method saveAll in interface ListCrudRepository<T,ID> cannot be applied to given types;
+        adminMenuImageJpaRepository.saveAll(entities);
+                                   ^
+  required: Iterable<S>
+  found:    List<MenuImageJpaEntity>
+  reason: inference variable S has incompatible bounds
+    equality constraints: MenuImageJpaEntity
+    upper bounds: AdminMenuImageJpaEntity
+  where S,T,ID are type-variables:
+    S extends AdminMenuImageJpaEntity declared in method <S>saveAll(Iterable<S>)
+    T extends Object declared in interface ListCrudRepository
+    ID extends Object declared in interface ListCrudRepository
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:23: error: AdminMenuPersistenceAdapter is not abstract and does not override abstract method findById(Long) in LoadAdminMenuImagePort
+public class AdminMenuPersistenceAdapter implements 
+       ^
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:33: error: findById(Long) in AdminMenuPersistenceAdapter cannot implement findById(Long) in LoadAdminMenuImagePort
+    public Menu findById(Long id) {
+                ^
+  return type Menu is not compatible with MenuImage
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:122: error: cannot find symbol
+                .id(entity.getId())
+                          ^
+  symbol:   method getId()
+  location: variable entity of type AdminMenuJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:123: error: cannot find symbol
+                .korName(entity.getKorName())
+                               ^
+  symbol:   method getKorName()
+  location: variable entity of type AdminMenuJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:124: error: cannot find symbol
+                .engName(entity.getEngName())
+                               ^
+  symbol:   method getEngName()
+  location: variable entity of type AdminMenuJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:125: error: cannot find symbol
+                .description(entity.getDescription())
+                                   ^
+  symbol:   method getDescription()
+  location: variable entity of type AdminMenuJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:126: error: cannot find symbol
+                .price(entity.getPrice())
+                             ^
+  symbol:   method getPrice()
+  location: variable entity of type AdminMenuJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:127: error: cannot find symbol
+                .categoryId(entity.getCategoryId())
+                                  ^
+  symbol:   method getCategoryId()
+  location: variable entity of type AdminMenuJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:128: error: cannot find symbol
+                .isAvailable(entity.getIsAvailable())
+                                   ^
+  symbol:   method getIsAvailable()
+  location: variable entity of type AdminMenuJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:129: error: cannot find symbol
+                .isSoldOut(entity.getIsSoldOut())
+                                 ^
+  symbol:   method getIsSoldOut()
+  location: variable entity of type AdminMenuJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:130: error: cannot find symbol
+                .sortOrder(entity.getSortOrder())
+                                 ^
+  symbol:   method getSortOrder()
+  location: variable entity of type AdminMenuJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:131: error: cannot find symbol
+                .createdAt(entity.getCreatedAt())
+                                 ^
+  symbol:   method getCreatedAt()
+  location: variable entity of type AdminMenuJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:132: error: cannot find symbol
+                .updatedAt(entity.getUpdatedAt())
+                                 ^
+  symbol:   method getUpdatedAt()
+  location: variable entity of type AdminMenuJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:137: error: cannot find symbol
+        return AdminMenuJpaEntity.builder()
+                                 ^
+  symbol:   method builder()
+  location: class AdminMenuJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:154: error: cannot find symbol
+                .id(entity.getId())
+                          ^
+  symbol:   method getId()
+  location: variable entity of type AdminMenuImageJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:155: error: cannot find symbol
+                .menuId(entity.getMenuId())
+                              ^
+  symbol:   method getMenuId()
+  location: variable entity of type AdminMenuImageJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:156: error: cannot find symbol
+                .srcUrl(entity.getSrcUrl())
+                              ^
+  symbol:   method getSrcUrl()
+  location: variable entity of type AdminMenuImageJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:157: error: cannot find symbol
+                .sortOrder(entity.getSortOrder())
+                                 ^
+  symbol:   method getSortOrder()
+  location: variable entity of type AdminMenuImageJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:158: error: cannot find symbol
+                .createdAt(entity.getCreatedAt())
+                                 ^
+  symbol:   method getCreatedAt()
+  location: variable entity of type AdminMenuImageJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:163: error: cannot find symbol
+        return AdminMenuImageJpaEntity.builder()
+                                      ^
+  symbol:   method builder()
+  location: class AdminMenuImageJpaEntity
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\config\DataInitializer.java:30: error: cannot find symbol
+            log.info("Data already exists, skipping initialization.");
+            ^
+  symbol:   variable log
+  location: class DataInitializer
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\config\DataInitializer.java:34: error: cannot find symbol
+        log.info("Starting data initialization...");
+        ^
+  symbol:   variable log
+  location: class DataInitializer
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\config\DataInitializer.java:69: error: cannot find symbol
+        log.info("Data initialization completed.");
+        ^
+  symbol:   variable log
+  location: class DataInitializer
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\config\DataInitializer.java:94: error: method save in interface CrudRepository<T,ID> cannot be applied to given types;
+        MenuJpaEntity savedMenu = adminMenuRepository.save(menu);
+                                                     ^
+  required: S
+  found:    MenuJpaEntity
+  reason: inference variable S has incompatible bounds
+    upper bounds: AdminMenuJpaEntity
+    lower bounds: MenuJpaEntity
+  where S,T,ID are type-variables:
+    S extends AdminMenuJpaEntity declared in method <S>save(S)
+    T extends Object declared in interface CrudRepository
+    ID extends Object declared in interface CrudRepository
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+29 errors
+
+[Incubating] Problems report is available at: file:///C:/project/workspace/ncafe/backend/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler output below.
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuImagePersistenceAdapter.java:38: error: method save in interface CrudRepository<T,ID> cannot be applied to given types;
+          return toDomain(adminMenuImageJpaRepository.save(entity));
+                                                     ^
+    required: S
+    found:    MenuImageJpaEntity
+    reason: inference variable S has incompatible bounds
+      upper bounds: AdminMenuImageJpaEntity
+      lower bounds: MenuImageJpaEntity
+    where S,T,ID are type-variables:
+      S extends AdminMenuImageJpaEntity declared in method <S>save(S)
+      T extends Object declared in interface CrudRepository
+      ID extends Object declared in interface CrudRepository
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuImagePersistenceAdapter.java:46: error: method saveAll in interface ListCrudRepository<T,ID> cannot be applied to given types;
+          adminMenuImageJpaRepository.saveAll(entities);
+                                     ^
+    required: Iterable<S>
+    found:    List<MenuImageJpaEntity>
+    reason: inference variable S has incompatible bounds
+      equality constraints: MenuImageJpaEntity
+      upper bounds: AdminMenuImageJpaEntity
+    where S,T,ID are type-variables:
+      S extends AdminMenuImageJpaEntity declared in method <S>saveAll(Iterable<S>)
+      T extends Object declared in interface ListCrudRepository
+      ID extends Object declared in interface ListCrudRepository
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\config\DataInitializer.java:94: error: method save in interface CrudRepository<T,ID> cannot be applied to given types;
+          MenuJpaEntity savedMenu = adminMenuRepository.save(menu);
+                                                       ^
+    required: S
+    found:    MenuJpaEntity
+    reason: inference variable S has incompatible bounds
+      upper bounds: AdminMenuJpaEntity
+      lower bounds: MenuJpaEntity
+    where S,T,ID are type-variables:
+      S extends AdminMenuJpaEntity declared in method <S>save(S)
+      T extends Object declared in interface CrudRepository
+      ID extends Object declared in interface CrudRepository
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:33: error: findById(Long) in AdminMenuPersistenceAdapter cannot implement findById(Long) in LoadAdminMenuImagePort
+      public Menu findById(Long id) {
+                  ^
+    return type Menu is not compatible with MenuImage
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:23: error: AdminMenuPersistenceAdapter is not abstract and does not override abstract method findById(Long) in LoadAdminMenuImagePort
+  public class AdminMenuPersistenceAdapter implements 
+         ^
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuImagePersistenceAdapter.java:24: error: incompatible types: invalid method reference
+                  .map(this::toDomain)
+                       ^
+      incompatible types: AdminMenuImageJpaEntity cannot be converted to MenuImageJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuImagePersistenceAdapter.java:31: error: incompatible types: invalid method reference
+                  .map(this::toDomain)
+                       ^
+      incompatible types: AdminMenuImageJpaEntity cannot be converted to MenuImageJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\config\DataInitializer.java:30: error: cannot find symbol
+              log.info("Data already exists, skipping initialization.");
+              ^
+    symbol:   variable log
+    location: class DataInitializer
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\config\DataInitializer.java:34: error: cannot find symbol
+          log.info("Starting data initialization...");
+          ^
+    symbol:   variable log
+    location: class DataInitializer
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\config\DataInitializer.java:69: error: cannot find symbol
+          log.info("Data initialization completed.");
+          ^
+    symbol:   variable log
+    location: class DataInitializer
+  Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:122: error: cannot find symbol
+                  .id(entity.getId())
+                            ^
+    symbol:   method getId()
+    location: variable entity of type AdminMenuJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:123: error: cannot find symbol
+                  .korName(entity.getKorName())
+                                 ^
+    symbol:   method getKorName()
+    location: variable entity of type AdminMenuJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:124: error: cannot find symbol
+                  .engName(entity.getEngName())
+                                 ^
+    symbol:   method getEngName()
+    location: variable entity of type AdminMenuJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:125: error: cannot find symbol
+                  .description(entity.getDescription())
+                                     ^
+    symbol:   method getDescription()
+    location: variable entity of type AdminMenuJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:126: error: cannot find symbol
+                  .price(entity.getPrice())
+                               ^
+    symbol:   method getPrice()
+    location: variable entity of type AdminMenuJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:127: error: cannot find symbol
+                  .categoryId(entity.getCategoryId())
+                                    ^
+    symbol:   method getCategoryId()
+    location: variable entity of type AdminMenuJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:128: error: cannot find symbol
+                  .isAvailable(entity.getIsAvailable())
+                                     ^
+    symbol:   method getIsAvailable()
+    location: variable entity of type AdminMenuJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:129: error: cannot find symbol
+                  .isSoldOut(entity.getIsSoldOut())
+                                   ^
+    symbol:   method getIsSoldOut()
+    location: variable entity of type AdminMenuJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:130: error: cannot find symbol
+                  .sortOrder(entity.getSortOrder())
+                                   ^
+    symbol:   method getSortOrder()
+    location: variable entity of type AdminMenuJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:131: error: cannot find symbol
+                  .createdAt(entity.getCreatedAt())
+                                   ^
+    symbol:   method getCreatedAt()
+    location: variable entity of type AdminMenuJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:132: error: cannot find symbol
+                  .updatedAt(entity.getUpdatedAt())
+                                   ^
+    symbol:   method getUpdatedAt()
+    location: variable entity of type AdminMenuJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:137: error: cannot find symbol
+          return AdminMenuJpaEntity.builder()
+                                   ^
+    symbol:   method builder()
+    location: class AdminMenuJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:154: error: cannot find symbol
+                  .id(entity.getId())
+                            ^
+    symbol:   method getId()
+    location: variable entity of type AdminMenuImageJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:155: error: cannot find symbol
+                  .menuId(entity.getMenuId())
+                                ^
+    symbol:   method getMenuId()
+    location: variable entity of type AdminMenuImageJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:156: error: cannot find symbol
+                  .srcUrl(entity.getSrcUrl())
+                                ^
+    symbol:   method getSrcUrl()
+    location: variable entity of type AdminMenuImageJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:157: error: cannot find symbol
+                  .sortOrder(entity.getSortOrder())
+                                   ^
+    symbol:   method getSortOrder()
+    location: variable entity of type AdminMenuImageJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:158: error: cannot find symbol
+                  .createdAt(entity.getCreatedAt())
+                                   ^
+    symbol:   method getCreatedAt()
+    location: variable entity of type AdminMenuImageJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:163: error: cannot find symbol
+          return AdminMenuImageJpaEntity.builder()
+                                        ^
+    symbol:   method builder()
+    location: class AdminMenuImageJpaEntity
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\admin\menu\adapter\out\persistence\AdminMenuPersistenceAdapter.java:89: error: method findById(Long) is already defined in class AdminMenuPersistenceAdapter
+      public MenuImage findById(Long id) {
+                       ^
+  29 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 4s
+1 actionable task: 1 executed

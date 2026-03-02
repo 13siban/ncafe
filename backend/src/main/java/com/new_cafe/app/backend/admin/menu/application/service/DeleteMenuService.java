@@ -5,7 +5,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.new_cafe.app.backend.admin.menu.application.command.DeleteMenuCommand;
 import com.new_cafe.app.backend.admin.menu.application.port.in.DeleteMenuUseCase;
-import com.new_cafe.app.backend.menu.application.port.out.MenuRepositoryPort;
+import com.new_cafe.app.backend.admin.menu.application.port.out.DeleteAdminMenuPort;
+import com.new_cafe.app.backend.admin.menu.application.port.out.LoadAdminMenuPort;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,10 +15,15 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class DeleteMenuService implements DeleteMenuUseCase {
 
-    private final MenuRepositoryPort menuRepositoryPort;
+    private final LoadAdminMenuPort loadAdminMenuPort;
+    private final DeleteAdminMenuPort deleteAdminMenuPort;
 
     @Override
     public void deleteMenu(DeleteMenuCommand command) {
-        // 메뉴 삭제 로직 구현
+        // 존재 여부 확인
+        if (loadAdminMenuPort.findById(command.getId()) == null) {
+            throw new IllegalArgumentException("삭제할 메뉴를 찾을 수 없습니다.");
+        }
+        deleteAdminMenuPort.deleteById(command.getId());
     }
 }

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { fetchAPI } from '@/app/lib/api';
 import { MenuForm, MenuFormValues } from '../../_components/MenuForm/MenuForm';
 import { menus } from '@/mocks/menuData';
 import styles from './page.module.css';
@@ -13,50 +14,53 @@ export default function EditMenuPage() {
   const [initialValues, setInitialValues] = useState<Partial<MenuFormValues> | null>(null);
 
   useEffect(() => {
-    // Simulate API fetch delay
     const loadData = async () => {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const menu = menus.find(m => m.id === Number(id));
-      if (menu) {
+      try {
+        const menu = await fetchAPI(`/admin/menus/${id}`);
+
         setInitialValues({
           korName: menu.korName,
           engName: menu.engName,
           description: menu.description,
           price: menu.price,
-          categoryId: menu.category.id,
+          categoryId: menu.categoryId, // ensure using the correct field mapping here
           status: menu.isSoldOut ? 'soldout' : (!menu.isAvailable ? 'hidden' : 'available'),
-          existingImages: menu.images.map(img => img.url),
+          existingImages: [], // not implementing images yet over API
           images: [],
-          options: menu.options.map(opt => ({
-            name: opt.name,
-            type: opt.type,
-            required: opt.required,
-            items: opt.items.map(item => ({
-              name: item.name,
-              priceDelta: item.priceDelta
-            }))
-          }))
+          options: [] // not implementing options yet over API
         });
-      } else {
+      } catch (error) {
+        console.error('Failed to load menu data', error);
         alert('메뉴를 찾을 수 없습니다.');
         router.push('/admin/menus');
       }
     };
-    
+
     if (id) {
       loadData();
     }
   }, [id, router]);
 
   const handleUpdate = async (data: MenuFormValues) => {
-    console.log("Updating:", data);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    alert(`메뉴 [${data.korName}] 수정이 완료되었습니다.`);
-    router.push(`/admin/menus/${id}`);
+    try {
+      await fetchAPI(`/admin/menus/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          korName: data.korName,
+          engName: data.engName || '',
+          description: data.description || '',
+          price: Number(data.price),
+          categoryId: Number(data.categoryId),
+          isAvailable: data.status === 'available',
+        }),
+      });
+
+      alert(`메뉴 [${data.korName}] 수정이 완료되었습니다.`);
+      router.push(`/admin/menus`);
+    } catch (error) {
+      console.error('Failed to update menu', error);
+      alert('메뉴 수정에 실패했습니다.');
+    }
   };
 
   if (!initialValues) {
@@ -65,8 +69,8 @@ export default function EditMenuPage() {
 
   return (
     <div className={styles.container}>
-      <MenuForm 
-        initialValues={initialValues} 
+      <MenuForm
+        initialValues={initialValues}
         onSubmit={handleUpdate}
         submitLabel="수정사항 저장"
       />

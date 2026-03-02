@@ -11,27 +11,33 @@ import styles from './page.module.css';
 
 
 export default function MenuDetailPage({ params }: { params: Promise<{ id: number }> }) {
-  const {id}= use(params);
+  const { id } = use(params);
 
 
-  // const resolvedParams = use(params);
-  // const id = resolvedParams.id;
-  // const router = useRouter();
+  const router = useRouter();
 
-
-  // const handleDelete = () => {
-  //   if (confirm('정말로 이 메뉴를 삭제하시겠습니까?')) {
-  //     alert('메뉴가 삭제되었습니다.');
-  //     router.push('/admin/menus');
-  //   }
-  // };
-
+  const handleDelete = async () => {
+    if (confirm('정말로 이 메뉴를 삭제하시겠습니까?')) {
+      try {
+        const response = await fetch(`/api/admin/menus/${id}`, {
+          method: 'DELETE',
+        });
+        if (!response.ok) throw new Error('Delete failed');
+        alert('메뉴가 삭제되었습니다.');
+        router.push('/admin/menus');
+      } catch (error) {
+        console.error('Delete menu error', error);
+        alert('메뉴 삭제에 실패했습니다.');
+      }
+    }
+  };
 
   return (
     <main className={styles.container}>
       <MenuDetailHeader
         title="메뉴상세"
-
+        menuId={id}
+        onDelete={handleDelete}
       />
       <div className={styles.grid}>
         <div className={styles.leftColumn}>

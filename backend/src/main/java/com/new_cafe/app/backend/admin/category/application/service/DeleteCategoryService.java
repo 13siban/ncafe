@@ -18,6 +18,6 @@ public class DeleteCategoryService implements DeleteCategoryUseCase {
 
     @Override
     public void deleteCategory(DeleteCategoryCommand command) {
-        // 카테고리 삭제 로직 (현재는 스켈레톤)
+        categoryRepositoryPort.deleteById(command.getId());
     }
 }

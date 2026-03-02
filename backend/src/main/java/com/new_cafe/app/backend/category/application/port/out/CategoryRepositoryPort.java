@@ -9,4 +9,8 @@ public interface CategoryRepositoryPort {
     List<CategoryResponse> findAllWithMenuCount();
 
     Category findById(Long id);
+
+    Category save(Category category);
+
+    void deleteById(Long id);
 }

@@ -1,0 +1,107 @@
+.nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.navContainer {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: var(--font-bold);
+    font-size: var(--text-xl);
+    color: var(--color-gray-900);
+    text-decoration: none;
+}
+
+.navLinks {
+    display: none;
+    gap: var(--space-8);
+}
+
+@media (min-width: 768px) {
+    .navLinks {
+        display: flex;
+    }
+}
+
+.navLinks a {
+    color: var(--color-gray-600);
+    font-weight: var(--font-medium);
+    transition: color var(--transition-base);
+    text-decoration: none;
+}
+
+.navLinks a:hover,
+.navLinks a.active {
+    color: var(--color-primary-600);
+}
+
+.authLinks {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.loginButton {
+    padding: var(--space-2) var(--space-6);
+    background-color: var(--color-gray-900);
+    border: 1px solid var(--color-gray-900);
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: white;
+    transition: all var(--transition-base);
+    text-decoration: none;
+}
+
+.loginButton:hover {
+    background-color: transparent;
+    color: var(--color-gray-900);
+}
+
+.userSection {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.username {
+    font-size: var(--text-sm);
+    font-weight: var(--font-bold);
+    color: var(--color-gray-900);
+}
+
+.logoutButton {
+    padding: var(--space-1) var(--space-4);
+    background-color: transparent;
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    color: var(--color-gray-600);
+    transition: all var(--transition-base);
+}
+
+.logoutButton:hover {
+    background-color: var(--color-gray-100);
+    color: var(--color-gray-900);
+}

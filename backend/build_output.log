@@ -1,0 +1,31 @@
+
+> Task :compileJava
+C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\auth\adapter\in\web\AuthController.java:38: error: cannot find symbol
+    @ExceptionHandler(RuntimeException.class)
+     ^
+  symbol:   class ExceptionHandler
+  location: class AuthController
+1 error
+
+> Task :compileJava FAILED
+
+[Incubating] Problems report is available at: file:///C:/project/workspace/ncafe/backend/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler output below.
+  C:\project\workspace\ncafe\backend\src\main\java\com\new_cafe\app\backend\auth\adapter\in\web\AuthController.java:38: error: cannot find symbol
+      @ExceptionHandler(RuntimeException.class)
+       ^
+    symbol:   class ExceptionHandler
+    location: class AuthController
+  1 error
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 28s
+1 actionable task: 1 executed

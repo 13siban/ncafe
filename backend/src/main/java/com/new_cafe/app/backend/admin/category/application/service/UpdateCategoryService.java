@@ -18,6 +18,14 @@ public class UpdateCategoryService implements UpdateCategoryUseCase {
 
     @Override
     public void updateCategory(UpdateCategoryCommand command) {
-        // 카테고리 수정 로직 (현재는 스켈레톤)
+        var category = categoryRepositoryPort.findById(command.getId());
+        if (category == null) {
+            throw new IllegalArgumentException("Category not found: " + command.getId());
+        }
+        
+        category.setName(command.getName());
+        category.setSortOrder(command.getSortOrder());
+        
+        categoryRepositoryPort.save(category);
     }
 }

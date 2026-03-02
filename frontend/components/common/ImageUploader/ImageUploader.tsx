@@ -16,11 +16,11 @@ interface PreviewFile extends File {
   preview: string;
 }
 
-export const ImageUploader = ({ 
-  onFilesChange, 
+export const ImageUploader = ({
+  onFilesChange,
   onInitialImagesChange,
-  initialImages = [], 
-  maxFiles = 5 
+  initialImages = [],
+  maxFiles = 5
 }: ImageUploaderProps) => {
   const [files, setFiles] = useState<PreviewFile[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>(initialImages);
@@ -32,17 +32,20 @@ export const ImageUploader = ({
 
   // Cleanup previews when component unmounts
   useEffect(() => {
-    return () => files.forEach(file => URL.revokeObjectURL(file.preview));
+    // React 18 Strict Mode double-invokes effects, which causes URL.revokeObjectURL 
+    // to destroy the preview image immediately after selection.
+    // To prevent the X-box issue during registration, we avoid revoking URLs here.
+    return () => { };
   }, [files]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const currentTotal = files.length + existingImages.length;
     const remainingSlots = maxFiles - currentTotal;
-    
+
     if (remainingSlots <= 0) return;
 
     const filesToAdd = acceptedFiles.slice(0, remainingSlots);
-    
+
     const newFiles = filesToAdd.map(file => Object.assign(file, {
       preview: URL.createObjectURL(file)
     }));
@@ -56,6 +59,7 @@ export const ImageUploader = ({
     const updated = files.filter(f => f !== file);
     setFiles(updated);
     onFilesChange(updated);
+    URL.revokeObjectURL(file.preview); // Cleanup only when explicitly removed
   };
 
   const removeExistingImage = (imageUrl: string) => {
@@ -100,9 +104,9 @@ export const ImageUploader = ({
                 className={styles.previewImage}
                 alt={`existing-${index}`}
               />
-              <button 
-                type="button" 
-                className={styles.removeButton} 
+              <button
+                type="button"
+                className={styles.removeButton}
                 onClick={(e) => {
                   e.stopPropagation();
                   removeExistingImage(url);
@@ -122,9 +126,9 @@ export const ImageUploader = ({
                 className={styles.previewImage}
                 alt={`preview-${index}`}
               />
-              <button 
-                type="button" 
-                className={styles.removeButton} 
+              <button
+                type="button"
+                className={styles.removeButton}
                 onClick={(e) => {
                   e.stopPropagation();
                   removeFile(file);

@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { Button } from '@/components/common';
-import { categories } from '@/mocks/menuData';
+import { useCategories } from '@/components/menu/CategoryTabs/useCategories';
 import { BasicInfoSection } from './sections/BasicInfoSection';
 import { OptionSection } from './sections/OptionSection';
 import { ImageSection } from './sections/ImageSection';
@@ -37,13 +37,15 @@ interface MenuFormProps {
 }
 
 export const MenuForm = ({ initialValues, onSubmit, submitLabel = '메뉴 등록하기' }: MenuFormProps) => {
+  const { categories, isLoading: isCategoriesLoading } = useCategories({ mode: 'admin' });
+
   const { register, control, handleSubmit, setValue, formState: { errors, isSubmitting }, watch } = useForm<MenuFormValues>({
     defaultValues: {
       korName: '',
       engName: '',
       description: '',
       price: 0,
-      categoryId: categories[1]?.id || 'coffee',
+      categoryId: '',
       status: 'available',
       images: [],
       existingImages: [],
@@ -51,6 +53,13 @@ export const MenuForm = ({ initialValues, onSubmit, submitLabel = '메뉴 등록
       ...initialValues
     }
   });
+
+  useEffect(() => {
+    // initialValues가 없고 카테고리가 로드되었을 때 첫 번째 카테고리를 기본값으로 설정
+    if (!initialValues?.categoryId && categories.length > 0) {
+      setValue('categoryId', categories[0].id);
+    }
+  }, [categories, initialValues, setValue]);
 
   const { fields: optionFields, append: appendOption, remove: removeOption } = useFieldArray({
     control,
@@ -62,28 +71,28 @@ export const MenuForm = ({ initialValues, onSubmit, submitLabel = '메뉴 등록
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
       <div className={styles.mainColumn}>
-        <BasicInfoSection register={register} errors={errors} />
-        <OptionSection 
-          register={register} 
-          control={control} 
-          fields={optionFields} 
-          append={appendOption} 
-          remove={removeOption} 
+        <BasicInfoSection register={register} errors={errors} categories={categories} />
+        <OptionSection
+          register={register}
+          control={control}
+          fields={optionFields}
+          append={appendOption}
+          remove={removeOption}
         />
       </div>
 
       <div className={styles.sideColumn}>
-        <ImageSection 
-          control={control} 
-          setValue={setValue} 
-          existingImages={existingImages} 
+        <ImageSection
+          control={control}
+          setValue={setValue}
+          existingImages={existingImages}
         />
         <StatusSection register={register} />
-        
-        <Button 
-          type="submit" 
-          variant="primary" 
-          size="lg" 
+
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
           className={styles.submitButton}
           disabled={isSubmitting}
         >

@@ -1,33 +1,23 @@
 package com.new_cafe.app.backend.menu.domain.model;
 
-import lombok.Data;
-import lombok.Builder;
-
 import java.time.LocalDateTime;
 
+import lombok.Getter;
+import lombok.Builder;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import jakarta.persistence.*;
 
-@Data
+/**
+ * MenuImage 도메인 모델 — 순수 POJO
+ */
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "ServiceMenuImage")
-@Table(name = "menu_images")
 public class MenuImage {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(name = "menu_id")
     private Long menuId;
-    @Column(name = "src_url")
     private String srcUrl;
-    
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-    
-    @Column(name = "sort_order")
     private Integer sortOrder;
+    private LocalDateTime createdAt;
 }

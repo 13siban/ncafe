@@ -43,7 +43,7 @@ public class MenuPersistenceAdapter implements MenuRepositoryPort {
 
     @Override
     public List<Menu> findPagedMenus(Long categoryId, String searchQuery, Integer page, Integer size, String sortBy, Boolean onlyAvailable) {
-        Specification<Menu> spec = (root, query, cb) -> {
+        Specification<MenuJpaEntity> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (categoryId != null) {
@@ -71,14 +71,38 @@ public class MenuPersistenceAdapter implements MenuRepositoryPort {
 
         if (page != null && size != null) {
             Pageable pageable = PageRequest.of(page - 1, size, sort);
-            return menuJpaRepository.findAll(spec, pageable).getContent();
+            return menuJpaRepository.findAll(spec, pageable).getContent().stream()
+                    .map(this::toDomain)
+                    .toList();
         } else {
-            return menuJpaRepository.findAll(spec, sort);
+            return menuJpaRepository.findAll(spec, sort).stream()
+                    .map(this::toDomain)
+                    .toList();
         }
     }
 
     @Override
     public Menu findById(Long id) {
-        return menuJpaRepository.findById(id).orElse(null);
+        return menuJpaRepository.findById(id)
+                .map(this::toDomain)
+                .orElse(null);
+    }
+
+    // ========== 변환 메서드 ==========
+
+    private Menu toDomain(MenuJpaEntity entity) {
+        return Menu.builder()
+                .id(entity.getId())
+                .korName(entity.getKorName())
+                .engName(entity.getEngName())
+                .description(entity.getDescription())
+                .price(entity.getPrice())
+                .categoryId(entity.getCategoryId())
+                .isAvailable(entity.getIsAvailable())
+                .isSoldOut(entity.getIsSoldOut())
+                .sortOrder(entity.getSortOrder())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .build();
     }
 }

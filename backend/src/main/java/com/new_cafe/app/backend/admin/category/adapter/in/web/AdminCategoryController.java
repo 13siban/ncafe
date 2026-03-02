@@ -1,5 +1,6 @@
 package com.new_cafe.app.backend.admin.category.adapter.in.web;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import com.new_cafe.app.backend.admin.category.application.command.CreateCategoryCommand;
@@ -49,19 +50,20 @@ public class AdminCategoryController {
 
     // 카테고리 수정
     @PutMapping("/{id}")
-    public String update(@PathVariable Long id, @RequestBody UpdateCategoryCommand command) {
-        // command에 id 세팅 로직 필요할 수 있음
-        updateCategoryUseCase.updateCategory(command);
-        return "Update Success";
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void update(@PathVariable Long id, @RequestBody UpdateCategoryCommand command) {
+        UpdateCategoryCommand finalCommand = UpdateCategoryCommand.builder()
+                .id(id)
+                .name(command.getName())
+                .sortOrder(command.getSortOrder())
+                .build();
+        updateCategoryUseCase.updateCategory(finalCommand);
     }
 
     // 카테고리 삭제
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable Long id) {
-        DeleteCategoryCommand command = DeleteCategoryCommand.builder()
-                .id(id)
-                .build();
-        deleteCategoryUseCase.deleteCategory(command);
-        return "Delete Success";
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        deleteCategoryUseCase.deleteCategory(new DeleteCategoryCommand(id));
     }
 }

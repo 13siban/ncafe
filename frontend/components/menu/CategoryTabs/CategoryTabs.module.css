@@ -1,0 +1,131 @@
+/* components/menu/CategoryTabs/CategoryTabs.module.css */
+
+.tabsContainer {
+    width: 260px;
+    flex-shrink: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-6));
+    height: fit-content;
+}
+
+.tabsList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding-bottom: 0;
+}
+
+/* Header Style */
+.header {
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.manageButton {
+    background: transparent;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    margin-top: -8px;
+}
+
+.manageButton:hover {
+    background-color: #f5f5f5;
+    color: #c5a47e;
+}
+
+.title {
+    font-size: 14px;
+    color: #c5a47e;
+    font-weight: var(--font-semithin);
+    letter-spacing: 1px;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+}
+
+.subtitle {
+    font-family: serif;
+    font-size: 56px;
+    font-weight: var(--font-semithin);
+    color: #1a1a1a;
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* Tab Item Style */
+.tab {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+}
+
+.checkbox {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    color: transparent;
+}
+
+.tab:hover .checkbox {
+    border-color: #c5a47e;
+}
+
+.tabActive .checkbox {
+    border-color: #c5a47e;
+    background-color: #fdf8f6;
+    color: #c5a47e;
+}
+
+.tabText {
+    font-size: var(--text-base);
+    font-weight: var(--font-medium);
+    color: #1a1a1a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tabActive .tabText {
+    color: #1a1a1a;
+}
+
+/* Count */
+.tabCount {
+    margin-left: auto;
+    font-size: 16px;
+    color: #999;
+    font-weight: 500;
+}
+
+.tabActive .tabCount {
+    color: #c5a47e;
+    font-weight: 700;
+}
+
+/* Loading & Error States */
+.loadingState,
+.errorState {
+    padding: var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
+}

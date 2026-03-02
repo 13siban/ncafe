@@ -14,6 +14,8 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import styles from './AdminSidebar.module.css';
+import { apiFetch } from '@/lib/api';
+import { useAuthStore } from '@/store/useAuthStore';
 
 interface NavItem {
   label: string;
@@ -42,16 +44,24 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   onToggleCollapse
 }) => {
   const pathname = usePathname();
+  const { user, logout, checkAuth, isLoading } = useAuthStore();
   const [menuCount, setMenuCount] = React.useState<number>(0);
+  const [isMounted, setIsMounted] = React.useState(false);
 
   React.useEffect(() => {
+    setIsMounted(true);
     const fetchData = async () => {
-      try {
-        const menusRes = await fetch('/api/admin/menus');
+      // 세션 정보가 없으면 확인
+      if (!user) {
+        await checkAuth();
+      }
 
+      try {
+        const menusRes = await apiFetch('/api/admin/menus');
         if (menusRes.ok) {
-          const menus = await menusRes.json();
-          setMenuCount(menus.length);
+          const menusData = await menusRes.json();
+          const count = Array.isArray(menusData) ? menusData.length : (menusData.menus?.length || 0);
+          setMenuCount(count);
         }
       } catch (error) {
         console.error('Sidebar data fetch error:', error);
@@ -59,7 +69,12 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     };
 
     fetchData();
-  }, []);
+  }, [user, checkAuth]);
+
+  const handleLogout = async () => {
+    await logout();
+    window.location.href = '/login';
+  };
 
   const navItems = [
     { label: '대시보드', href: '/admin', icon: <LayoutDashboard size={20} /> },
@@ -160,12 +175,35 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {/* Footer - User Info */}
         <div className={styles.footer}>
           <div className={styles.userInfo}>
-            <div className={styles.userAvatar}>JK</div>
-            <div>
-              <div className={styles.userName}>김사장</div>
-              <div className={styles.userRole}>카페 관리자</div>
+            <div className={styles.userAvatar}>
+              {isMounted && !isLoading ? (user ? (user.username || user.nickname).substring(0, 2).toUpperCase() : '??') : '...'}
             </div>
-            <LogOut size={18} style={{ marginLeft: 'auto', color: 'var(--color-gray-400)' }} />
+            <div>
+              <div className={styles.userName}>
+                {isMounted && !isLoading ? (user ? (user.username || user.nickname) : '로그인 필요') : '로딩 중...'}
+              </div>
+              <div className={styles.userRole}>
+                {isMounted && !isLoading && user ? (user.role === 'ROLE_ADMIN' ? '관리자' : '사용자') : ''}
+              </div>
+            </div>
+            {isMounted && !isLoading && user && (
+              <button
+                onClick={handleLogout}
+                className={styles.logoutIconButton}
+                title="로그아웃"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  marginLeft: 'auto',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '4px'
+                }}
+              >
+                <LogOut size={18} style={{ color: 'var(--color-gray-400)' }} />
+              </button>
+            )}
           </div>
         </div>
       </aside>

@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Coffee } from 'lucide-react';
-import { MenuList } from './_components/MenuList/MenuList';
-import { MenuActionBar } from './_components/MenuActionBar/MenuActionBar';
-import CategoryTabs from './_components/CategoryTabs/CategoryTabs';
+import { MenuList } from '@/components/menu/MenuList/MenuList';
+import { MenuActionBar } from '@/components/menu/MenuActionBar/MenuActionBar';
+import CategoryTabs from '@/components/menu/CategoryTabs/CategoryTabs';
 import styles from './page.module.css';
 
 export default function PublicMenusPage() {
@@ -33,20 +33,17 @@ export default function PublicMenusPage() {
             </nav>
 
             <main className={styles.container}>
-                {/* Category Tabs (Sidebar) */}
                 <CategoryTabs
                     selected={selectedCategory}
                     onSelect={setSelectedCategory}
                 />
 
                 <div className={styles.contentArea}>
-                    {/* Top Action Bar */}
                     <MenuActionBar
                         searchQuery={searchQuery}
                         onSearchChange={setSearchQuery}
                     />
 
-                    {/* Menu List */}
                     <MenuList
                         selectedCategory={selectedCategory}
                         searchQuery={searchQuery}
@@ -54,7 +51,6 @@ export default function PublicMenusPage() {
                 </div>
             </main>
 
-            {/* Simple Footer */}
             <footer className={styles.footer}>
                 <p>&copy; 2024 NCafe. All rights reserved.</p>
             </footer>

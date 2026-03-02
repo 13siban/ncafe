@@ -47,7 +47,8 @@
   display: flex;
   gap: 0.75rem;
   overflow-x: auto;
-  padding: 0.25rem; /* 여유 공간 확보로 잘림 방지 */
+  padding: 0.25rem;
+  /* 여유 공간 확보로 잘림 방지 */
   margin: -0.25rem;
 }
 
@@ -79,7 +80,8 @@
 }
 
 .thumbnailButton:hover .overlay {
-  background-color: rgba(0, 0, 0, 0.05); /* 살짝 어두워지는 호버 효과 */
+  background-color: rgba(0, 0, 0, 0.05);
+  /* 살짝 어두워지는 호버 효과 */
 }
 
 .thumbnailButton.active {
@@ -89,7 +91,8 @@
 }
 
 .thumbnailButton.active .overlay {
-  background-color: rgba(164, 117, 81, 0.4); /* 갈색 메인컬러 반투명 오버레이 */
+  background-color: rgba(164, 117, 81, 0.4);
+  /* 갈색 메인컬러 반투명 오버레이 */
   border-color: var(--color-primary-500);
   opacity: 1;
 }
@@ -106,3 +109,60 @@
   height: 100%;
 }
 
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  justify-content: flex-end;
+}
+
+.setPrimaryBtn {
+  background: var(--color-primary-600);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.setPrimaryBtn:hover {
+  background: var(--color-primary-700);
+}
+
+.deleteBtn {
+  background: white;
+  color: var(--color-red-600);
+  border: 1px solid var(--color-gray-200);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+  background: var(--color-red-50);
+  border-color: var(--color-red-200);
+}
+
+.uploadBtn {
+  background: white;
+  color: var(--color-primary-600);
+  border: 1px solid var(--color-primary-600);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-block;
+  text-align: center;
+}
+
+.uploadBtn:hover {
+  background: var(--color-primary-50);
+}

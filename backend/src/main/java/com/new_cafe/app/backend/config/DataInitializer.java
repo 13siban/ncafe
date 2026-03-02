@@ -2,10 +2,10 @@ package com.new_cafe.app.backend.config;
 
 import com.new_cafe.app.backend.category.adapter.out.persistence.CategoryJpaRepository;
 import com.new_cafe.app.backend.category.domain.model.Category;
-import com.new_cafe.app.backend.menu.adapter.out.persistence.MenuImageJpaRepository;
-import com.new_cafe.app.backend.menu.adapter.out.persistence.MenuJpaRepository;
-import com.new_cafe.app.backend.menu.domain.model.Menu;
-import com.new_cafe.app.backend.menu.domain.model.MenuImage;
+import com.new_cafe.app.backend.admin.menu.adapter.out.persistence.AdminMenuJpaEntity;
+import com.new_cafe.app.backend.admin.menu.adapter.out.persistence.AdminMenuJpaRepository;
+import com.new_cafe.app.backend.admin.menu.adapter.out.persistence.AdminMenuImageJpaEntity;
+import com.new_cafe.app.backend.admin.menu.adapter.out.persistence.AdminMenuImageJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Slf4j
 @Component
@@ -21,8 +20,8 @@ import java.util.List;
 public class DataInitializer implements CommandLineRunner {
 
     private final CategoryJpaRepository categoryRepository;
-    private final MenuJpaRepository menuRepository;
-    private final MenuImageJpaRepository menuImageRepository;
+    private final AdminMenuJpaRepository adminMenuRepository;
+    private final AdminMenuImageJpaRepository adminMenuImageRepository;
 
     @Override
     @Transactional
@@ -79,7 +78,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void createMenu(Category category, String korName, String engName, String description, int price, int sortOrder, String imageName) {
-        Menu menu = Menu.builder()
+        AdminMenuJpaEntity menu = AdminMenuJpaEntity.builder()
                 .korName(korName)
                 .engName(engName)
                 .description(description)
@@ -91,16 +90,16 @@ public class DataInitializer implements CommandLineRunner {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
-        
-        Menu savedMenu = menuRepository.save(menu);
 
-        MenuImage menuImage = MenuImage.builder()
+        AdminMenuJpaEntity savedMenu = adminMenuRepository.save(menu);
+
+        AdminMenuImageJpaEntity menuImage = AdminMenuImageJpaEntity.builder()
                 .menuId(savedMenu.getId())
                 .srcUrl(imageName)
                 .sortOrder(1)
                 .createdAt(LocalDateTime.now())
                 .build();
-        
-        menuImageRepository.save(menuImage);
+
+        adminMenuImageRepository.save(menuImage);
     }
 }

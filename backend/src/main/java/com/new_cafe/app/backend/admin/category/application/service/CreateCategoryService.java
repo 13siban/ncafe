@@ -20,7 +20,16 @@ public class CreateCategoryService implements CreateCategoryUseCase {
 
     @Override
     public CreateCategoryResult createCategory(CreateCategoryCommand command) {
-        // 카테고리 생성 로직 (현재는 스켈레톤)
-        return null;
+        Category category = Category.builder()
+                .name(command.getName())
+                .sortOrder(command.getSortOrder())
+                .build();
+        
+        Category saved = categoryRepositoryPort.save(category);
+        
+        return CreateCategoryResult.builder()
+                .id(saved.getId())
+                .name(saved.getName())
+                .build();
     }
 }

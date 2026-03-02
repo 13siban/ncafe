@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { fetchAPI } from '@/app/lib/api';
 
 export interface MenuImageResponse {
   id: number;
@@ -26,12 +27,8 @@ export const useMenuImages = (menuId: number) => {
     setError(null);
 
     try {
-      const response = await fetch(`/api/admin/menus/${menuId}/menu-images`);
-      if (!response.ok) {
-        throw new Error('메뉴 이미지를 불러오는데 실패했습니다.');
-      }
-
-      const data: MenuImageListResponse = await response.json();
+      // fetchAPI handles the /api prefix and res.json() parsing internally
+      const data: MenuImageListResponse = await fetchAPI(`/menus/${menuId}/menu-images`);
       setImages(data.images || []);
       setKorName(data.korName || '');
     } catch (err) {
@@ -42,6 +39,56 @@ export const useMenuImages = (menuId: number) => {
     }
   }, [menuId]);
 
+  const setPrimaryImage = async (imageId: number) => {
+    try {
+      await fetchAPI(`/admin/menus/${menuId}/menu-images/${imageId}/set-primary`, {
+        method: 'PUT'
+      });
+      await fetchImages(); // 갱신
+    } catch (err) {
+      console.error('대표 이미지 설정 실패:', err);
+      alert('대표 이미지 설정에 실패했습니다.');
+    }
+  };
+
+  const deleteImage = async (imageId: number) => {
+    if (!confirm('정말 이 이미지를 삭제하시겠습니까?')) return;
+    try {
+      await fetchAPI(`/admin/menus/${menuId}/menu-images/${imageId}`, {
+        method: 'DELETE'
+      });
+      await fetchImages(); // 갱신
+    } catch (err) {
+      console.error('이미지 삭제 실패:', err);
+      alert('이미지 삭제에 실패했습니다.');
+    }
+  };
+
+  const uploadImages = async (files: FileList | File[]) => {
+    if (!files || files.length === 0) return;
+    setIsLoading(true);
+
+    try {
+      const formData = new FormData();
+      Array.from(files).forEach(file => {
+        formData.append('files', file);
+      });
+
+      await fetchAPI(`/admin/menus/${menuId}/menu-images`, {
+        method: 'POST',
+        // fetchAPI needs to not alter Content-Type when body is FormData so browser can set boundary automatically
+        // If fetchAPI forces application/json, we might need a workaround. Assuming fetchAPI handles FormData naturally.
+        body: formData,
+      });
+      await fetchImages(); // 갱신
+    } catch (err) {
+      console.error('이미지 업로드 실패:', err);
+      alert('이미지 업로드에 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchImages();
   }, [fetchImages]);
@@ -51,6 +98,9 @@ export const useMenuImages = (menuId: number) => {
     korName,
     isLoading,
     error,
-    refresh: fetchImages
+    refresh: fetchImages,
+    setPrimaryImage,
+    deleteImage,
+    uploadImages
   };
 };

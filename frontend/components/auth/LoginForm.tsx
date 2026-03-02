@@ -1,9 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './LoginForm.module.css';
+import { authAPI } from '@/app/lib/api';
+import { useAuthStore } from '@/store/useAuthStore';
 
 const LoginForm = () => {
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -15,25 +20,23 @@ const LoginForm = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, password }),
-            });
+            // BFF 방식: JWT는 httpOnly 쿠키에 저장되므로 응답에 토큰이 없음
+            // 응답: { user: { id, email, nickname, role } }
+            const res = await authAPI.login(username, password);
 
-            if (!response.ok) {
-                throw new Error('로그인에 실패했습니다. 정보를 확인해주세요.');
+            if (res && res.user) {
+                useAuthStore.getState().setUser(res.user);
             }
 
-            const data = await response.json();
-            console.log('Login success:', data);
+            // 다른 컴포넌트(Header)에게 로그인 상태 변경 알림
+            window.dispatchEvent(new Event('login'));
 
-            // 실제 구현 시 토큰 저장 및 페이지 이동 logic 추가
-            window.location.href = '/';
+            // 이전 페이지 또는 홈으로 리다이렉트
+            const redirect = searchParams.get('redirect') || '/';
+            router.push(redirect);
+            router.refresh(); // 서버 컴포넌트 재검증
         } catch (err: any) {
-            setError(err.message || '알 수 없는 오류가 발생했습니다.');
+            setError(err.message || '로그인 중 오류가 발생했습니다.');
         } finally {
             setIsLoading(false);
         }

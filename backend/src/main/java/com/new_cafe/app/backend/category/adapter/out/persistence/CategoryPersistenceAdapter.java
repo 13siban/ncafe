@@ -33,4 +33,14 @@ public class CategoryPersistenceAdapter implements CategoryRepositoryPort {
     public Category findById(Long id) {
         return categoryJpaRepository.findById(id).orElse(null);
     }
+
+    @Override
+    public Category save(Category category) {
+        return categoryJpaRepository.save(category);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        categoryJpaRepository.deleteById(id);
+    }
 }
