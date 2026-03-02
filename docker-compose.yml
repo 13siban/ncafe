@@ -96,7 +96,7 @@ services:
     environment:
       - API_BASE_URL=http://backend:8031
       - SESSION_SECRET=ncafe-super-secret-session-key-minimum-32-chars
-      - SESSION_SECURE=false # Set to false if not using HTTPS (common in Docker local testing)
+      - SESSION_SECURE=true # 필수: https://mymyy.com 에서 쿠키를 정상 인식하려면 true여야 합니다.
     depends_on:
       - backend
     restart: unless-stopped
