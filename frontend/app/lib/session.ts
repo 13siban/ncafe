@@ -22,7 +22,7 @@ export const sessionOptions: SessionOptions = {
     cookieName: 'app_session',
     cookieOptions: {
         httpOnly: true,                                   // JavaScript 접근 차단 (XSS 방어 핵심)
-        secure: process.env.NODE_ENV === 'production',    // 운영에서만 HTTPS 필수
+        secure: process.env.SESSION_SECURE === 'true',    // HTTPS 필수 여부 (Docker 환경 대응을 위해 명시적 설정)
         sameSite: 'lax' as const,                         // CSRF 기본 방어
         path: '/',
         maxAge: 60 * 60 * 24,                             // 24시간 (JWT 만료시간과 동기화)
