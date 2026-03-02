@@ -28,10 +28,15 @@ export async function fetchAPI(endpoint: string, options?: RequestInit) {
 
         if (!res.ok) {
             // 401이면 로그인 페이지로 리다이렉트
+            // 단, 이미 로그인 페이지거나 인증 요청(/auth/...)인 경우는 제외 (무한 리다이렉트 방지)
             if (res.status === 401 && typeof window !== 'undefined') {
                 const currentPath = window.location.pathname;
-                window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
-                return;
+                const isAuthEndpoint = endpoint.startsWith('/auth/');
+
+                if (!currentPath.startsWith('/login') && !isAuthEndpoint) {
+                    window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+                    return;
+                }
             }
             const error: any = new Error(`API Error: ${res.status}`);
             error.status = res.status;

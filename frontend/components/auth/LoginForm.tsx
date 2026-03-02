@@ -32,7 +32,14 @@ const LoginForm = () => {
             window.dispatchEvent(new Event('login'));
 
             // 이전 페이지 또는 홈으로 리다이렉트
-            const redirect = searchParams.get('redirect') || '/';
+            let redirect = searchParams.get('redirect') || '/';
+
+            // 만약 리다이렉트 대상이 로그인이면 홈으로 보냄 (무한 루프 방지)
+            if (redirect.startsWith('/login')) {
+                redirect = '/';
+            }
+
+            console.log(`[LoginForm] Success: redirecting to ${redirect}`);
             router.push(redirect);
             router.refresh(); // 서버 컴포넌트 재검증
         } catch (err: any) {
