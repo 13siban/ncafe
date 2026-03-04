@@ -1,0 +1,48 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ prototype ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create .env file
+        run: |
+          echo "COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-young-ncafe}" > .env
+          echo "USER_ID=${USER_ID:-young}" >> .env
+          echo "BACKEND_PORT=${BACKEND_PORT:-8031}" >> .env
+          echo "FRONTEND_PORT=${FRONTEND_PORT:-3031}" >> .env
+          echo "DB_PORT=${DB_PORT:-5431}" >> .env
+          echo "SESSION_SECRET=${SESSION_SECRET:-ncafe-super-secret-session-key-random}" >> .env
+        env:
+          COMPOSE_PROJECT_NAME: ${{ secrets.COMPOSE_PROJECT_NAME }}
+          USER_ID: ${{ secrets.USER_ID }}
+          BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
+          FRONTEND_PORT: ${{ secrets.FRONTEND_PORT }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+
+      - name: Build and Deploy
+        run: docker compose --profile with-db up --build -d
+
+      - name: Verify deployment
+        run: |
+          echo "=== Container Status ==="
+          docker compose ps
+          sleep 15
+          echo ""
+          echo "=== Health Check ==="
+          curl -sf --max-time 10 -o /dev/null -w "Backend  : HTTP %{http_code}\n" http://localhost:${BACKEND_PORT:-8031} || echo "Backend  : not responding"
+          curl -sf --max-time 10 -o /dev/null -w "Frontend : HTTP %{http_code}\n" http://localhost:${FRONTEND_PORT:-3031} || echo "Frontend : not responding"
+        env:
+          BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
+          FRONTEND_PORT: ${{ secrets.FRONTEND_PORT }}
+
+      - name: Clean up old images
+        run: docker image prune -f

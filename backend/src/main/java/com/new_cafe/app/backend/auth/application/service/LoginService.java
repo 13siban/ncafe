@@ -2,7 +2,7 @@ package com.new_cafe.app.backend.auth.application.service;
 
 import com.new_cafe.app.backend.auth.application.port.in.LoginUseCase;
 import com.new_cafe.app.backend.auth.application.port.out.LoadUserPort;
-import com.new_cafe.app.backend.auth.domain.model.AuthUser;
+import com.new_cafe.app.backend.auth.domain.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.new_cafe.app.backend.config.security.JwtTokenProvider;

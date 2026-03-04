@@ -1,66 +1,4 @@
-# services:
-#   backend:
-#     build:
-#       context: ./backend
-#       dockerfile: Dockerfile
-#     # container_name: young-ncafe-backend (removed for automatic naming)
-#     ports:
-#       - "8031:8031" # 외부 8031 -> 내부 8031
-#     # environment:
-#     #   - SPRING_PROFILES_ACTIVE=prod
-#     #   - SERVER_PORT=8031 # [추가] 스프링 내부 포트를 8031로 강제 지정
-#     #   - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/ncafe
-#     #   - SPRING_DATASOURCE_USERNAME=ncafe
-#     #   - SPRING_DATASOURCE_PASSWORD=1234
-#     volumes:
-#       - /home/young/dist/ncafe/upload:/app/upload
-#     networks:
-#       - ncafe-network
-#     restart: always
-
-#   frontend:
-#     build:
-#       context: ./frontend
-#       dockerfile: Dockerfile
-#     # container_name: young-ncafe-frontend (removed for automatic naming)
-#     ports:
-#       - "3031:3031"
-#     environment:
-#       - BACKEND_URL=http://backend:8031
-#       - PORT=3031
-#       - HOSTNAME=0.0.0.0
-#     stdin_open: true # [추가] 컨테이너가 바로 종료되는 것 방지
-#     tty: true # [추가] 터미널 환경 활성화
-#     depends_on:
-#       - backend
-#     networks:
-#       - ncafe-network
-#     restart: always
-
-#   db:
-#     image: postgres:17
-#     profiles: [ "with-db" ] # 이 프로필을 지정해야만 실행됨
-#     container_name: dev-postgres
-#     environment:
-#       POSTGRES_DB: ncafe
-#       POSTGRES_USER: ncafe
-#       POSTGRES_PASSWORD: 1234
-#     ports:
-#       - "5431:5432"
-#     volumes:
-#       - /home/young/dist/ncafe/data:/var/lib/postgresql/data
-#     restart: unless-stopped
-
-# volumes:
-#   ncafe-db-data:
-
-# =================================================================
-# [ 실행 방법 ]
-# 1. 기존 컨테이너 삭제: docker compose down
-# 2. 빌드 및 실행: docker compose up -d --build
-# 3. DB 포함 실행: docker compose --profile with-db up -d --build
-# =================================================================
-name: young-ncafe
+name: ${COMPOSE_PROJECT_NAME:-young-ncafe}
 
 services:
   # ── 백엔드 (Spring Boot) ──
@@ -68,13 +6,14 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    image: young-ncafe-backend-image
-    container_name: young-ncafe-backend
+    image: ${USER_ID:-young}-ncafe-backend
+    container_name: ${USER_ID:-young}-backend
     ports:
-      - "8031:8031"
+      - "${BACKEND_PORT:-8031}:8081"
     volumes:
       - /home/young/dist/ncafe/upload:/app/upload
     environment:
+      - SPRING_PROFILES_ACTIVE=prod
       - DB_HOST=db
       - DB_PORT=5432
       - DB_USERNAME=ncafe
@@ -89,14 +28,14 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    image: young-ncafe-frontend-image
-    container_name: young-ncafe-frontend
+    image: ${USER_ID:-young}-ncafe-frontend
+    container_name: ${USER_ID:-young}-frontend
     ports:
-      - "3031:3031"
+      - "${FRONTEND_PORT:-3031}:3001"
     environment:
-      - API_BASE_URL=http://backend:8031
-      - SESSION_SECRET=ncafe-super-secret-session-key-minimum-32-chars
-      - SESSION_SECURE=true # 필수: https://mymyy.com 에서 쿠키를 정상 인식하려면 true여야 합니다.
+      - API_BASE_URL=http://backend:8081
+      - SESSION_SECRET=${SESSION_SECRET:-ncafe-super-secret-session-key-minimum-32-chars}
+      - SESSION_SECURE=true
     depends_on:
       - backend
     restart: unless-stopped
@@ -104,16 +43,17 @@ services:
   # ── 데이터베이스 (PostgreSQL) ──
   db:
     build:
-      context: ./db # Dockerfile이 있는 폴더 경로
+      context: ./db
       dockerfile: Dockerfile
-    image: young-ncafe-db-image # 빌드 후 생성될 이름
-    container_name: young-ncafe-db
+    image: ${USER_ID:-young}-ncafe-db
+    profiles: [ "with-db" ]
+    container_name: ${USER_ID:-young}-db
     environment:
       POSTGRES_DB: ncafedb
       POSTGRES_USER: ncafe
       POSTGRES_PASSWORD: 1234
     ports:
-      - "5431:5432"
+      - "${DB_PORT:-5431}:5432"
     volumes:
       - /home/young/dist/ncafe/data:/var/lib/postgresql/data
     restart: unless-stopped

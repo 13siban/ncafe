@@ -39,8 +39,8 @@ public class SecurityConfig {
                     .requestMatchers("/categories/**").permitAll()
                     .requestMatchers("/**/*.png", "/**/*.jpg", "/**/*.jpeg", "/**/*.gif", "/**/*.svg").permitAll()
 
-                    // 관리자 API: 인증만 되어 있으면 접근 가능 (테스트용)
-                    .requestMatchers("/admin/**").authenticated()
+                    // 관리자 API: ADMIN 권한이 있는 사용자만 접근 가능
+                    .requestMatchers("/admin/**").hasRole("ADMIN")
                     // 그 외 모든 요청은 인증 필요
                     .anyRequest().authenticated())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

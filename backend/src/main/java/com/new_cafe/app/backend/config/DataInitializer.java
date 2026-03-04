@@ -8,6 +8,10 @@ import com.new_cafe.app.backend.admin.menu.adapter.out.persistence.AdminMenuImag
 import com.new_cafe.app.backend.admin.menu.adapter.out.persistence.AdminMenuImageJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import com.new_cafe.app.backend.auth.adapter.out.persistence.UserJpaRepository;
+import com.new_cafe.app.backend.auth.domain.model.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import java.util.UUID;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,16 +26,22 @@ public class DataInitializer implements CommandLineRunner {
     private final CategoryJpaRepository categoryRepository;
     private final AdminMenuJpaRepository adminMenuRepository;
     private final AdminMenuImageJpaRepository adminMenuImageRepository;
+    private final UserJpaRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        if (categoryRepository.count() > 0) {
+        if (categoryRepository.count() > 0 && userRepository.count() > 0) {
             log.info("Data already exists, skipping initialization.");
             return;
         }
 
         log.info("Starting data initialization...");
+
+        if (userRepository.count() == 0) {
+            createInitialUsers();
+        }
 
         if (categoryRepository.count() == 0) {
             // 1. Categories
@@ -103,5 +113,24 @@ public class DataInitializer implements CommandLineRunner {
                 .build();
 
         adminMenuImageRepository.save(menuImage);
+    }
+    private void createInitialUsers() {
+        log.info("Creating initial users...");
+        
+        createUser("hong", "1234", "ROLE_ADMIN");
+        createUser("admin", "1234", "ROLE_ADMIN");
+        createUser("newlec", "1234", "ROLE_USER");
+        
+        log.info("Initial users created.");
+    }
+
+    private void createUser(String nickname, String password, String role) {
+        User user = User.builder()
+                .id(UUID.randomUUID().toString())
+                .username(nickname)
+                .password(passwordEncoder.encode(password))
+                .role(role)
+                .build();
+        userRepository.save(user);
     }
 }

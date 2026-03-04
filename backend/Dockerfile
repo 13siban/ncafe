@@ -28,7 +28,7 @@ COPY --from=builder /app/build/libs/*.jar app.jar
 RUN mkdir -p /app/upload
 VOLUME /app/upload
 
-ENV SERVER_PORT=8031
-EXPOSE 8031
+ENV SERVER_PORT=8081
+EXPOSE 8081
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Dserver.port=8081", "-jar", "app.jar"]
