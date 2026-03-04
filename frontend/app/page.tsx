@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Coffee, ArrowRight, MapPin, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -65,7 +66,7 @@ export default function HomePage() {
               <span className={styles.badge}>New Opening</span>
               <h1 className={styles.heroTitle}>
                 Brewed to <br />
-                <span className={styles.highlight}>Perfection.</span>
+                <span className={styles.highlight}>Perfectionn.</span>
               </h1>
               <p className={styles.heroDescription}>
                 Experience the finest artisanal coffee in a space designed for comfort and creativity.
