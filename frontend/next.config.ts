@@ -16,8 +16,9 @@ const nextConfig: NextConfig = {
   // BFF 패턴: /api/* 요청은 Catch-all API Route (app/api/[...path]/route.ts)가 처리합니다.
   // 하지만 정적 이미지 자원은 JWT 주입이 필요 없으므로 단순 rewrite로 연결합니다.
   async rewrites() {
-    // 환경변수 확인 (없으면 표준 포트 8081 사용)
-    const backendUrl = process.env.API_BASE_URL || 'http://localhost:8080';
+    // 환경변수 확인 (없으면 빌드 환경(prod)에서는 backend:8080, 로컬에서는 localhost:8080 사용)
+    const isProd = process.env.NODE_ENV === 'production';
+    const backendUrl = process.env.API_BASE_URL || (isProd ? 'http://backend:8080' : 'http://localhost:8080');
 
     return [
       {
