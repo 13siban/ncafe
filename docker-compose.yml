@@ -20,7 +20,7 @@ services:
       - JWT_SECRET=${JWT_SECRET}
     depends_on:
       - db
-    restart: unless-stopped
+    restart: always
 
   # ── 프론트엔드 (Next.js) ──
   frontend:
@@ -37,7 +37,7 @@ services:
       - SESSION_SECURE=${SESSION_SECURE}
     depends_on:
       - backend
-    restart: unless-stopped
+    restart: always
 
   # ── 데이터베이스 (PostgreSQL) ──
   db:
@@ -59,7 +59,7 @@ services:
       - "5431"
     volumes:
       - /home/young/dist/ncafe/data:/var/lib/postgresql/data
-    restart: unless-stopped
+    restart: always
 
 volumes:
   ncafe-db-data:
