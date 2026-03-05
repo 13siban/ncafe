@@ -17,8 +17,8 @@ services:
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
-    # expose:
-    #   - "8080" # [Local Dev Only] Internal port for backend. Managed via Dockerfile EXPOSE.
+    ports:
+      - "${LOCAL_BACKEND_PORT:-}" # 서버 배포 시 비워두면 포트 자동 숨김
     depends_on:
       db:
         condition: service_healthy
@@ -57,8 +57,8 @@ services:
       - POSTGRES_DB=ncafedb
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
-    # expose:
-    #   - "5432" # [Local Dev Only] Internal port for DB. Managed via Dockerfile EXPOSE.
+    ports:
+      - "${LOCAL_DB_PORT:-}" # 서버 배포 시 비워두면 포트 자동 숨김
     volumes:
       - /home/young/dist/ncafe/data:/var/lib/postgresql/data
     command: -p 5432
