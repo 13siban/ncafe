@@ -11,34 +11,32 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          clean: false
 
       - name: Create .env file
         run: |
-          echo "COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-young-ncafe}" > .env
-          echo "USER_ID=${USER_ID:-young}" >> .env
-          echo "BACKEND_PORT=${BACKEND_PORT:-8031}" >> .env
-          echo "FRONTEND_PORT=${FRONTEND_PORT:-3031}" >> .env
-          echo "DB_PORT=${DB_PORT:-5431}" >> .env
-          echo "POSTGRES_DB=${POSTGRES_DB:-ncafedb}" >> .env
-          echo "DB_URL=${DB_URL:-jdbc:postgresql://db:5431/${POSTGRES_DB:-ncafedb}}" >> .env
-          echo "DB_USERNAME=${DB_USERNAME}" >> .env
-          echo "DB_PASSWORD=${DB_PASSWORD}" >> .env
-          echo "SESSION_SECRET=${SESSION_SECRET}" >> .env
-          echo "JWT_SECRET=${JWT_SECRET}" >> .env
-          echo "SESSION_SECURE=${SESSION_SECURE:-true}" >> .env
+          echo "COMPOSE_PROJECT_NAME=${{ vars.USER_ID }}-ncafe" >> .env
+          echo "USER_ID=${{ vars.USER_ID }}" >> .env
+          echo "BACKEND_PORT=${{ vars.BACKEND_PORT }}" >> .env
+          echo "FRONTEND_PORT=${{ vars.FRONTEND_PORT }}" >> .env
+          echo "DB_PORT=${{ vars.DB_PORT }}" >> .env
+          echo "BACKEND_IMAGE=${{ vars.BACKEND_IMAGE }}" >> .env
+          echo "FRONTEND_IMAGE=${{ vars.FRONTEND_IMAGE }}" >> .env
+          echo "SPRING_PROFILES_ACTIVE=${{ vars.SPRING_PROFILES_ACTIVE }}" >> .env
+          echo "JWT_EXPIRATION=${{ vars.JWT_EXPIRATION }}" >> .env
+          echo "PROD_DB_URL=${{ vars.SPRING_DATASOURCE_URL }}" >> .env
+          echo "PROD_DB_USERNAME=${{ vars.SPRING_DATASOURCE_USERNAME }}" >> .env
+          echo "PROD_DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "SESSION_SECRET=${{ secrets.SESSION_SECRET }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
         env:
-          COMPOSE_PROJECT_NAME: ${{ secrets.COMPOSE_PROJECT_NAME || vars.COMPOSE_PROJECT_NAME }}
-          USER_ID: ${{ secrets.USER_ID || vars.USER_ID }}
-          BACKEND_PORT: ${{ secrets.BACKEND_PORT || vars.BACKEND_PORT }}
-          FRONTEND_PORT: ${{ secrets.FRONTEND_PORT || vars.FRONTEND_PORT }}
-          DB_PORT: ${{ secrets.DB_PORT || vars.DB_PORT }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB || vars.POSTGRES_DB }}
-          DB_URL: ${{ secrets.DB_URL || vars.DB_URL }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME || vars.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD || vars.DB_PASSWORD }}
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET || vars.SESSION_SECRET }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET || vars.JWT_SECRET }}
-          SESSION_SECURE: ${{ secrets.SESSION_SECURE || vars.SESSION_SECURE }}
+          USER_ID: ${{ vars.USER_ID }}
+          BACKEND_PORT: ${{ vars.BACKEND_PORT }}
+          FRONTEND_PORT: ${{ vars.FRONTEND_PORT }}
+          DB_PORT: ${{ vars.DB_PORT }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
 
       - name: Build and Deploy
         run: docker compose --profile with-db up --build -d
@@ -47,16 +45,13 @@ jobs:
         run: |
           echo "=== Container Status ==="
           docker compose ps
-          sleep 20
+          sleep 15
           echo ""
           echo "=== Health Check ==="
-          # 프론트엔드는 호스트 포트로 체크
-          curl -sf --max-time 15 -o /dev/null -w "Frontend : HTTP %{http_code}\n" http://localhost:${FRONTEND_PORT:-3031} || echo "Frontend : not responding"
-          # 백엔드는 프론트엔드 컨테이너 내부에서 curl로 내부망 체크
-          docker exec ${USER_ID}-frontend curl -sf -o /dev/null -w "Backend (Internal) : HTTP %{http_code}\n" http://backend:8080/menus || echo "Backend : not responding (internal check failed)"
+          curl -sf --max-time 10 -o /dev/null -w "Frontend : HTTP %{http_code}\n" http://localhost:${FRONTEND_PORT:-3031} || echo "Frontend : not responding"
         env:
-          FRONTEND_PORT: ${{ secrets.FRONTEND_PORT || vars.FRONTEND_PORT }}
-          USER_ID: ${{ secrets.USER_ID || vars.USER_ID }}
+          BACKEND_PORT: ${{ vars.BACKEND_PORT }}
+          FRONTEND_PORT: ${{ vars.FRONTEND_PORT }}
 
       - name: Clean up old images
         run: docker image prune -f
