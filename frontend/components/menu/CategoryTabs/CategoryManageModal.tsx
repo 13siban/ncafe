@@ -10,6 +10,7 @@ interface CategoryManageModalProps {
     isOpen: boolean;
     onClose: () => void;
     categories: CategoryResponseDto[];
+    refetch: () => Promise<void> | void;
     onSave: () => void;
 }
 
@@ -20,7 +21,7 @@ type EditCategory = {
     isDeleted: boolean;
 };
 
-export function CategoryManageModal({ isOpen, onClose, categories, onSave }: CategoryManageModalProps) {
+export function CategoryManageModal({ isOpen, onClose, categories, refetch, onSave }: CategoryManageModalProps) {
     const [items, setItems] = useState<EditCategory[]>([]);
     const [isSaving, setIsSaving] = useState(false);
 
@@ -138,9 +139,27 @@ export function CategoryManageModal({ isOpen, onClose, categories, onSave }: Cat
             alert('카테고리 수정이 완료되었습니다.');
             onSave();
         } catch (error: any) {
-            console.error('Failed to save categories', error);
+            console.error('Catch block error:', error);
             const msg = error.message || '카테고리 저장 중 오류가 발생했습니다.';
-            alert(`오류: ${msg}`);
+
+            // [강력 수동 복원] 서버에서 에러가 나면 즉시 원본 데이터로 화면 복구
+            const rollbackItems = categories.map(c => ({
+                uid: String(c.id),
+                id: c.id,
+                name: c.name,
+                isDeleted: false
+            }));
+
+            console.log('Rolling back items to:', rollbackItems);
+            setItems(rollbackItems);
+
+            // 서버와 백그라운드 싱크
+            refetch();
+
+            // 리액트가 화면을 바꿀 기회를 주기 위해 약간의 지연 후 알림
+            setTimeout(() => {
+                alert(msg);
+            }, 100);
         } finally {
             setIsSaving(false);
         }

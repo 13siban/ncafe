@@ -18,7 +18,7 @@ export default function CategoryTabs({
     onSelect,
     mode = 'public',
 }: CategoryTabsProps) {
-    const { categories, isLoading, error } = useCategories({ mode });
+    const { categories, isLoading, error, refetch } = useCategories({ mode });
     const [isManageModalOpen, setIsManageModalOpen] = useState(false);
 
     if (isLoading) {
@@ -99,9 +99,10 @@ export default function CategoryTabs({
                         isOpen={isManageModalOpen}
                         onClose={() => setIsManageModalOpen(false)}
                         categories={categories}
+                        refetch={refetch}
                         onSave={() => {
                             setIsManageModalOpen(false);
-                            window.location.reload();
+                            refetch();
                         }}
                     />
                 )
