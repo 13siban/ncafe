@@ -151,7 +151,24 @@ export default function CategoryManageModal({ isOpen, onClose, categories, onSav
         } catch (error: any) {
             console.error('Failed to save categories', error);
             const message = error.message || '카테고리 저장 중 오류가 발생했습니다.';
-            alert(message);
+
+            // 오류 발생 시 초기 상태(수정 전)로 되돌리기
+            // alert 전에 수행하여 UI가 먼저 그려지도록 유도
+            const originalItems = categories.map(c => ({
+                uid: String(c.id),
+                id: c.id,
+                name: c.name,
+                isDeleted: false
+            }));
+
+            console.log('Resetting items to:', originalItems);
+            setItems(originalItems);
+
+            // alert는 자바스크립트 실행을 중단시키므로,
+            // 화면이 먼저 다시 그려지도록 약간의 지연(setTimeout)을 줍니다.
+            setTimeout(() => {
+                alert(message);
+            }, 50);
         } finally {
             setIsSaving(false);
         }

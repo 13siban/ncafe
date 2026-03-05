@@ -99,28 +99,36 @@ async function unifiedHandler(req: NextRequest) {
         headers['Authorization'] = `Bearer ${session.token}`;
     }
 
-    // [개선] 바디를 바로 스트림으로 전달 (메모리 효율 및 Multipart 경계값 보존)
-    const proxyRes = await fetch(targetUrl, {
-        method: req.method,
-        headers,
-        body: req.method !== 'GET' && req.method !== 'HEAD' ? req.body : null,
-        // @ts-ignore - Next.js fetch에 duplex 옵션이 필요한 경우가 있음
-        duplex: 'half',
-    });
+    try {
+        // [개선] 바디를 바로 스트림으로 전달 (메모리 효율 및 Multipart 경계값 보존)
+        const proxyRes = await fetch(targetUrl, {
+            method: req.method,
+            headers,
+            body: req.method !== 'GET' && req.method !== 'HEAD' ? req.body : null,
+            // @ts-ignore - Next.js fetch에 duplex 옵션이 필요한 경우가 있음
+            duplex: 'half',
+        });
 
-    if (proxyRes.status === 401 && session.token) {
-        session.destroy();
+        if (proxyRes.status === 401 && session.token) {
+            session.destroy();
+        }
+
+        const responseHeaders = new Headers();
+        const resContentType = proxyRes.headers.get('content-type');
+        if (resContentType) responseHeaders.set('Content-Type', resContentType);
+
+        return new NextResponse(proxyRes.body, {
+            status: proxyRes.status,
+            statusText: proxyRes.statusText,
+            headers: responseHeaders,
+        });
+    } catch (e: any) {
+        console.error('Proxy error:', e);
+        return NextResponse.json(
+            { message: `백엔드 서버와 통신 중 오류가 발생했습니다: ${e.message}` },
+            { status: 500 }
+        );
     }
-
-    const responseHeaders = new Headers();
-    const resContentType = proxyRes.headers.get('content-type');
-    if (resContentType) responseHeaders.set('Content-Type', resContentType);
-
-    return new NextResponse(proxyRes.body, {
-        status: proxyRes.status,
-        statusText: proxyRes.statusText,
-        headers: responseHeaders,
-    });
 }
 
 export const GET = unifiedHandler;

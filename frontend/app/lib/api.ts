@@ -27,25 +27,30 @@ export async function fetchAPI(endpoint: string, options?: RequestInit) {
         });
 
         if (!res.ok) {
+            let message = `Error: ${res.status} ${res.statusText}`;
+            let status = res.status;
+
+            try {
+                const body = await res.json();
+                if (body && body.message) {
+                    message = body.message;
+                }
+            } catch {
+                /* no json body */
+            }
+
             // 401이면 로그인 페이지로 리다이렉트
-            // 단, 이미 로그인 페이지거나 인증 요청(/auth/...)인 경우는 제외 (무한 리다이렉트 방지)
-            if (res.status === 401 && typeof window !== 'undefined') {
+            if (status === 401 && typeof window !== 'undefined') {
                 const currentPath = window.location.pathname;
                 const isAuthEndpoint = endpoint.startsWith('/auth/');
-
                 if (!currentPath.startsWith('/login') && !isAuthEndpoint) {
                     window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
                     return;
                 }
             }
-            const error: any = new Error(`API Error: ${res.status}`);
-            error.status = res.status;
-            try {
-                const body = await res.json();
-                error.message = body.message || error.message;
-            } catch {
-                /* no json body */
-            }
+
+            const error: any = new Error(message);
+            error.status = status;
             throw error;
         }
 
