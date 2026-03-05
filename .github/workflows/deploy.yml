@@ -15,25 +15,25 @@ jobs:
           clean: false
 
       - name: Create .env file
-        run: |
-          echo "COMPOSE_PROJECT_NAME=${{ vars.COMPOSE_PROJECT_NAME }}" > .env
-          echo "USER_ID=${{ vars.USER_ID }}" >> .env
-          echo "BACKEND_PORT=${{ vars.BACKEND_PORT }}" >> .env
-          echo "FRONTEND_PORT=${{ vars.FRONTEND_PORT }}" >> .env
-          echo "DB_PORT=${{ vars.DB_PORT }}" >> .env
-          echo "DB_USERNAME=${{ vars.DB_USERNAME }}" >> .env
-          echo "DB_PASSWORD=$DB_PASSWORD" >> .env
-          echo "JWT_SECRET=$JWT_SECRET" >> .env
-          echo "SESSION_SECRET=$SESSION_SECRET" >> .env
-          echo "DB_URL=jdbc:postgresql://db:5431/ncafedb" >> .env
-          echo "POSTGRES_DB=ncafedb" >> .env
-          echo "SPRING_PROFILES_ACTIVE=prod" >> .env
-          echo "SESSION_SECURE=true" >> .env
         # 쉘에서 바로 변수를 사용할 수 있게 env 블록 유지
         env:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+        run: |
+          echo "COMPOSE_PROJECT_NAME='${{ vars.COMPOSE_PROJECT_NAME }}'" > .env
+          echo "USER_ID='${{ vars.USER_ID }}'" >> .env
+          echo "BACKEND_PORT='${{ vars.BACKEND_PORT }}'" >> .env
+          echo "FRONTEND_PORT='${{ vars.FRONTEND_PORT }}'" >> .env
+          echo "DB_PORT='${{ vars.DB_PORT }}'" >> .env
+          echo "DB_USERNAME='${{ vars.DB_USERNAME }}'" >> .env
+          echo "DB_PASSWORD='$DB_PASSWORD'" >> .env
+          echo "JWT_SECRET='$JWT_SECRET'" >> .env
+          echo "SESSION_SECRET='$SESSION_SECRET'" >> .env
+          echo "DB_URL='jdbc:postgresql://db:5431/ncafedb'" >> .env
+          echo "POSTGRES_DB='ncafedb'" >> .env
+          echo "SPRING_PROFILES_ACTIVE='prod'" >> .env
+          echo "SESSION_SECURE='true'" >> .env
 
 
       - name: Build and Deploy
