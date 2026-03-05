@@ -13,10 +13,12 @@ services:
       - /home/young/dist/ncafe/upload:/app/upload
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - DB_URL=${DB_URL}
+      - DB_URL=jdbc:postgresql://db:5432/ncafedb
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
+    # expose:
+    #   - "8080" # [Local Dev Only] Internal port for backend. Managed via Dockerfile EXPOSE.
     depends_on:
       db:
         condition: service_healthy
@@ -50,18 +52,18 @@ services:
     restart: always
     env_file: .env
     environment:
-      # DB 컨테이너 내부 포트를 5431로 고정
-      - PGPORT=5431
+      # DB 컨테이너 내부 포트를 5432로 고정
+      - PGPORT=5432
       - POSTGRES_DB=ncafedb
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
-    expose:
-      - "5431"
+    # expose:
+    #   - "5432" # [Local Dev Only] Internal port for DB. Managed via Dockerfile EXPOSE.
     volumes:
       - /home/young/dist/ncafe/data:/var/lib/postgresql/data
-    command: -p 5431
+    command: -p 5432
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME} -p 5431 -d ncafedb" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME} -p 5432 -d ncafedb" ]
       interval: 10s
       timeout: 5s
       retries: 5

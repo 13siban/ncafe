@@ -6,3 +6,4 @@ node_modules/
 dist/
 build/
 .next/
+docker-compose.override.yml
