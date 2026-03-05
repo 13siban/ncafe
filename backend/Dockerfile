@@ -11,19 +11,19 @@ COPY build.gradle settings.gradle ./
 RUN chmod +x gradlew
 RUN ./gradlew dependencies --no-daemon
 
-# 소스 복사 및 빌드 (결과물 파일명을 강제 지정하면 더 안전합니다)
+# 소스 복사 및 빌드
 COPY src ./src
 RUN ./gradlew bootJar -x test --no-daemon
+
+# 빌드된 결과물 중 실행 가능한 jar를 찾아서 이름을 고정합니다. (plain.jar 제외)
+RUN mv build/libs/*[!plain].jar build/libs/app.jar
 
 # 2단계: 실행 스테이지
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# [수정] 패턴 매칭 대신 빌드된 모든 jar 중 가장 큰 실행형 jar 하나를 가져오도록 수정하거나,
-# 아래와 같이 명시적인 위치를 지정합니다.
-# 보통 Gradle 빌드 결과물은 build/libs/ 폴더에 생성됩니다.
-# Gradle 빌드 시 생성되는 실행 가능한 jar만 복사 (plain.jar 제외)
-COPY --from=builder /app/build/libs/*[!plain].jar app.jar
+# 빌드 스테이지에서 이름을 고정한 app.jar만 가져옵니다.
+COPY --from=builder /app/build/libs/app.jar app.jar
 
 # 파일 업로드 설정
 RUN mkdir -p /app/upload
