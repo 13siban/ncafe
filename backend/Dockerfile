@@ -22,7 +22,8 @@ WORKDIR /app
 # [수정] 패턴 매칭 대신 빌드된 모든 jar 중 가장 큰 실행형 jar 하나를 가져오도록 수정하거나,
 # 아래와 같이 명시적인 위치를 지정합니다.
 # 보통 Gradle 빌드 결과물은 build/libs/ 폴더에 생성됩니다.
-COPY --from=builder /app/build/libs/*.jar app.jar
+# Gradle 빌드 시 생성되는 실행 가능한 jar만 복사 (plain.jar 제외)
+COPY --from=builder /app/build/libs/*[!plain].jar app.jar
 
 # 파일 업로드 설정
 RUN mkdir -p /app/upload
