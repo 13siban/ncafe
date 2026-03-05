@@ -1,50 +1,36 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import styles from './LoginForm.module.css';
 import { authAPI } from '@/app/lib/api';
-import { useAuthStore } from '@/store/useAuthStore';
+import Link from 'next/link';
 
-const LoginForm = () => {
+const SignupForm = () => {
     const router = useRouter();
-    const searchParams = useSearchParams();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [passwordConfirm, setPasswordConfirm] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+
+        if (password !== passwordConfirm) {
+            setError('비밀번호가 일치하지 않습니다.');
+            return;
+        }
+
         setIsLoading(true);
 
         try {
-            // BFF 방식: JWT는 httpOnly 쿠키에 저장되므로 응답에 토큰이 없음
-            // 응답: { user: { id, email, nickname, role } }
-            const res = await authAPI.login(username, password);
-
-            if (res && res.user) {
-                useAuthStore.getState().setUser(res.user);
-            }
-
-            // 다른 컴포넌트(Header)에게 로그인 상태 변경 알림
-            window.dispatchEvent(new Event('login'));
-
-            // 이전 페이지 또는 홈으로 리다이렉트
-            let redirect = searchParams.get('redirect') || '/';
-
-            // 만약 리다이렉트 대상이 로그인이면 홈으로 보냄 (무한 루프 방지)
-            if (redirect.startsWith('/login')) {
-                redirect = '/';
-            }
-
-            console.log(`[LoginForm] Success: redirecting to ${redirect}`);
-            router.push(redirect);
-            router.refresh(); // 서버 컴포넌트 재검증
+            await authAPI.signup(username, password);
+            alert('회원가입이 완료되었습니다. 로그인해주세요.');
+            router.push('/login');
         } catch (err: any) {
-            setError(err.message || '로그인 중 오류가 발생했습니다.');
+            setError(err.message || '회원가입 중 오류가 발생했습니다.');
         } finally {
             setIsLoading(false);
         }
@@ -52,8 +38,8 @@ const LoginForm = () => {
 
     return (
         <div className={styles.formContainer}>
-            <h1 className={styles.title}>로그인</h1>
-            <p className={styles.subtitle}>Welcome back to NCafe</p>
+            <h1 className={styles.title}>회원가입</h1>
+            <p className={styles.subtitle}>Create a new NCafe account</p>
 
             <form onSubmit={handleSubmit}>
                 <div className={styles.formGroup}>
@@ -64,7 +50,7 @@ const LoginForm = () => {
                         className={styles.input}
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        placeholder="아이디를 입력하세요"
+                        placeholder="새로운 아이디를 입력하세요"
                         required
                     />
                 </div>
@@ -77,7 +63,20 @@ const LoginForm = () => {
                         className={styles.input}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="비밀번호를 입력하세요"
+                        placeholder="사용할 비밀번호를 입력하세요"
+                        required
+                    />
+                </div>
+
+                <div className={styles.formGroup}>
+                    <label htmlFor="passwordConfirm" className={styles.label}>비밀번호 확인</label>
+                    <input
+                        id="passwordConfirm"
+                        type="password"
+                        className={styles.input}
+                        value={passwordConfirm}
+                        onChange={(e) => setPasswordConfirm(e.target.value)}
+                        placeholder="비밀번호를 다시 한번 입력하세요"
                         required
                     />
                 </div>
@@ -94,12 +93,12 @@ const LoginForm = () => {
                     className={styles.submitButton}
                     disabled={isLoading}
                 >
-                    {isLoading ? '로그인 중...' : '로그인'}
+                    {isLoading ? '가입 중...' : '가입하기'}
                 </button>
                 <div style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.875rem' }}>
-                    <span style={{ color: 'var(--color-gray-500)' }}>계정이 없으신가요? </span>
-                    <Link href="/signup" style={{ color: 'var(--color-primary-600)', fontWeight: 600, textDecoration: 'underline' }}>
-                        회원가입
+                    <span style={{ color: 'var(--color-gray-500)' }}>이미 계정이 있으신가요? </span>
+                    <Link href="/login" style={{ color: 'var(--color-primary-600)', fontWeight: 600, textDecoration: 'underline' }}>
+                        로그인
                     </Link>
                 </div>
             </form>
@@ -107,4 +106,4 @@ const LoginForm = () => {
     );
 };
 
-export default LoginForm;
+export default SignupForm;

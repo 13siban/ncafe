@@ -78,9 +78,14 @@ const Header = () => {
                             </button>
                         </div>
                     ) : isMounted ? (
-                        <Link href="/login" className={styles.loginButton}>
-                            Login
-                        </Link>
+                        <>
+                            <Link href="/login" className={styles.loginButton}>
+                                Login
+                            </Link>
+                            <Link href="/signup" className={styles.signupButton}>
+                                Sign Up
+                            </Link>
+                        </>
                     ) : null}
                 </div>
             </div>

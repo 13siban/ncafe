@@ -4,6 +4,7 @@ import com.new_cafe.app.backend.auth.adapter.in.web.dto.LoginRequest;
 import com.new_cafe.app.backend.auth.adapter.in.web.dto.LoginResponse;
 import com.new_cafe.app.backend.auth.adapter.in.web.dto.MeResponse;
 import com.new_cafe.app.backend.auth.application.port.in.LoginUseCase;
+import com.new_cafe.app.backend.auth.application.port.in.SignupUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,6 +26,18 @@ import java.util.Map;
 public class AuthController {
 
     private final LoginUseCase loginUseCase;
+    private final SignupUseCase signupUseCase;
+
+    @PostMapping("/signup")
+    public ResponseEntity<?> signup(@RequestBody com.new_cafe.app.backend.auth.adapter.in.web.dto.SignupRequest request) {
+        signupUseCase.signup(
+                SignupUseCase.SignupCommand.builder()
+                        .username(request.getUsername())
+                        .password(request.getPassword())
+                        .build()
+        );
+        return ResponseEntity.ok(Map.of("message", "회원가입이 완료되었습니다."));
+    }
 
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest request) {

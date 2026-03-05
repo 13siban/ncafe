@@ -82,4 +82,11 @@ export const authAPI = {
 
     /** 현재 세션에서 사용자 정보 조회 */
     getSession: () => fetchAPI('/auth/session'),
+
+    /** 회원가입: 새로운 사용자 등록 */
+    signup: (username: string, password: string) =>
+        fetchAPI('/auth/signup', {
+            method: 'POST',
+            body: JSON.stringify({ username, password }),
+        }),
 };
