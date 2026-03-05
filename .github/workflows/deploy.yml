@@ -27,18 +27,18 @@ jobs:
           echo "JWT_SECRET=${JWT_SECRET}" >> .env
           echo "SESSION_SECURE=${SESSION_SECURE:-true}" >> .env
         env:
-          COMPOSE_PROJECT_NAME: ${{ secrets.COMPOSE_PROJECT_NAME }}
-          USER_ID: ${{ secrets.USER_ID }}
-          BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
-          FRONTEND_PORT: ${{ secrets.FRONTEND_PORT }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          SESSION_SECURE: ${{ secrets.SESSION_SECURE }}
+          COMPOSE_PROJECT_NAME: ${{ secrets.COMPOSE_PROJECT_NAME || vars.COMPOSE_PROJECT_NAME }}
+          USER_ID: ${{ secrets.USER_ID || vars.USER_ID }}
+          BACKEND_PORT: ${{ secrets.BACKEND_PORT || vars.BACKEND_PORT }}
+          FRONTEND_PORT: ${{ secrets.FRONTEND_PORT || vars.FRONTEND_PORT }}
+          DB_PORT: ${{ secrets.DB_PORT || vars.DB_PORT }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB || vars.POSTGRES_DB }}
+          DB_URL: ${{ secrets.DB_URL || vars.DB_URL }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME || vars.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD || vars.DB_PASSWORD }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET || vars.SESSION_SECRET }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET || vars.JWT_SECRET }}
+          SESSION_SECURE: ${{ secrets.SESSION_SECURE || vars.SESSION_SECURE }}
 
       - name: Build and Deploy
         run: docker compose --profile with-db up --build -d
@@ -53,8 +53,8 @@ jobs:
           curl -sf --max-time 10 -o /dev/null -w "Backend   : HTTP %{http_code}\n" http://localhost:${BACKEND_PORT:-8031}/menus || echo "Backend  : not responding"
           curl -sf --max-time 10 -o /dev/null -w "Frontend : HTTP %{http_code}\n" http://localhost:${FRONTEND_PORT:-3031} || echo "Frontend : not responding"
         env:
-          BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
-          FRONTEND_PORT: ${{ secrets.FRONTEND_PORT }}
+          BACKEND_PORT: ${{ secrets.BACKEND_PORT || vars.BACKEND_PORT }}
+          FRONTEND_PORT: ${{ secrets.FRONTEND_PORT || vars.FRONTEND_PORT }}
 
       - name: Clean up old images
         run: docker image prune -f
