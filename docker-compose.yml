@@ -8,8 +8,6 @@ services:
       dockerfile: Dockerfile
     image: ${USER_ID}-ncafe-backend
     container_name: ${USER_ID}-backend
-    # ports:
-    #   - "${BACKEND_PORT}:8080"
     volumes:
       - /home/young/dist/ncafe/upload:/app/upload
     environment:
@@ -48,25 +46,19 @@ services:
     image: ${USER_ID}-ncafe-db
     profiles: [ "with-db" ]
     container_name: ${USER_ID}-db
+    restart: always
+    env_file: .env
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      # 나중에 5432로 바꿀 수도 있으나 지금은 내부 포트를 5431로 고정합니다.
-      PGPORT: 5431
-    # 외부로 포트를 열지 않고(0.0.0.0 제거) 도커 내부망에서만 사용하도록 expose 처리합니다.
-    # ports: 대신 expose를 사용해야 ps 명령 시 '5431/tcp' 로만 깔끔하게 보입니다.
+      - POSTGRES_DB=ncafedb
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     expose:
       - "5431"
+    volumes:
+      - /home/young/dist/ncafe/data:/var/lib/postgresql/data
+    command: -p 5431
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -p 5431 -U ${DB_USERNAME}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME} -p 5431 -d ncafedb" ]
       interval: 10s
       timeout: 5s
       retries: 5
-    volumes:
-      - /home/young/dist/ncafe/data:/var/lib/postgresql/data
-    restart: always
-volumes:
-  ncafe-db-data:
-
-
