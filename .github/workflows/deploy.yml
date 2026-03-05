@@ -16,21 +16,29 @@ jobs:
         run: |
           echo "COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME:-young-ncafe}" > .env
           echo "USER_ID=${USER_ID:-young}" >> .env
+          echo "BACKEND_PORT=${BACKEND_PORT:-8031}" >> .env
           echo "FRONTEND_PORT=${FRONTEND_PORT:-3031}" >> .env
-          echo "DB_URL=${DB_URL}" >> .env
+          echo "DB_PORT=${DB_PORT:-5431}" >> .env
+          echo "POSTGRES_DB=${POSTGRES_DB:-ncafedb}" >> .env
+          echo "DB_URL=${DB_URL:-jdbc:postgresql://db:5432/${POSTGRES_DB:-ncafedb}}" >> .env
           echo "DB_USERNAME=${DB_USERNAME}" >> .env
           echo "DB_PASSWORD=${DB_PASSWORD}" >> .env
           echo "SESSION_SECRET=${SESSION_SECRET}" >> .env
           echo "JWT_SECRET=${JWT_SECRET}" >> .env
+          echo "SESSION_SECURE=${SESSION_SECURE:-true}" >> .env
         env:
           COMPOSE_PROJECT_NAME: ${{ secrets.COMPOSE_PROJECT_NAME }}
           USER_ID: ${{ secrets.USER_ID }}
+          BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
           FRONTEND_PORT: ${{ secrets.FRONTEND_PORT }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
           DB_URL: ${{ secrets.DB_URL }}
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SESSION_SECURE: ${{ secrets.SESSION_SECURE }}
 
       - name: Build and Deploy
         run: docker compose --profile with-db up --build -d
@@ -42,9 +50,10 @@ jobs:
           sleep 15
           echo ""
           echo "=== Health Check ==="
-          echo "Backend  : Isolated (BFF Mode - No Public Port)"
+          curl -sf --max-time 10 -o /dev/null -w "Backend   : HTTP %{http_code}\n" http://localhost:${BACKEND_PORT:-8031}/menus || echo "Backend  : not responding"
           curl -sf --max-time 10 -o /dev/null -w "Frontend : HTTP %{http_code}\n" http://localhost:${FRONTEND_PORT:-3031} || echo "Frontend : not responding"
         env:
+          BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
           FRONTEND_PORT: ${{ secrets.FRONTEND_PORT }}
 
       - name: Clean up old images
