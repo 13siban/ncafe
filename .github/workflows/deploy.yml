@@ -52,8 +52,8 @@ jobs:
           echo "=== Health Check ==="
           # 프론트엔드는 호스트 포트로 체크
           curl -sf --max-time 15 -o /dev/null -w "Frontend : HTTP %{http_code}\n" http://localhost:${FRONTEND_PORT:-3031} || echo "Frontend : not responding"
-          # 백엔드는 도커 내부 네트워크를 통해 체크 (BFF 패스 확인)
-          docker exec ${USER_ID}-frontend curl -sf -o /dev/null -w "Backend (Internal) : HTTP %{http_code}\n" http://backend:8080/menus || echo "Backend : not responding (internal check failed)"
+          # 백엔드는 도커 내부 네트워크를 통해 체크 (BFF 패스 확인 - curl 대신 wget 사용)
+          docker exec ${USER_ID}-frontend wget --spider -q http://backend:8080/menus && echo "Backend (Internal) : OK" || echo "Backend : not responding (internal check failed)"
         env:
           FRONTEND_PORT: ${{ secrets.FRONTEND_PORT || vars.FRONTEND_PORT }}
           USER_ID: ${{ secrets.USER_ID || vars.USER_ID }}

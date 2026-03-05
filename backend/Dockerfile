@@ -11,12 +11,10 @@ COPY build.gradle settings.gradle ./
 RUN chmod +x gradlew
 RUN ./gradlew dependencies --no-daemon
 
-# 소스 복사 및 빌드
-COPY src ./src
-RUN ./gradlew bootJar -x test --no-daemon
-
 # 가장 용량이 큰 jar 파일을 app.jar로 사용 (실행형 jar가 plain.jar보다 훨씬 큽니다)
-RUN find build/libs -name "*.jar" -exec ls -S {} + | head -n 1 | xargs -I {} cp {} app.jar
+RUN JAR_FILE=$(find build/libs -name "*.jar" -exec ls -S {} + | head -n 1) && \
+    cp "$JAR_FILE" app.jar && \
+    [ -f app.jar ] || exit 1
 
 # 2단계: 실행 스테이지
 FROM eclipse-temurin:21-jre-alpine
