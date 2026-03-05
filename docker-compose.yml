@@ -1,3 +1,4 @@
+# ncafe Docker Compose - Final Build Configuration
 name: ${COMPOSE_PROJECT_NAME}
 
 services:
@@ -49,6 +50,8 @@ services:
     restart: always
     env_file: .env
     environment:
+      # DB 컨테이너 내부 포트를 5431로 고정
+      - PGPORT=5431
       - POSTGRES_DB=ncafedb
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
