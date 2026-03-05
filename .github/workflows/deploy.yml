@@ -22,8 +22,8 @@ jobs:
           echo "FRONTEND_PORT=${{ vars.FRONTEND_PORT || secrets.FRONTEND_PORT }}" >> .env
           echo "DB_PORT=${{ vars.DB_PORT || secrets.DB_PORT }}" >> .env
           echo "SPRING_PROFILES_ACTIVE=${{ vars.SPRING_PROFILES_ACTIVE || 'prod' }}" >> .env
-          echo "DB_URL=${{ vars.SPRING_DATASOURCE_URL || vars.DB_URL || secrets.DB_URL }}" >> .env
-          echo "DB_USERNAME=${{ vars.SPRING_DATASOURCE_USERNAME || vars.DB_USERNAME || secrets.DB_USERNAME }}" >> .env
+          echo "DB_URL=${{ vars.SPRING_DATASOURCE_URL || vars.DB_URL || secrets.DB_URL || 'jdbc:postgresql://db:5431/ncafedb' }}" >> .env
+          echo "DB_USERNAME=${{ vars.SPRING_DATASOURCE_USERNAME || vars.DB_USERNAME || secrets.DB_USERNAME || 'ncafe' }}" >> .env
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD || vars.DB_PASSWORD }}" >> .env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET || vars.JWT_SECRET }}" >> .env
           echo "SESSION_SECRET=${{ secrets.SESSION_SECRET || vars.SESSION_SECRET }}" >> .env
