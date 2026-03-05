@@ -41,6 +41,10 @@ public class SecurityConfig {
 
                     // 관리자 API: ADMIN 권한이 있는 사용자만 접근 가능
                     .requestMatchers("/admin/**").hasRole("ADMIN")
+                    
+                    // 에러 페이지 접근 허용 (상세 에러메시지 전달을 위함)
+                    .requestMatchers("/error").permitAll()
+
                     // 그 외 모든 요청은 인증 필요
                     .anyRequest().authenticated())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

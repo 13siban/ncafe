@@ -144,18 +144,14 @@ export default function CategoryManageModal({ isOpen, onClose, categories, onSav
             }
 
             // 모든 Promise 대기 (하나라도 실패하면 catch로 넘어감)
-            const results = await Promise.all(promises);
-            for (const res of results) {
-                if (!res.ok) {
-                    throw new Error('Some API requests failed');
-                }
-            }
+            await Promise.all(promises);
 
             alert('카테고리 수정이 완료되었습니다.');
             onSave();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to save categories', error);
-            alert('카테고리 저장 중 오류가 발생했습니다. (메뉴가 포함된 카테고리는 삭제할 수 없습니다)');
+            const message = error.message || '카테고리 저장 중 오류가 발생했습니다.';
+            alert(message);
         } finally {
             setIsSaving(false);
         }

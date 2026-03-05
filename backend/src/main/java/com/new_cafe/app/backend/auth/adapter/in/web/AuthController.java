@@ -80,10 +80,4 @@ public class AuthController {
                 .role(role)
                 .build());
     }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("message", e.getMessage()));
-    }
 }
