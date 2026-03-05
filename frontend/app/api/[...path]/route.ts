@@ -99,19 +99,13 @@ async function unifiedHandler(req: NextRequest) {
         headers['Authorization'] = `Bearer ${session.token}`;
     }
 
-    let body: BodyInit | null = null;
-    if (req.method !== 'GET' && req.method !== 'HEAD') {
-        if (contentType?.includes('multipart/form-data')) {
-            body = await req.blob();
-        } else {
-            body = await req.text();
-        }
-    }
-
+    // [개선] 바디를 바로 스트림으로 전달 (메모리 효율 및 Multipart 경계값 보존)
     const proxyRes = await fetch(targetUrl, {
         method: req.method,
         headers,
-        body,
+        body: req.method !== 'GET' && req.method !== 'HEAD' ? req.body : null,
+        // @ts-ignore - Next.js fetch에 duplex 옵션이 필요한 경우가 있음
+        duplex: 'half',
     });
 
     if (proxyRes.status === 401 && session.token) {
