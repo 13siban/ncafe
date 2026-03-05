@@ -87,6 +87,7 @@ export default function CategoryTabs({ selected, onSelect }: CategoryTabsProps) 
                     isOpen={isManageModalOpen}
                     onClose={() => setIsManageModalOpen(false)}
                     categories={categories}
+                    refetch={refetch}
                     onSave={() => {
                         setIsManageModalOpen(false);
                         refetch();

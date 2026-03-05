@@ -10,6 +10,7 @@ interface CategoryManageModalProps {
     isOpen: boolean;
     onClose: () => void;
     categories: CategoryResponseDto[];
+    refetch: () => void | Promise<void>;
     onSave: () => void;
 }
 
@@ -20,7 +21,7 @@ type EditCategory = {
     isDeleted: boolean;
 };
 
-export default function CategoryManageModal({ isOpen, onClose, categories, onSave }: CategoryManageModalProps) {
+export default function CategoryManageModal({ isOpen, onClose, categories, refetch, onSave }: CategoryManageModalProps) {
     const [items, setItems] = useState<EditCategory[]>([]);
     const [isSaving, setIsSaving] = useState(false);
 
@@ -149,26 +150,28 @@ export default function CategoryManageModal({ isOpen, onClose, categories, onSav
             alert('카테고리 수정이 완료되었습니다.');
             onSave();
         } catch (error: any) {
-            console.error('Failed to save categories', error);
+            console.error('Catch block error:', error);
             const message = error.message || '카테고리 저장 중 오류가 발생했습니다.';
 
-            // 오류 발생 시 초기 상태(수정 전)로 되돌리기
-            // alert 전에 수행하여 UI가 먼저 그려지도록 유도
-            const originalItems = categories.map(c => ({
+            // [강력 수동 복원] 서버 응답 올 때까지 기다리지 말고,
+            // 우리가 이미 알고 있는 원본(categories)으로 화면을 즉시 갈아끼웁니다.
+            const rollbackItems = categories.map(c => ({
                 uid: String(c.id),
                 id: c.id,
                 name: c.name,
                 isDeleted: false
             }));
 
-            console.log('Resetting items to:', originalItems);
-            setItems(originalItems);
+            console.log('Rolling back state to:', rollbackItems);
+            setItems(rollbackItems);
 
-            // alert는 자바스크립트 실행을 중단시키므로,
-            // 화면이 먼저 다시 그려지도록 약간의 지연(setTimeout)을 줍니다.
+            // 부모 컴포넌트도 싱크를 맞춰줍니다 (백그라운드에서 실행)
+            refetch();
+
+            // 리액트가 화면을 바꿀 기회를 주기 위해 0.1초 뒤에 알림을 띄웁니다.
             setTimeout(() => {
                 alert(message);
-            }, 50);
+            }, 100);
         } finally {
             setIsSaving(false);
         }
