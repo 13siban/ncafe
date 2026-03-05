@@ -156,10 +156,7 @@ export function CategoryManageModal({ isOpen, onClose, categories, refetch, onSa
             // 서버와 백그라운드 싱크
             refetch();
 
-            // 리액트가 화면을 바꿀 기회를 주기 위해 약간의 지연 후 알림
-            setTimeout(() => {
-                alert(msg);
-            }, 100);
+            alert(msg);
         } finally {
             setIsSaving(false);
         }

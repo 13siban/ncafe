@@ -99,14 +99,26 @@ async function unifiedHandler(req: NextRequest) {
         headers['Authorization'] = `Bearer ${session.token}`;
     }
 
+    const hasBody = !['GET', 'HEAD'].includes(req.method);
+    let requestBody = null;
+
+    if (hasBody) {
+        try {
+            const buffer = await req.arrayBuffer();
+            if (buffer.byteLength > 0) {
+                requestBody = buffer;
+            }
+        } catch (e) {
+            console.error('Failed to read request body:', e);
+        }
+    }
+
     try {
-        // [개선] 바디를 바로 스트림으로 전달 (메모리 효율 및 Multipart 경계값 보존)
         const proxyRes = await fetch(targetUrl, {
             method: req.method,
             headers,
-            body: req.method !== 'GET' && req.method !== 'HEAD' ? req.body : null,
-            // @ts-ignore - Next.js fetch에 duplex 옵션이 필요한 경우가 있음
-            duplex: 'half',
+            body: requestBody,
+            // duplex 옵션은 더 이상 스트림을 직접 전달하지 않으므로 제거됩니다.
         });
 
         if (proxyRes.status === 401 && session.token) {
