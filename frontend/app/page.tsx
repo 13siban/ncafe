@@ -66,7 +66,7 @@ export default function HomePage() {
               <span className={styles.badge}>New Opening</span>
               <h1 className={styles.heroTitle}>
                 Brewed to <br />
-                <span className={styles.highlight}>Perfection..</span>
+                <span className={styles.highlight}>Perfection.</span>
               </h1>
               <p className={styles.heroDescription}>
                 Experience the finest artisanal coffee in a space designed for comfort and creativity.
