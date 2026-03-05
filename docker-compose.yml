@@ -51,11 +51,17 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "${DB_PORT}:5432"
+      # 나중에 5432로 바꿀 수도 있으나 지금은 내부 포트를 5431로 고정합니다.
+      PGPORT: 5431
+    # 외부로 포트를 열지 않고(0.0.0.0 제거) 도커 내부망에서만 사용하도록 expose 처리합니다.
+    # ports: 대신 expose를 사용해야 ps 명령 시 '5431/tcp' 로만 깔끔하게 보입니다.
+    expose:
+      - "5431"
     volumes:
       - /home/young/dist/ncafe/data:/var/lib/postgresql/data
     restart: unless-stopped
 
 volumes:
   ncafe-db-data:
+
+

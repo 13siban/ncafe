@@ -20,7 +20,7 @@ jobs:
           echo "FRONTEND_PORT=${FRONTEND_PORT:-3031}" >> .env
           echo "DB_PORT=${DB_PORT:-5431}" >> .env
           echo "POSTGRES_DB=${POSTGRES_DB:-ncafedb}" >> .env
-          echo "DB_URL=${DB_URL:-jdbc:postgresql://db:5432/${POSTGRES_DB:-ncafedb}}" >> .env
+          echo "DB_URL=${DB_URL:-jdbc:postgresql://db:5431/${POSTGRES_DB:-ncafedb}}" >> .env
           echo "DB_USERNAME=${DB_USERNAME}" >> .env
           echo "DB_PASSWORD=${DB_PASSWORD}" >> .env
           echo "SESSION_SECRET=${SESSION_SECRET}" >> .env
