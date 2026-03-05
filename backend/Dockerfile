@@ -15,15 +15,15 @@ RUN ./gradlew dependencies --no-daemon
 COPY src ./src
 RUN ./gradlew bootJar -x test --no-daemon
 
-# 빌드된 결과물 중 실행 가능한 jar를 찾아서 이름을 고정합니다. (plain.jar 제외)
-RUN mv build/libs/*[!plain].jar build/libs/app.jar
+# 가장 용량이 큰 jar 파일을 app.jar로 사용 (실행형 jar가 plain.jar보다 훨씬 큽니다)
+RUN find build/libs -name "*.jar" -exec ls -S {} + | head -n 1 | xargs -I {} cp {} app.jar
 
 # 2단계: 실행 스테이지
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# 빌드 스테이지에서 이름을 고정한 app.jar만 가져옵니다.
-COPY --from=builder /app/build/libs/app.jar app.jar
+# 빌드 스테이지에서 준비된 app.jar를 복사합니다.
+COPY --from=builder /app/app.jar app.jar
 
 # 파일 업로드 설정
 RUN mkdir -p /app/upload

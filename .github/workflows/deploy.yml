@@ -47,14 +47,16 @@ jobs:
         run: |
           echo "=== Container Status ==="
           docker compose ps
-          sleep 15
+          sleep 20
           echo ""
           echo "=== Health Check ==="
-          curl -sf --max-time 10 -o /dev/null -w "Backend   : HTTP %{http_code}\n" http://localhost:${BACKEND_PORT:-8031}/menus || echo "Backend  : not responding"
-          curl -sf --max-time 10 -o /dev/null -w "Frontend : HTTP %{http_code}\n" http://localhost:${FRONTEND_PORT:-3031} || echo "Frontend : not responding"
+          # 프론트엔드는 호스트 포트로 체크
+          curl -sf --max-time 15 -o /dev/null -w "Frontend : HTTP %{http_code}\n" http://localhost:${FRONTEND_PORT:-3031} || echo "Frontend : not responding"
+          # 백엔드는 도커 내부 네트워크를 통해 체크 (BFF 패스 확인)
+          docker exec ${USER_ID}-frontend curl -sf -o /dev/null -w "Backend (Internal) : HTTP %{http_code}\n" http://backend:8080/menus || echo "Backend : not responding (internal check failed)"
         env:
-          BACKEND_PORT: ${{ secrets.BACKEND_PORT || vars.BACKEND_PORT }}
           FRONTEND_PORT: ${{ secrets.FRONTEND_PORT || vars.FRONTEND_PORT }}
+          USER_ID: ${{ secrets.USER_ID || vars.USER_ID }}
 
       - name: Clean up old images
         run: docker image prune -f
