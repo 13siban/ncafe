@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
       {
         protocol: 'http',
         hostname: 'localhost',
-        port: '8081',
+        port: '8080',
         pathname: '/**',
       },
     ],
@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
   // 하지만 정적 이미지 자원은 JWT 주입이 필요 없으므로 단순 rewrite로 연결합니다.
   async rewrites() {
     // 환경변수 확인 (없으면 표준 포트 8081 사용)
-    const backendUrl = process.env.API_BASE_URL || 'http://localhost:8081';
+    const backendUrl = process.env.API_BASE_URL || 'http://localhost:8080';
 
     return [
       {

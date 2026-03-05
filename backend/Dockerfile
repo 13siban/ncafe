@@ -29,6 +29,6 @@ RUN mkdir -p /app/upload
 VOLUME /app/upload
 
 ENV SERVER_PORT=8081
-EXPOSE 8081
+EXPOSE 8080
 
-ENTRYPOINT ["java", "-Dserver.port=8081", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Dserver.port=8080", "-jar", "app.jar"]

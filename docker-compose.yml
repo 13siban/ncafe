@@ -1,4 +1,4 @@
-name: ${COMPOSE_PROJECT_NAME:-young-ncafe}
+name: ${COMPOSE_PROJECT_NAME}
 
 services:
   # ── 백엔드 (Spring Boot) ──
@@ -6,19 +6,18 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    image: ${USER_ID:-young}-ncafe-backend
-    container_name: ${USER_ID:-young}-backend
-    ports:
-      - "${BACKEND_PORT:-8031}:8081"
+    image: ${USER_ID}-ncafe-backend
+    container_name: ${USER_ID}-backend
+    # ports:
+    #   - "${BACKEND_PORT}:8080"
     volumes:
       - /home/young/dist/ncafe/upload:/app/upload
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USERNAME=ncafe
-      - DB_PASSWORD=1234
-      - JWT_SECRET=ncafe-secret-key-for-jwt-signing-and-validation-32chars
+      - DB_URL=${DB_URL}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
     depends_on:
       - db
     restart: unless-stopped
@@ -28,14 +27,14 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    image: ${USER_ID:-young}-ncafe-frontend
-    container_name: ${USER_ID:-young}-frontend
+    image: ${USER_ID}-ncafe-frontend
+    container_name: ${USER_ID}-frontend
     ports:
-      - "${FRONTEND_PORT:-3031}:3001"
+      - "${FRONTEND_PORT}:3000"
     environment:
-      - API_BASE_URL=http://backend:8081
-      - SESSION_SECRET=${SESSION_SECRET:-ncafe-super-secret-session-key-minimum-32-chars}
-      - SESSION_SECURE=true
+      - API_BASE_URL=http://backend:8080
+      - SESSION_SECRET=${SESSION_SECRET}
+      - SESSION_SECURE=${SESSION_SECURE}
     depends_on:
       - backend
     restart: unless-stopped
@@ -45,15 +44,15 @@ services:
     build:
       context: ./db
       dockerfile: Dockerfile
-    image: ${USER_ID:-young}-ncafe-db
+    image: ${USER_ID}-ncafe-db
     profiles: [ "with-db" ]
-    container_name: ${USER_ID:-young}-db
+    container_name: ${USER_ID}-db
     environment:
-      POSTGRES_DB: ncafedb
-      POSTGRES_USER: ncafe
-      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "${DB_PORT:-5431}:5432"
+      - "${DB_PORT}:5432"
     volumes:
       - /home/young/dist/ncafe/data:/var/lib/postgresql/data
     restart: unless-stopped

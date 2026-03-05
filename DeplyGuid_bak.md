@@ -378,10 +378,10 @@ const API_BASE = process.env.API_BASE_URL || 'http://localhost:8081';
 ### 여기에 나의 설정값을 입력하세요
 
 ```
-USER_ID=young
-COMPOSE_PROJECT_NAME=young_ncafe
-FRONTEND_PORT=3031
-BACKEND_PORT=8031
-DB_PORT=5431
-SESSION_SECRET=
+USER_ID=            ← 예: young
+COMPOSE_PROJECT_NAME=  ← 예: young_ncafe
+FRONTEND_PORT=      ← 예: 3031
+BACKEND_PORT=       ← 예: 8031
+DB_PORT=            ← 예: 5431
+SESSION_SECRET=     ← 32자 이상 랜덤 문자열 (빈칸이면 AI가 생성해줌)
 ```
