@@ -12,20 +12,28 @@ const LoginPage = () => {
     return (
         <>
             <Header />
-            <div style={{ paddingTop: '80px' }}>
-                <main className={styles.pageWrapper}>
+            <div className={styles.splitLayout}>
+                <div className={styles.leftPanel}>
                     <div className={styles.backgroundDecor}>
                         <div className={`${styles.circle} ${styles.circle1}`} />
                         <div className={`${styles.circle} ${styles.circle2}`} />
                     </div>
-
-                    <div className={styles.content}>
-                        {/* useSearchParams()를 사용하는 LoginForm은 Suspense로 감싸야 합니다 */}
-                        <Suspense fallback={<div>로딩 중...</div>}>
-                            <LoginForm />
-                        </Suspense>
+                    <div className={styles.placeholderContent}>
+                        <h2>추가 예정</h2>
+                        <p>새로운 콘텐츠가 여기에 추가됩니다.</p>
                     </div>
-                </main>
+                </div>
+
+                <div className={styles.rightPanel}>
+                    <main className={styles.pageWrapper}>
+                        <div className={styles.content}>
+                            {/* useSearchParams()를 사용하는 LoginForm은 Suspense로 감싸야 합니다 */}
+                            <Suspense fallback={<div>로딩 중...</div>}>
+                                <LoginForm />
+                            </Suspense>
+                        </div>
+                    </main>
+                </div>
             </div>
         </>
     );
