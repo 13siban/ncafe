@@ -10,7 +10,9 @@ services:
     image: ${USER_ID}-ncafe-backend
     container_name: ${USER_ID}-backend
     volumes:
-      - ncafe_uploads:/app/upload
+      - /home/young/dist/ncafe/upload:/app/upload
+      # [Named Volume 방식 참고] 도커가 관리하는 볼륨을 사용하려면 아래 주석을 풀고 위 경로를 주석처리하세요.
+      # - ncafe_uploads:/app/upload
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - DB_URL=jdbc:postgresql://db:5432/ncafedb
@@ -56,7 +58,9 @@ services:
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     volumes:
-      - ncafe_db_data:/var/lib/postgresql/data
+      - /home/young/dist/ncafe/data:/var/lib/postgresql/data
+      # [Named Volume 방식 참고] 도커가 관리하는 볼륨을 사용하려면 아래 주석을 풀고 위 경로를 주석처리하세요.
+      # - ncafe_db_data:/var/lib/postgresql/data
     command: -p 5432
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME} -p 5432 -d ncafedb" ]
@@ -64,8 +68,9 @@ services:
       timeout: 5s
       retries: 5
 
-volumes:
-  ncafe_db_data:
-    name: ${COMPOSE_PROJECT_NAME}-db-data
-  ncafe_uploads:
-    name: ${COMPOSE_PROJECT_NAME}-uploads
+# [Named Volume 정의] 위의 서비스 설정에서 Named Volume을 활성화할 경우 아래 주석도 함께 풀어주어야 합니다.
+# volumes:
+#   ncafe_db_data:
+#     name: ${COMPOSE_PROJECT_NAME}-db-data
+#   ncafe_uploads:
+#     name: ${COMPOSE_PROJECT_NAME}-uploads
