@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthErrorHandler } from "@/components/auth/AuthErrorHandler";
+import ChatWidget from "@/components/chat/ChatWidget";
 
 export const metadata: Metadata = {
   title: "NCafe - 카페 메뉴 관리",
@@ -17,6 +18,7 @@ export default function RootLayout({
       <body>
         <AuthErrorHandler />
         {children}
+        <ChatWidget />
       </body>
     </html>
   );
