@@ -89,7 +89,21 @@ async function unifiedHandler(req: NextRequest) {
     }
 
     // 4. [프록시] 그 외 모든 요청 Spring Boot로 전달
-    const backendPath = pathname.replace(/^\/api/, '');
+    let backendPath = pathname;
+    // Next.js rewrite로 들어온 경우 req.nextUrl.pathname에 /api 가 없을 수 있음.
+    // 기존 /api/ 경로는 제거
+    if (backendPath.startsWith('/api/')) {
+        backendPath = backendPath.replace(/^\/api/, '');
+    }
+    // /images/ 경로는 백엔드의 /upload/ 폴더에 매핑
+    else if (backendPath.startsWith('/images/')) {
+        backendPath = backendPath.replace(/^\/images/, '/upload');
+    }
+    // 프론트엔드의 /upload/ 경로 요청은 그대로 백엔드의 /upload/ 로 매핑
+    else if (!backendPath.startsWith('/upload/')) {
+        // 만약 api나 images, upload등으로 시작하지 않는 예상치 못한 요청이면
+    }
+
     const targetUrl = `${API_BASE}${backendPath}${search}`;
 
     const headers: Record<string, string> = {};
