@@ -35,10 +35,22 @@ services:
       - "${FRONTEND_PORT}:3000"
     environment:
       - API_BASE_URL=http://backend:8080
+      - CHAT_SERVER_URL=http://agent:8000
       - SESSION_SECRET=${SESSION_SECRET}
       - SESSION_SECURE=${SESSION_SECURE}
     depends_on:
       - backend
+      - agent
+    restart: always
+
+  # ── AI 에이전트 (FastAPI) ──
+  agent:
+    build:
+      context: ./agent-server
+      dockerfile: Dockerfile
+    image: ${USER_ID}-ncafe-agent
+    container_name: ${USER_ID}-agent
+    env_file: ./agent-server/.env
     restart: always
 
   # ── 데이터베이스 (PostgreSQL) ──
