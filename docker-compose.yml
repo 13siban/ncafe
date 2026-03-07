@@ -59,7 +59,7 @@ services:
       context: ./db
       dockerfile: Dockerfile
     image: ${USER_ID}-ncafe-db
-    profiles: [ "with-db" ]
+
     container_name: ${USER_ID}-db
     restart: always
     env_file: .env
