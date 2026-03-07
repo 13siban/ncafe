@@ -105,6 +105,11 @@ public class AdminMenuPersistenceAdapter implements
         adminMenuImageJpaRepository.deleteById(id);
     }
 
+    @Override
+    public void deleteImagesByMenuId(Long menuId) {
+        adminMenuImageJpaRepository.deleteByMenuId(menuId);
+    }
+
     // ========== Mappers ==========
 
     private Menu toMenuDomain(AdminMenuJpaEntity entity) {
