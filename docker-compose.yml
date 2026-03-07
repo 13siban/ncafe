@@ -50,7 +50,9 @@ services:
       dockerfile: Dockerfile
     image: ${USER_ID}-ncafe-agent
     container_name: ${USER_ID}-agent
-    env_file: ./agent-server/.env
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL=${GEMINI_MODEL}
     restart: always
 
   # ── 데이터베이스 (PostgreSQL) ──

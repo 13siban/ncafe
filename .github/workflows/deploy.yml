@@ -20,6 +20,7 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           echo "COMPOSE_PROJECT_NAME=${{ vars.COMPOSE_PROJECT_NAME }}" > .env
           echo "USER_ID=${{ vars.USER_ID }}" >> .env
@@ -34,10 +35,12 @@ jobs:
           echo "POSTGRES_DB=ncafedb" >> .env
           echo "SPRING_PROFILES_ACTIVE=prod" >> .env
           echo "SESSION_SECURE=true" >> .env
+          echo "GEMINI_API_KEY=$GEMINI_API_KEY" >> .env
+          echo "GEMINI_MODEL=${{ vars.GEMINI_MODEL || 'gemini-2.5-flash' }}" >> .env
 
 
       - name: Build and Deploy
-        run: docker compose --profile with-db up --build -d
+        run: docker compose up --build -d
 
       - name: Verify deployment
         run: |
