@@ -8,6 +8,207 @@
 
 .header {
   margin-bottom: var(--space-2);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.headerInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.statusBadge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+}
+
+.statusOpen {
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+  border: 1px solid var(--color-success);
+}
+
+.statusClosed {
+  background-color: var(--color-error-light);
+  color: var(--color-error);
+  border: 1px solid var(--color-error);
+}
+
+/* Main Grid Layout */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-6);
+}
+
+@media (max-width: 1024px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+}
+
+/* Store Manager Styles */
+.storeManager {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.manageItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.manageInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.manageLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  color: var(--color-gray-900);
+}
+
+.manageDesc {
+  font-size: var(--text-xs);
+  color: var(--color-gray-500);
+}
+
+.toggleButton {
+  position: relative;
+  width: 64px;
+  height: 32px;
+  background-color: var(--color-gray-200);
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+}
+
+.activeToggle {
+  background-color: var(--color-primary-600);
+}
+
+.toggleCircle {
+  width: 28px;
+  height: 28px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+  box-shadow: var(--shadow-sm);
+}
+
+.activeToggle .toggleCircle {
+  transform: translateX(32px);
+}
+
+.toggleText {
+  position: absolute;
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  right: 8px;
+}
+
+.activeToggle .toggleText {
+  right: auto;
+  left: 8px;
+}
+
+.divider {
+  height: 1px;
+  background-color: var(--color-gray-100);
+  width: 100%;
+}
+
+.timeInputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.timeInputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.timeInputGroup label {
+  font-size: var(--text-xs);
+  color: var(--color-gray-500);
+}
+
+.inputWithIcon {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-primary);
+}
+
+.inputWithIcon input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: var(--text-sm);
+  background: transparent;
+}
+
+.saveButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background-color: var(--color-gray-900);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: var(--space-2);
+}
+
+.saveButton:hover {
+  background-color: var(--color-gray-800);
+}
+
+.saveButton:disabled {
+  background-color: var(--color-gray-400);
+  cursor: default;
 }
 
 .title {

@@ -1,0 +1,79 @@
+.container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    background: var(--color-gray-50);
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-gray-600);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-gray-100);
+    color: var(--color-gray-800);
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+.table tr:hover td {
+    background: var(--color-gray-50);
+}
+
+.roleBadge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.roleAdmin {
+    background: #def7ec;
+    color: #03543f;
+}
+
+.roleUser {
+    background: #e1effe;
+    color: #1e429f;
+}
+
+.deleteBtn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #f8b4b4;
+    background: white;
+    color: #c81e1e;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+    background: #fde8e8;
+}
+
+.loading,
+.error,
+.empty {
+    padding: 3rem;
+    text-align: center;
+    color: var(--color-gray-500);
+}
+
+.error {
+    color: #c81e1e;
+}

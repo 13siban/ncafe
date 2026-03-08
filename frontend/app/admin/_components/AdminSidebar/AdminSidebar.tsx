@@ -12,6 +12,8 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Users,
+  Sliders,
 } from 'lucide-react';
 import styles from './AdminSidebar.module.css';
 import { apiFetch } from '@/lib/api';
@@ -84,7 +86,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       icon: <UtensilsCrossed size={20} />,
       badge: menuCount > 0 ? menuCount : undefined,
     },
+    { label: '옵션 관리', href: '/admin/options', icon: <Sliders size={20} /> },
     { label: '주문 관리', href: '/admin/orders', icon: <ShoppingBag size={20} /> },
+    { label: '회원 관리', href: '/admin/users', icon: <Users size={20} /> },
   ];
 
   const isActive = (href: string) => {

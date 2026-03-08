@@ -44,9 +44,20 @@ export async function middleware(req: NextRequest) {
         const session = await getIronSession<{ user?: { role: string } }>(req, res, sessionOptions);
 
         if (!session.user || session.user.role !== 'ROLE_ADMIN') {
-            // [수정] 이전 창(Referer)으로 이동하거나, 없으면 메인으로 이동
             const referer = req.headers.get('referer');
-            const targetUrl = referer ? new URL(referer) : new URL('/', req.url);
+            let targetUrl = new URL('/', req.url);
+
+            if (referer) {
+                try {
+                    const refUrl = new URL(referer);
+                    // 무한 리다이렉트 방지: referer가 admin 경로가 아닐 때만 사용
+                    if (!refUrl.pathname.startsWith('/admin')) {
+                        targetUrl = refUrl;
+                    }
+                } catch (e) {
+                    // 무시
+                }
+            }
 
             targetUrl.searchParams.set('error', 'forbidden');
             return NextResponse.redirect(targetUrl);

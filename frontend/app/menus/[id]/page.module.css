@@ -1,0 +1,358 @@
+.wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-primary);
+}
+
+.nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--color-gray-200);
+}
+
+.navContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.navRight {
+    display: flex;
+    align-items: center;
+}
+
+.cartLink {
+    position: relative;
+    color: var(--color-gray-500);
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+}
+
+.cartLink:hover {
+    color: var(--color-primary-600);
+}
+
+.cartBadge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: var(--color-primary-600);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    min-width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 2px solid white;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--color-primary-600);
+    text-decoration: none;
+}
+
+.navLinks {
+    display: flex;
+    gap: 1.5rem;
+    flex: 1;
+}
+
+.navLinks a {
+    text-decoration: none;
+    color: var(--color-gray-500);
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.navLinks a:hover,
+.activeLink {
+    color: var(--primary) !important;
+}
+
+.container {
+    flex: 1;
+    max-width: 768px;
+    /* narrowed since it's a detail page */
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    width: 100%;
+}
+
+.backButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-gray-500);
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-bottom: 2rem;
+    padding: 0;
+}
+
+.backButton:hover {
+    color: var(--color-primary-600);
+}
+
+.mainContent {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.imageSection {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: var(--bg-secondary);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-gray-500);
+}
+
+.infoSection {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.names {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.names h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-gray-900);
+    margin: 0;
+}
+
+.names h2 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--color-gray-500);
+    margin: 0;
+}
+
+.price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary-600);
+}
+
+.description {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-gray-500);
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 0;
+}
+
+/* Options */
+.optionsSection {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    margin-top: 1rem;
+    border-top: 1px solid var(--color-gray-200);
+    padding-top: 2.5rem;
+}
+
+.optionGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.optionGroupHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.optionGroupName {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--color-gray-900);
+}
+
+.requiredBadge {
+    font-size: 0.75rem;
+    background-color: #ef4444;
+    /* red */
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.optionItems {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.optionItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border: 1px solid var(--color-gray-200);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg-primary);
+}
+
+.optionItem:hover {
+    border-color: var(--color-primary-600);
+}
+
+.optionItemSelected {
+    border-color: var(--color-primary-600);
+    background-color: var(--color-primary-100);
+}
+
+.optionItem input {
+    margin-right: 1rem;
+    accent-color: var(--color-primary-600);
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+}
+
+.optionItemContent {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.optionItemName {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-gray-900);
+}
+
+.optionItemPrice {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-primary-600);
+}
+
+/* Bottom Bar */
+.bottomBar {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    background: white;
+    padding: 1.5rem;
+    border-top: 1px solid var(--color-gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.bottomBarContainer {
+    max-width: 768px;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.totalPriceInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.totalPriceLabel {
+    font-size: 0.875rem;
+    color: var(--color-gray-500);
+    font-weight: 500;
+}
+
+.totalPriceValue {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-primary-600);
+}
+
+.actionArea {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.storeClosedMessage {
+    color: #e53e3e;
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.orderButton {
+    background: var(--color-primary-600);
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    border-radius: 8px;
+    font-size: 1.125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.orderButton:hover {
+    background: var(--color-primary-700);
+}
+
+.orderButton:disabled {
+    background: var(--color-gray-400);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+}

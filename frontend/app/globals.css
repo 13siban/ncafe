@@ -168,6 +168,15 @@
   --sidebar-width: 220px;
   --sidebar-collapsed-width: 72px;
   --header-height: 64px;
+
+  /* Aliases for convenience */
+  --primary: var(--color-primary-600);
+  --primary-light: var(--color-primary-100);
+  --background: var(--bg-primary);
+  --background-secondary: var(--bg-secondary);
+  --border: var(--color-gray-200);
+  --text-primary: var(--color-gray-900);
+  --text-secondary: var(--color-gray-500);
 }
 
 /* Reset and Base Styles */
@@ -252,6 +261,20 @@ ol {
   background-size: 200px 100%;
   animation: skeleton-loading 1.2s ease-in-out infinite;
   border-radius: var(--radius-md);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 
 /* Focus Styles */

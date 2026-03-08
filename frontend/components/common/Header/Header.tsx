@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import styles from './Header.module.css';
-import { Coffee } from 'lucide-react';
+import { Coffee, ShoppingCart } from 'lucide-react';
 import { authAPI } from '@/app/lib/api';
+import { useCartStore } from '@/store/useCartStore';
 
 interface SessionUser {
     id: string;
@@ -19,6 +20,8 @@ const Header = () => {
     const router = useRouter();
     const [user, setUser] = useState<SessionUser | null>(null);
     const [isMounted, setIsMounted] = useState(false);
+
+    const cartItemsCount = useCartStore((state) => state.getTotalItems());
 
     const checkLoginStatus = async () => {
         try {
@@ -66,27 +69,38 @@ const Header = () => {
                 </Link>
                 <div className={styles.navLinks}>
                     <Link href="/menus" className={isActive('/menus') ? styles.active : ''}>Menu</Link>
+                    <Link href="/order/my" className={isActive('/order/my') ? styles.active : ''}>My Order</Link>
                     <Link href="/about" className={isActive('/about') ? styles.active : ''}>About</Link>
                     <Link href="/admin" className={isActive('/admin') ? styles.active : ''}>Admin</Link>
                 </div>
-                <div className={styles.authLinks}>
-                    {isMounted && user ? (
-                        <div className={styles.userSection}>
-                            <span className={styles.username}>{user.nickname}님</span>
-                            <button onClick={handleLogout} className={styles.logoutButton}>
-                                Logout
-                            </button>
-                        </div>
-                    ) : isMounted ? (
-                        <>
-                            <Link href="/login" className={styles.loginButton}>
-                                Login
-                            </Link>
-                            <Link href="/signup" className={styles.signupButton}>
-                                Sign Up
-                            </Link>
-                        </>
-                    ) : null}
+                <div className={styles.rightSection}>
+                    {isMounted && (
+                        <Link href="/cart" className={styles.cartIconWrapper}>
+                            <ShoppingCart size={24} />
+                            {cartItemsCount > 0 && (
+                                <span className={styles.cartBadge}>{cartItemsCount}</span>
+                            )}
+                        </Link>
+                    )}
+                    <div className={styles.authLinks}>
+                        {isMounted && user ? (
+                            <div className={styles.userSection}>
+                                <span className={styles.username}>{user.nickname}님</span>
+                                <button onClick={handleLogout} className={styles.logoutButton}>
+                                    Logout
+                                </button>
+                            </div>
+                        ) : isMounted ? (
+                            <>
+                                <Link href="/login" className={styles.loginButton}>
+                                    Login
+                                </Link>
+                                <Link href="/signup" className={styles.signupButton}>
+                                    Sign Up
+                                </Link>
+                            </>
+                        ) : null}
+                    </div>
                 </div>
             </div>
         </nav>

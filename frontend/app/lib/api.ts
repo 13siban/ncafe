@@ -95,3 +95,23 @@ export const authAPI = {
             body: JSON.stringify({ username, password }),
         }),
 };
+
+// 매장 관리 API 모음
+export const adminStoreAPI = {
+    /** 매장 현재 상태 및 설정 조회 */
+    getStoreStatus: () => fetchAPI('/admin/store/status'),
+
+    /** 매장 영업 시작 */
+    openStore: () => fetchAPI('/admin/store/open', { method: 'PUT' }),
+
+    /** 매장 영업 종료 */
+    closeStore: () => fetchAPI('/admin/store/close', { method: 'PUT' }),
+
+    /** 영업 시간 등 설정 업데이트 */
+    updateSettings: (openTime: string, closeTime: string) =>
+        fetchAPI('/admin/store/settings', {
+            method: 'PUT',
+            body: JSON.stringify({ openTime, closeTime }),
+        }),
+};
+

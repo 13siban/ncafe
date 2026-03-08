@@ -38,6 +38,8 @@ public class SecurityConfig {
                     .requestMatchers("/menus/**").permitAll()
                     .requestMatchers("/categories/**").permitAll()
                     .requestMatchers("/**/*.png", "/**/*.jpg", "/**/*.jpeg", "/**/*.gif", "/**/*.svg").permitAll()
+                    .requestMatchers("/store/status").permitAll()
+                    .requestMatchers("/orders/**").permitAll()
 
                     // 관리자 API: ADMIN 권한이 있는 사용자만 접근 가능
                     .requestMatchers("/admin/**").hasRole("ADMIN")

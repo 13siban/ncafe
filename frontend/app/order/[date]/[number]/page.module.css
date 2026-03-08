@@ -1,0 +1,309 @@
+.wrapper {
+    min-height: 100vh;
+    background-color: var(--bg-secondary);
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    background: white;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.backButton {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-gray-600);
+}
+
+.title {
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+.container {
+    flex: 1;
+    padding: 1.5rem;
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.statusCard {
+    background: white;
+    border-radius: var(--radius-2xl);
+    padding: 2rem 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border-top: 5px solid var(--primary);
+}
+
+.statusIcon {
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.statusTitle {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.statusTime {
+    font-size: 0.8125rem;
+    color: var(--color-gray-400);
+    margin-bottom: 2rem;
+}
+
+/* Tracking Steps Bar */
+.trackingBar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.trackingBar::before {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 10%;
+    right: 10%;
+    height: 3px;
+    background: var(--color-gray-200);
+    z-index: 1;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    z-index: 2;
+    flex: 1;
+}
+
+.stepIcon {
+    width: 32px;
+    height: 32px;
+    background: white;
+    border: 3px solid var(--color-gray-200);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-gray-200);
+    transition: all 0.3s;
+}
+
+.stepLabel {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-gray-400);
+}
+
+.activeStep .stepIcon {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 0 0 4px var(--primary-light);
+}
+
+.activeStep .stepLabel {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.completedStep .stepIcon {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.completedStep .stepLabel {
+    color: var(--color-gray-600);
+}
+
+/* Rejected State */
+.rejectedCard {
+    border-top-color: var(--color-error);
+}
+
+.rejectedIcon {
+    color: var(--color-error);
+}
+
+.rejectDetails {
+    background: #fff5f5;
+    border: 1px solid #fed7d7;
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    width: 100%;
+    margin-top: 1rem;
+    text-align: left;
+}
+
+.rejectLabel {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #c53030;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.rejectReason {
+    font-size: 0.875rem;
+    color: #333;
+    line-height: 1.5;
+}
+
+/* Order Breakdown Section */
+.section {
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.sectionTitle {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-gray-800);
+}
+
+.orderBrief {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed var(--color-gray-200);
+    margin-bottom: 1rem;
+}
+
+.orderNumber {
+    font-size: 1.125rem;
+    font-weight: 800;
+}
+
+.displayNumber {
+    color: var(--primary);
+}
+
+.itemList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.item {
+    display: flex;
+    justify-content: space-between;
+}
+
+.itemName {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-gray-700);
+}
+
+.itemOptions {
+    font-size: 0.75rem;
+    color: var(--color-gray-400);
+    margin-top: 2px;
+}
+
+.itemPrice {
+    font-size: 0.9375rem;
+    font-weight: 600;
+}
+
+.totalRow {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-gray-100);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.totalLabel {
+    font-weight: 700;
+    color: var(--color-gray-800);
+}
+
+.totalValue {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.memoBox {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    color: var(--color-gray-600);
+    display: flex;
+    gap: 0.5rem;
+}
+
+.memoLabel {
+    font-weight: 700;
+    color: var(--color-gray-400);
+    white-space: nowrap;
+}
+
+.footerActions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.primaryButton {
+    background: var(--primary);
+    color: white;
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.secondaryButton {
+    background: white;
+    border: 1px solid var(--color-gray-200);
+    color: var(--color-gray-600);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}

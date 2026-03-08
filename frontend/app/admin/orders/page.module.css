@@ -1,0 +1,322 @@
+.container {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-gray-900);
+    margin: 0;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--color-gray-100);
+    padding: 0.25rem;
+    border-radius: var(--radius-lg);
+    width: fit-content;
+}
+
+.tab {
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-gray-500);
+    transition: all 0.2s;
+}
+
+.tab:hover {
+    color: var(--color-gray-700);
+}
+
+.activeTab {
+    background: white;
+    color: var(--color-primary-600);
+    box-shadow: var(--shadow-sm);
+}
+
+.tabBadge {
+    margin-left: 0.5rem;
+    background: var(--color-gray-200);
+    color: var(--color-gray-600);
+    padding: 0.1rem 0.4rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+}
+
+.activeTab .tabBadge {
+    background: var(--color-primary-100);
+    color: var(--color-primary-600);
+}
+
+/* Order Grid */
+.orderGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 1.5rem;
+}
+
+.orderCard {
+    background: white;
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.orderCard:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.selectedCard {
+    border-color: var(--color-primary-600);
+    box-shadow: 0 0 0 1px var(--color-primary-600);
+    background-color: var(--color-primary-50);
+}
+
+.cardHeader {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--color-gray-100);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.headerLeft {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.orderNumber {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--color-gray-900);
+}
+
+.orderTime {
+    font-size: 0.75rem;
+    color: var(--color-gray-400);
+}
+
+.customerInfo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-gray-700);
+}
+
+.cardBody {
+    padding: 1.25rem;
+    flex: 1;
+}
+
+.itemList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+}
+
+.itemName {
+    font-weight: 500;
+    color: var(--color-gray-800);
+}
+
+.itemPrice {
+    color: var(--color-gray-500);
+}
+
+.itemOptions {
+    font-size: 0.75rem;
+    color: var(--color-gray-400);
+    margin-top: 0.1rem;
+    padding-left: 0.5rem;
+    border-left: 2px solid var(--color-gray-100);
+}
+
+.memo {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: var(--color-gray-50);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    color: var(--color-gray-600);
+    display: flex;
+    gap: 0.5rem;
+}
+
+.cardFooter {
+    padding: 1rem 1.25rem;
+    background: var(--color-gray-50);
+    border-top: 1px solid var(--color-gray-100);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.totalPrice {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-primary-600);
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.actionButton {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.primaryAction {
+    background: var(--color-primary-600);
+    color: white;
+}
+
+.primaryAction:hover {
+    background: var(--color-primary-700);
+}
+
+.secondaryAction {
+    background: white;
+    border: 1px solid var(--color-gray-200);
+    color: var(--color-gray-600);
+}
+
+.secondaryAction:hover {
+    background: var(--color-gray-50);
+    color: var(--color-gray-800);
+}
+
+.dangerAction {
+    color: var(--color-error);
+    border: 1px solid var(--color-error-light);
+}
+
+.dangerAction:hover {
+    background: var(--color-error-light);
+}
+
+/* Status Badges */
+.statusBadge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.badgePreparing {
+    background: var(--color-primary-100);
+    color: var(--color-primary-700);
+}
+
+.badgeCompleted {
+    background: var(--color-success-light);
+    color: var(--color-success);
+}
+
+.badgeRejected {
+    background: var(--color-error-light);
+    color: var(--color-error);
+}
+
+.badgePickedUp {
+    background: var(--color-info-light);
+    color: var(--color-info);
+}
+
+/* Empty State */
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 2rem;
+    background: white;
+    border-radius: var(--radius-2xl);
+    border: 1px dashed var(--color-gray-300);
+    color: var(--color-gray-400);
+    gap: 1rem;
+}
+
+/* Modal */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.modal {
+    background: white;
+    padding: 1.5rem;
+    border-radius: var(--radius-xl);
+    width: 100%;
+    max-width: 400px;
+    box-shadow: var(--shadow-2xl);
+}
+
+.modalTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-md);
+    margin-bottom: 1.5rem;
+    min-height: 100px;
+    resize: none;
+}
+
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+    .orderGrid {
+        grid-template-columns: 1fr;
+    }
+}

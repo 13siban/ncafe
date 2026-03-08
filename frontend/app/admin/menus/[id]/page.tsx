@@ -47,7 +47,7 @@ export default function MenuDetailPage({ params }: { params: Promise<{ id: numbe
         </div>
         <div className={styles.rightColumn}>
           <MenuDetailInfo id={id} />
-          <MenuDetailOptions />
+          <MenuDetailOptions menuId={id} />
         </div>
       </div>
     </main>

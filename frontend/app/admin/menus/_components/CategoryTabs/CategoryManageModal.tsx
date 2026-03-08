@@ -206,6 +206,16 @@ export default function CategoryManageModal({ isOpen, onClose, categories, refet
                                     onChange={(e) => handleNameChange(item.uid, e.target.value)}
                                     placeholder="카테고리명"
                                 />
+                                {item.id && (
+                                    <button
+                                        className={styles.optionsButton}
+                                        onClick={() => window.location.href = `/admin/categories/${item.id}/options`}
+                                        title="옵션 설정"
+                                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)', padding: '0.25rem', display: 'flex' }}
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21 16-4-4" /><path d="M17 12V2" /><path d="m3 8 4 4" /><path d="M7 12v10" /><path d="m14 2 4 4-4 4" /></svg>
+                                    </button>
+                                )}
                                 <button
                                     className={styles.deleteButton}
                                     onClick={() => handleDelete(item.uid)}
