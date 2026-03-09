@@ -114,6 +114,9 @@ public class GetOrderService implements GetOrderUseCase {
                 .totalPrice(order.getTotalPrice())
                 .memo(order.getMemo())
                 .rejectReason(order.getRejectReason())
+                .paymentId(order.getPaymentId())
+                .paymentMethod(order.getPaymentMethod())
+                .paymentStatus(order.getPaymentStatus())
                 .createdAt(order.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                 .items(itemResponses)
                 .build();

@@ -8,6 +8,7 @@ import { MenuList } from '@/components/menu/MenuList/MenuList';
 import { MenuCard } from '@/components/menu/MenuCard/MenuCard';
 import { MenuActionBar } from '@/components/menu/MenuActionBar/MenuActionBar';
 import CategoryTabs from '@/components/menu/CategoryTabs/CategoryTabs';
+import { Footer } from '@/components/common';
 import styles from './page.module.css';
 
 export default function PublicMenusPage() {
@@ -70,9 +71,7 @@ export default function PublicMenusPage() {
                 </div>
             </main>
 
-            <footer className={styles.footer}>
-                <p>&copy; 2024 NCafe. All rights reserved.</p>
-            </footer>
+            <Footer />
         </div>
     );
 }

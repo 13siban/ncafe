@@ -27,12 +27,16 @@ public class OrderController {
                     .customerName("비회원")
                     .memo(command.getMemo())
                     .items(command.getItems())
+                    .paymentId(command.getPaymentId())
+                    .paymentMethod(command.getPaymentMethod())
                     .build();
         } else if (userId != null && (command.getCustomerName() == null || command.getCustomerName().isBlank())) {
             command = CreateOrderUseCase.CreateOrderCommand.builder()
                     .customerName(user.getUsername())
                     .memo(command.getMemo())
                     .items(command.getItems())
+                    .paymentId(command.getPaymentId())
+                    .paymentMethod(command.getPaymentMethod())
                     .build();
         }
         

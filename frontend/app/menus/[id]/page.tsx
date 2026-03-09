@@ -10,6 +10,7 @@ import { useMenuDetail } from './_components/useMenuDetail';
 import { MenuInfo } from './_components/MenuInfo/MenuInfo';
 import { MenuOptions } from './_components/MenuOptions/MenuOptions';
 import { CartActionBar } from './_components/CartActionBar/CartActionBar';
+import { Footer } from '@/components/common';
 import { useCartStore } from '@/store/useCartStore';
 
 export default function PublicMenuDetailPage({ params }: { params: Promise<{ id: number }> }) {
@@ -29,7 +30,15 @@ export default function PublicMenuDetailPage({ params }: { params: Promise<{ id:
         handleAddToCart
     } = useMenuDetail(id);
 
+    const [showModal, setShowModal] = React.useState(false);
     const totalItems = useCartStore((state) => state.items.reduce((acc, item) => acc + item.quantity, 0));
+
+    const handleAddToCartSuccess = () => {
+        const success = handleAddToCart();
+        if (success) {
+            setShowModal(true);
+        }
+    };
 
     if (isLoading) {
         return (
@@ -96,12 +105,39 @@ export default function PublicMenuDetailPage({ params }: { params: Promise<{ id:
                 isSoldOut={menu.isSoldOut}
                 isStoreOpen={isStoreOpen}
                 isLoading={isLoading}
-                onAdd={handleAddToCart}
+                onAdd={handleAddToCartSuccess}
             />
 
-            <footer className={styles.footer}>
-                <p>&copy; 2024 NCafe. All rights reserved.</p>
-            </footer>
+            {showModal && (
+                <div className={styles.modalOverlay} onClick={() => setShowModal(false)}>
+                    <div className={styles.modal} onClick={e => e.stopPropagation()}>
+                        <div className={styles.modalIcon}>
+                            <ShoppingBag size={32} />
+                        </div>
+                        <h3 className={styles.modalTitle}>장바구니 추가 완료!</h3>
+                        <p className={styles.modalDesc}>
+                            {menu.korName}가 장바구니에 담겼습니다.<br />
+                            계속 쇼핑하시겠습니까?
+                        </p>
+                        <div className={styles.modalButtons}>
+                            <button
+                                className={styles.primaryBtn}
+                                onClick={() => router.push('/cart')}
+                            >
+                                장바구니로 가기
+                            </button>
+                            <button
+                                className={styles.secondaryBtn}
+                                onClick={() => router.push('/menus')}
+                            >
+                                메뉴 더보기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <Footer />
         </div>
     );
 }

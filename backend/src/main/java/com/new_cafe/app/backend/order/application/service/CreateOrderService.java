@@ -12,6 +12,7 @@ import com.new_cafe.app.backend.order.application.port.out.OrderRepositoryPort;
 import com.new_cafe.app.backend.order.domain.model.Order;
 import com.new_cafe.app.backend.order.domain.model.OrderItem;
 import com.new_cafe.app.backend.order.domain.model.OrderStatus;
+import com.new_cafe.app.backend.payment.PaymentVerificationService;
 import com.new_cafe.app.backend.store.application.port.in.GetStoreSettingsUseCase;
 import com.new_cafe.app.backend.store.application.port.out.StoreSettingsRepositoryPort;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,8 @@ public class CreateOrderService implements CreateOrderUseCase {
     private final OptionGroupJpaRepository optionGroupRepository;
     private final OptionItemJpaRepository optionItemRepository;
 
+    private final PaymentVerificationService paymentVerificationService;
+
     @Override
     @Transactional
     public OrderResponse createOrder(CreateOrderCommand command, String userId) {
@@ -55,6 +58,27 @@ public class CreateOrderService implements CreateOrderUseCase {
         List<OrderItemResponse> itemResponses = new ArrayList<>();
         int totalOrderPrice = 0;
 
+        // --- 1단계: 주문 금액 사전 계산 (결제 검증용) ---
+        for (OrderItemCommand itemCommand : command.getItems()) {
+            AdminMenuJpaEntity menu = menuRepository.findById(itemCommand.getMenuId())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid menu ID"));
+            int optionPriceSum = 0;
+            if (itemCommand.getSelectedOptions() != null) {
+                for (OrderOptionCommand optCmd : itemCommand.getSelectedOptions()) {
+                    OptionItemJpaEntity item = optionItemRepository.findById(optCmd.getOptionItemId()).orElseThrow();
+                    optionPriceSum += item.getPriceDelta();
+                }
+            }
+            totalOrderPrice += (menu.getPrice() + optionPriceSum) * itemCommand.getQuantity();
+        }
+
+        // --- 2단계: 결제 검증 (결제 ID가 있는 경우) ---
+        String paymentStatus = "NONE";
+        if (command.getPaymentId() != null && !command.getPaymentId().isBlank()) {
+            paymentVerificationService.verifyPayment(command.getPaymentId(), totalOrderPrice);
+            paymentStatus = "PAID";
+        }
+
         Order order = Order.builder()
                 .orderDate(today)
                 .orderNumber(nextOrderNumber)
@@ -62,17 +86,19 @@ public class CreateOrderService implements CreateOrderUseCase {
                 .customerName(actualCustomerName)
                 .status(OrderStatus.PREPARING)
                 .memo(command.getMemo())
+                .paymentId(command.getPaymentId())
+                .paymentMethod(command.getPaymentMethod())
+                .paymentStatus(paymentStatus)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .totalPrice(0) // Will update
+                .totalPrice(totalOrderPrice)
                 .build();
 
         Order savedOrder = orderRepository.save(order);
 
+        // --- 3단계: 주문 아이템 및 옵션 저장 ---
         for (OrderItemCommand itemCommand : command.getItems()) {
-            AdminMenuJpaEntity menu = menuRepository.findById(itemCommand.getMenuId())
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid menu ID"));
-
+            AdminMenuJpaEntity menu = menuRepository.findById(itemCommand.getMenuId()).orElseThrow();
             int optionPriceSum = 0;
             List<OrderOptionResponse> optionResponses = new ArrayList<>();
             List<OrderOptionRepositoryPort.OptionSelectionData> optionDatas = new ArrayList<>();
@@ -96,7 +122,6 @@ public class CreateOrderService implements CreateOrderUseCase {
             }
 
             int subtotal = (menu.getPrice() + optionPriceSum) * itemCommand.getQuantity();
-            totalOrderPrice += subtotal;
 
             OrderItem orderItem = OrderItem.builder()
                     .orderId(savedOrder.getId())
@@ -125,30 +150,14 @@ public class CreateOrderService implements CreateOrderUseCase {
                     .build());
         }
 
-        Order orderToUpdate = Order.builder()
-                .id(savedOrder.getId())
-                .orderDate(savedOrder.getOrderDate())
-                .orderNumber(savedOrder.getOrderNumber())
-                .userId(savedOrder.getUserId())
-                .customerName(savedOrder.getCustomerName())
-                .status(savedOrder.getStatus())
-                .memo(savedOrder.getMemo())
-                .totalPrice(totalOrderPrice)
-                .createdAt(savedOrder.getCreatedAt())
-                .updatedAt(savedOrder.getUpdatedAt())
-                .items(savedItems)
-                .build();
-
-        Order finalOrder = orderRepository.save(orderToUpdate); 
-        
         return OrderResponse.builder()
-                .orderDate(finalOrder.getOrderDate().toString())
-                .orderNumber(finalOrder.getOrderNumber())
-                .displayNumber("#" + finalOrder.getOrderNumber())
-                .status(finalOrder.getStatus())
-                .customerName(finalOrder.getCustomerName())
-                .totalPrice(finalOrder.getTotalPrice())
-                .createdAt(finalOrder.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                .orderDate(savedOrder.getOrderDate().toString())
+                .orderNumber(savedOrder.getOrderNumber())
+                .displayNumber("#" + savedOrder.getOrderNumber())
+                .status(savedOrder.getStatus())
+                .customerName(savedOrder.getCustomerName())
+                .totalPrice(savedOrder.getTotalPrice())
+                .createdAt(savedOrder.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                 .items(itemResponses)
                 .build();
     }

@@ -19,6 +19,9 @@ public class Order {
     private Integer totalPrice;
     private String rejectReason;
     private String memo;
+    private String paymentId;
+    private String paymentMethod;
+    private String paymentStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     

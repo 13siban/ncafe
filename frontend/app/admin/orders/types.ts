@@ -22,6 +22,9 @@ export interface OrderListItem {
 export interface OrderFull extends OrderListItem {
     memo: string;
     rejectReason?: string;
+    paymentId?: string;
+    paymentMethod?: string;
+    paymentStatus?: string;
     items: {
         menuName: string;
         quantity: number;

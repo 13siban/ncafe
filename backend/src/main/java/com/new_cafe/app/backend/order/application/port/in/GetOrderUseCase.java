@@ -27,6 +27,9 @@ public interface GetOrderUseCase {
         private Integer totalPrice;
         private String memo;
         private String rejectReason;
+        private String paymentId;
+        private String paymentMethod;
+        private String paymentStatus;
         private String createdAt;
         private List<CreateOrderUseCase.OrderItemResponse> items;
     }

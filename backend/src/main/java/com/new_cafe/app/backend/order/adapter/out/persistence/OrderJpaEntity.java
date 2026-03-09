@@ -46,6 +46,15 @@ public class OrderJpaEntity {
     @Column(columnDefinition = "TEXT")
     private String memo;
 
+    @Column(name = "payment_id", length = 100)
+    private String paymentId;
+
+    @Column(name = "payment_method", length = 20)
+    private String paymentMethod;
+
+    @Column(name = "payment_status", length = 20)
+    private String paymentStatus;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

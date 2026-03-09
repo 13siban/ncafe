@@ -7,6 +7,8 @@ import { authAPI } from "@/app/lib/api";
 import { ChevronLeft, ShoppingBag, ClipboardList, User, MessageCircle, CreditCard, Loader2 } from "lucide-react";
 import styles from "./page.module.css";
 
+import { requestPayment, PaymentMethod } from "@/lib/portone";
+
 export default function OrderConfirmPage() {
     const router = useRouter();
     const { items, getTotalPrice, clearCart } = useCartStore();
@@ -18,6 +20,7 @@ export default function OrderConfirmPage() {
     const [username, setUsername] = useState("비회원");
     const [memo, setMemo] = useState("");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("KAKAOPAY");
 
     useEffect(() => {
         setIsMounted(true);
@@ -43,46 +46,70 @@ export default function OrderConfirmPage() {
         }
     }, [isMounted, items.length, isOrdering, router]);
 
-    const handleOrder = async () => {
+    const submitOrder = async (paymentId?: string, method?: string) => {
+        const orderItems = items.map(item => ({
+            menuId: item.menuId,
+            quantity: item.quantity,
+            selectedOptions: item.selectedOptions.map(opt => ({
+                optionGroupId: opt.optionGroupId,
+                optionItemId: opt.optionItemId
+            }))
+        }));
+
+        const response = await fetch('/api/orders', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                customerName: username,
+                memo: memo,
+                items: orderItems,
+                ...(paymentId && { paymentId }),
+                ...(method && { paymentMethod: method })
+            })
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            clearCart();
+            router.push(`/order/${result.orderDate}/${result.orderNumber}`);
+        } else {
+            const error = await response.json();
+            throw new Error(error.message || '영업 중이 아니거나 서버 오류가 발생했습니다.');
+        }
+    };
+
+    const handleTestOrder = async () => {
         if (items.length === 0) return;
         setIsOrdering(true);
-
         try {
-            const orderItems = items.map(item => ({
-                menuId: item.menuId,
-                quantity: item.quantity,
-                selectedOptions: item.selectedOptions.map(opt => ({
-                    optionGroupId: opt.optionGroupId,
-                    optionItemId: opt.optionItemId
-                }))
-            }));
+            await submitOrder();
+        } catch (error: any) {
+            alert(`주문 실패: ${error.message}`);
+        } finally {
+            setIsOrdering(false);
+        }
+    };
 
-            // Use /api rewriting handled by Next.js middleware or route.ts
-            const response = await fetch('/api/orders', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    customerName: username,
-                    memo: memo,
-                    items: orderItems
-                })
+    const handlePaymentOrder = async () => {
+        if (items.length === 0) return;
+        setIsOrdering(true);
+        try {
+            const orderName = items.length === 1
+                ? items[0].menuName
+                : `${items[0].menuName} 외 ${items.length - 1}건`;
+
+            const paymentId = await requestPayment({
+                orderName,
+                totalAmount: getTotalPrice(),
+                method: paymentMethod,
+                customerName: username,
             });
 
-            if (response.ok) {
-                const result = await response.json();
-                clearCart();
-                // Phase 4-2 specifies order status page at /order/[date]/[number]
-                // But result probably has orderDate and orderNumber
-                router.push(`/order/${result.orderDate}/${result.orderNumber}`);
-            } else {
-                const error = await response.json();
-                alert(`주문 실패: ${error.message || '영업 중이 아니거나 서버 오류가 발생했습니다.'}`);
-            }
-        } catch (error) {
-            console.error("Order error:", error);
-            alert('주문 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+            await submitOrder(paymentId, paymentMethod);
+        } catch (error: any) {
+            alert(`결제 실패: ${error.message}`);
         } finally {
             setIsOrdering(false);
         }
@@ -164,14 +191,44 @@ export default function OrderConfirmPage() {
                     </div>
                 </div>
 
+                {/* 3. Payment Method Section */}
+                <div className={styles.section}>
+                    <h2 className={styles.sectionTitle}>
+                        <CreditCard size={20} /> 결제 수단
+                    </h2>
+                    <div className={styles.paymentMethods}>
+                        <button
+                            className={`${styles.paymentButton} ${paymentMethod === "KAKAOPAY" ? styles.selected : ""}`}
+                            onClick={() => setPaymentMethod("KAKAOPAY")}
+                        >
+                            <span className={styles.paymentIcon}>💛</span>
+                            카카오페이
+                        </button>
+                        <button
+                            className={`${styles.paymentButton} ${paymentMethod === "NAVERPAY" ? styles.selected : ""}`}
+                            onClick={() => setPaymentMethod("NAVERPAY")}
+                        >
+                            <span className={styles.paymentIcon}>💚</span>
+                            네이버페이
+                        </button>
+                    </div>
+                </div>
+
                 <div className={styles.footerActions}>
                     <button
+                        className={styles.testOrderButton}
+                        onClick={handleTestOrder}
+                        disabled={isOrdering || items.length === 0 || !username.trim()}
+                    >
+                        🧪 테스트 주문
+                    </button>
+                    <button
                         className={styles.orderButton}
-                        onClick={handleOrder}
+                        onClick={handlePaymentOrder}
                         disabled={isOrdering || items.length === 0 || !username.trim()}
                     >
                         <CreditCard size={20} />
-                        {new Intl.NumberFormat('ko-KR').format(getTotalPrice())}원 주문하기
+                        {new Intl.NumberFormat('ko-KR').format(getTotalPrice())}원 결제하기
                     </button>
                 </div>
             </main>
@@ -179,9 +236,10 @@ export default function OrderConfirmPage() {
             {isOrdering && (
                 <div className={styles.loadingOverlay}>
                     <Loader2 size={48} className="animate-spin" color="var(--primary)" />
-                    <span className={styles.loadingText}>주문을 전송하고 있습니다...</span>
+                    <span className={styles.loadingText}>주문을 처리하고 있습니다...</span>
                 </div>
             )}
         </div>
     );
 }
+

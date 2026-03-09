@@ -33,6 +33,9 @@ public class OrderPersistenceAdapter implements OrderRepositoryPort, OrderOption
                 .totalPrice(order.getTotalPrice())
                 .rejectReason(order.getRejectReason())
                 .memo(order.getMemo())
+                .paymentId(order.getPaymentId())
+                .paymentMethod(order.getPaymentMethod())
+                .paymentStatus(order.getPaymentStatus())
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
                 .build();
@@ -153,6 +156,9 @@ public class OrderPersistenceAdapter implements OrderRepositoryPort, OrderOption
                 .totalPrice(entity.getTotalPrice())
                 .rejectReason(entity.getRejectReason())
                 .memo(entity.getMemo())
+                .paymentId(entity.getPaymentId())
+                .paymentMethod(entity.getPaymentMethod())
+                .paymentStatus(entity.getPaymentStatus())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();

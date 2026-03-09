@@ -21,6 +21,8 @@ public interface CreateOrderUseCase {
         private String customerName;
         private String memo;
         private List<OrderItemCommand> items;
+        private String paymentId;
+        private String paymentMethod;
     }
 
     @Getter

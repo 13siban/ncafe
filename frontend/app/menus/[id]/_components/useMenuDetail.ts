@@ -102,7 +102,7 @@ export function useMenuDetail(id: number) {
     }, [menu, optionsData, selectedOptions]);
 
     const handleAddToCart = () => {
-        if (!menu || !isOrderable || !isStoreOpen) return;
+        if (!menu || !isOrderable || !isStoreOpen) return false;
 
         const cartOptions: CartOption[] = [];
         let optionTotalPrice = 0;
@@ -141,8 +141,7 @@ export function useMenuDetail(id: number) {
             subtotal: menu.price + optionTotalPrice
         });
 
-        alert("장바구니에 담겼습니다.");
-        router.push('/cart');
+        return true;
     };
 
     return {

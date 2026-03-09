@@ -34,9 +34,9 @@ export function OrderDetailModal({
                         <div className={modalStyles.orderHeader}>
                             <span className={modalStyles.orderNumber}>{order.displayNumber}</span>
                             <div className={`${styles.statusBadge} ${order.status === 'PREPARING' ? styles.badgePreparing :
-                                    order.status === 'COMPLETED' ? styles.badgeCompleted :
-                                        order.status === 'REJECTED' ? styles.badgeRejected :
-                                            styles.badgePickedUp
+                                order.status === 'COMPLETED' ? styles.badgeCompleted :
+                                    order.status === 'REJECTED' ? styles.badgeRejected :
+                                        styles.badgePickedUp
                                 }`}>
                                 {TABS.find(t => t.value === order.status)?.label || order.status}
                             </div>
@@ -86,6 +86,33 @@ export function OrderDetailModal({
                                 <div className={modalStyles.rejectBox}>
                                     <span className={modalStyles.rejectLabel}>반려사유</span>
                                     <span className={modalStyles.rejectValue}>{order.rejectReason}</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 className={modalStyles.sectionLabel}>결제 정보</h4>
+                        <div className={modalStyles.infoList}>
+                            <div className={modalStyles.infoRow}>
+                                <span className={modalStyles.infoLabel}>결제 수단</span>
+                                <span>
+                                    {order.paymentId ? (
+                                        <>
+                                            {order.paymentMethod === 'kakaopay' ? '카카오페이' :
+                                                order.paymentMethod === 'naverpay' ? '네이버페이' :
+                                                    order.paymentMethod}
+                                            {order.paymentStatus === 'PAID' && ' (결제완료)'}
+                                        </>
+                                    ) : (
+                                        <span style={{ color: '#ff6b6b', fontWeight: 'bold' }}>🧪 테스트 주문</span>
+                                    )}
+                                </span>
+                            </div>
+                            {order.paymentId && (
+                                <div className={modalStyles.infoRow}>
+                                    <span className={modalStyles.infoLabel}>결제 ID</span>
+                                    <span style={{ fontSize: '11px', color: '#999' }}>{order.paymentId}</span>
                                 </div>
                             )}
                         </div>
