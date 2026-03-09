@@ -175,7 +175,7 @@ public class DataInitializer implements CommandLineRunner {
             log.info("Initializing store settings...");
             StoreSettingsJpaEntity settings = StoreSettingsJpaEntity.builder()
                     .id(1)
-                    .isOpen(false)
+                    .isOpen(true)
                     .openTime("09:00")
                     .closeTime("22:00")
                     .updatedAt(LocalDateTime.now())
