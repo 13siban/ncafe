@@ -4,8 +4,8 @@ import { AuthErrorHandler } from "@/components/auth/AuthErrorHandler";
 import ChatWidget from "@/components/chat/ChatWidget";
 
 export const metadata: Metadata = {
-  title: "NCafe - 카페 메뉴 관리",
-  description: "카페 사장님을 위한 메뉴 관리 시스템",
+  title: "mymyy - 특별한 미식 경험",
+  description: "최고의 재료와 정성으로 준비한 커피와 디저트를 만나보세요.",
 };
 
 export default function RootLayout({

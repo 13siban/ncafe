@@ -19,6 +19,7 @@ import {
 import styles from './AdminSidebar.module.css';
 import { apiFetch } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
+import { Logo } from '@/components/common/Logo/Logo';
 
 interface NavItem {
   label: string;
@@ -127,11 +128,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
         {/* Logo */}
         <div className={styles.logo}>
-          <div className={styles.logoIcon}>
-            <Coffee size={24} />
-          </div>
-          <div>
-            <div className={styles.logoText}>NCafe</div>
+          <Logo variant="black" className={styles.adminLogo} />
+          <div className={styles.logoInfo}>
+            <div className={styles.logoText}>mymyy</div>
             <div className={styles.logoSubtext}>Admin Panel</div>
           </div>
         </div>

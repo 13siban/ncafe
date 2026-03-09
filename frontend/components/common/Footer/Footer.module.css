@@ -65,16 +65,11 @@
     min-width: 280px;
 }
 
-.logo {
-    font-family: var(--font-serif);
-    font-optical-sizing: auto;
-    font-variation-settings: "SOFT" 0, "WONK" 0;
-    font-size: 2.5rem;
-    font-weight: 500;
-    letter-spacing: 4px;
+.footerLogoContainer {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
     margin-bottom: 24px;
-    text-transform: uppercase;
-    color: #ffffff;
 }
 
 .description {

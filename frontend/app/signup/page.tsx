@@ -4,8 +4,8 @@ import styles from '../login/login.module.css';
 import Header from '@/components/common/Header/Header';
 
 export const metadata = {
-    title: '회원가입 | NCafe',
-    description: 'NCafe에 회원가입 하세요.',
+    title: '회원가입 | mymyy',
+    description: 'mymyy에 회원가입 하세요.',
 };
 
 const SignupPage = () => {

@@ -53,7 +53,7 @@ const LoginForm = () => {
     return (
         <div className={styles.formContainer}>
             <h1 className={styles.title}>로그인</h1>
-            <p className={styles.subtitle}>Welcome back to NCafe</p>
+            <p className={styles.subtitle}>Welcome back to mymyy</p>
 
             <form onSubmit={handleSubmit}>
                 <div className={styles.formGroup}>

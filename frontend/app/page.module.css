@@ -7,9 +7,7 @@
   overflow-x: hidden;
 }
 
-.contentWrapper {
-  padding-top: var(--header-height);
-}
+
 
 .modalTitle {
   font-family: var(--font-serif);

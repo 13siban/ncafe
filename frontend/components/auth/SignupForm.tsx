@@ -39,7 +39,7 @@ const SignupForm = () => {
     return (
         <div className={styles.formContainer}>
             <h1 className={styles.title}>회원가입</h1>
-            <p className={styles.subtitle}>Create a new NCafe account</p>
+            <p className={styles.subtitle}>Create a new mymyy account</p>
 
             <form onSubmit={handleSubmit}>
                 <div className={styles.formGroup}>

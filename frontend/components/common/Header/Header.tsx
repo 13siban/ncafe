@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import styles from './Header.module.css';
-import { Coffee, ShoppingCart } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { authAPI } from '@/app/lib/api';
 import { useCartStore } from '@/store/useCartStore';
 
@@ -15,10 +15,13 @@ interface SessionUser {
     role: string;
 }
 
+import { Logo } from '../Logo/Logo';
+
 const Header = () => {
     const pathname = usePathname();
     const router = useRouter();
     const [user, setUser] = useState<SessionUser | null>(null);
+    const [isScrolled, setIsScrolled] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
 
     const cartItemsCount = useCartStore((state) => state.getTotalItems());
@@ -37,6 +40,16 @@ const Header = () => {
         setIsMounted(true);
         checkLoginStatus();
 
+        const handleScroll = () => {
+            if (window.scrollY > window.innerHeight / 2) {
+                setIsScrolled(true);
+            } else {
+                setIsScrolled(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
         // LoginForm 또는 다른 컴포넌트에서 login/logout 이벤트 발생 시 상태 갱신
         const onLogin = () => checkLoginStatus();
         const onLogout = () => setUser(null);
@@ -45,6 +58,7 @@ const Header = () => {
         window.addEventListener('logout', onLogout);
 
         return () => {
+            window.removeEventListener('scroll', handleScroll);
             window.removeEventListener('login', onLogin);
             window.removeEventListener('logout', onLogout);
         };
@@ -60,12 +74,14 @@ const Header = () => {
         router.refresh(); // 서버 컴포넌트 재검증
     };
 
+    const isHomePage = pathname === '/';
+    const displayScrolled = !isHomePage || isScrolled;
+
     return (
-        <nav className={styles.nav}>
+        <nav className={`${styles.nav} ${displayScrolled ? styles.scrolled : styles.transparent}`}>
             <div className={styles.navContainer}>
                 <Link href="/" className={styles.logo}>
-                    <Coffee size={24} />
-                    <span>NCafe</span>
+                    <Logo variant={displayScrolled ? 'black' : 'white'} />
                 </Link>
                 <div className={styles.navLinks}>
                     <Link href="/menus" className={isActive('/menus') ? styles.active : ''}>Menu</Link>

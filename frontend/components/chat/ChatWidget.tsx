@@ -60,9 +60,9 @@ const ChatWidget = () => {
                     {/* 헤더 */}
                     <div className={styles.chatHeader}>
                         <div className={styles.chatHeaderInfo}>
-                            <div className={styles.chatHeaderAvatar}>☕</div>
+                            <div className={styles.chatHeaderAvatar}>✨</div>
                             <div className={styles.chatHeaderText}>
-                                <h3>NCafe AI 어시스턴트</h3>
+                                <h3>mymyy AI 어시스턴트</h3>
                                 <p>무엇이든 물어보세요!</p>
                             </div>
                         </div>
@@ -79,10 +79,10 @@ const ChatWidget = () => {
                     {/* 메시지 영역 */}
                     {messages.length === 0 ? (
                         <div className={styles.welcomeMessage}>
-                            <div className={styles.welcomeIcon}>☕</div>
+                            <div className={styles.welcomeIcon}>✨</div>
                             <h4>안녕하세요!</h4>
                             <p>
-                                NCafe AI 어시스턴트입니다.<br />
+                                mymyy AI 어시스턴트입니다.<br />
                                 메뉴, 가격, 영업시간 등<br />
                                 궁금한 것을 물어보세요!
                             </p>
@@ -93,12 +93,12 @@ const ChatWidget = () => {
                                 <div
                                     key={msg.id}
                                     className={`${styles.message} ${msg.role === 'user'
-                                            ? styles.messageUser
-                                            : styles.messageAssistant
+                                        ? styles.messageUser
+                                        : styles.messageAssistant
                                         }`}
                                 >
                                     {msg.role === 'assistant' && (
-                                        <div className={styles.assistantAvatar}>☕</div>
+                                        <div className={styles.assistantAvatar}>✨</div>
                                     )}
                                     <div className={styles.messageBubble}>
                                         {msg.content}

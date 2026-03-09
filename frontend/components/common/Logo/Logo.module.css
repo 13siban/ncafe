@@ -1,0 +1,11 @@
+.logoWrapper {
+    display: inline-flex;
+    align-items: center;
+}
+
+.logoImage {
+    height: 32px;
+    /* Default height */
+    width: auto;
+    object-fit: contain;
+}
