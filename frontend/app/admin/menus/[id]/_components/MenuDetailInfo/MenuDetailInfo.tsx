@@ -20,8 +20,8 @@ export const MenuDetailInfo = ({ id }: MenuDetailInfoProps) => {
           <div className={styles.badges}>
             <span className={`${styles.badge} ${styles.category}`}>{menu.categoryName}</span>
             {menu.isSoldOut && <span className={`${styles.badge} ${styles.soldOut}`}>품절</span>}
-            {!menu.isOrderable && <span className={`${styles.badge} ${styles.hidden}`}>숨김</span>}
-            {menu.isOrderable && !menu.isSoldOut && <span className={`${styles.badge} ${styles.active}`}>판매중</span>}
+            {!menu.isAvailable && <span className={`${styles.badge} ${styles.hidden}`}>숨김</span>}
+            {menu.isAvailable && !menu.isSoldOut && <span className={`${styles.badge} ${styles.active}`}>판매중</span>}
           </div>
           <h1 className={styles.korName}>{menu.korName}</h1>
           <p className={styles.engName}>{menu.engName}</p>

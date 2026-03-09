@@ -1,0 +1,137 @@
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modalContent {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.section {
+    margin-bottom: 0.5rem;
+}
+
+.orderHeader {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.orderNumber {
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.orderDate {
+    font-size: 0.875rem;
+    color: var(--color-gray-600);
+}
+
+.sectionLabel {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--color-gray-800);
+    border-bottom: 1px solid var(--color-gray-200);
+    padding-bottom: 0.5rem;
+}
+
+.itemList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.orderItem {
+    margin-bottom: 0.5rem;
+}
+
+.itemRow {
+    display: flex;
+    justify-content: space-between;
+}
+
+.itemName {
+    font-weight: 600;
+}
+
+.itemOptions {
+    font-size: 0.75rem;
+    color: var(--color-gray-400);
+    margin-top: 0.25rem;
+    padding-left: 0.5rem;
+    border-left: 2px solid var(--color-gray-200);
+}
+
+.totalRow {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-gray-200);
+    display: flex;
+    justify-content: space-between;
+    font-weight: 800;
+    color: var(--color-primary-600);
+    font-size: 1.125rem;
+}
+
+.infoList {
+    font-size: 0.875rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.infoRow {
+    display: flex;
+    gap: 1rem;
+}
+
+.infoLabel {
+    color: var(--color-gray-400);
+    width: 60px;
+}
+
+.memoText {
+    color: var(--color-gray-800);
+}
+
+.emptyMemo {
+    color: var(--color-gray-300);
+}
+
+.rejectBox {
+    display: flex;
+    gap: 1rem;
+    background-color: #fff5f5;
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    border: 1px solid #feb2b2;
+}
+
+.rejectLabel {
+    color: #c53030;
+    font-weight: 700;
+    width: 60px;
+}
+
+.rejectValue {
+    color: #c53030;
+}
+
+.modalFooter {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.flex1 {
+    flex: 1;
+}
+
+.flex2 {
+    flex: 2;
+}

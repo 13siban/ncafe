@@ -18,10 +18,10 @@ export const MenuList = ({
     selectedCategory,
     searchQuery,
 }: MenuListProps) => {
-    const [menus, setMenus] = React.useState<MenuResponse[]>([]);
+    const [menus, setMenus] = React.useState<MenuResponse[] | undefined>(undefined);
 
     const handleAvailableToggle = async (menuId: number, isAvailable: boolean) => {
-        const targetMenu = menus.find((m) => m.id === menuId);
+        const targetMenu = menus?.find((m) => m.id === menuId);
         if (!targetMenu) return;
 
         try {
@@ -34,7 +34,7 @@ export const MenuList = ({
             });
 
             setMenus((prev) =>
-                prev.map((menu) =>
+                prev?.map((menu) =>
                     menu.id === menuId ? { ...menu, isAvailable: isAvailable, isOrderable: isAvailable && !menu.isSoldOut } : menu
                 )
             );
@@ -50,7 +50,7 @@ export const MenuList = ({
                 method: 'DELETE',
             });
             alert('메뉴가 삭제되었습니다.');
-            setMenus((prev) => prev.filter((menu) => menu.id !== menuId));
+            setMenus((prev) => prev?.filter((menu) => menu.id !== menuId));
             window.location.reload(); // Refresh the entire list
         } catch (error) {
             console.error('Failed to delete menu', error);
@@ -63,6 +63,8 @@ export const MenuList = ({
             selectedCategory={selectedCategory}
             searchQuery={searchQuery}
             mode="admin"
+            menus={menus}
+            setMenus={setMenus}
             onMenusChange={setMenus}
             renderCard={(menu) => (
                 <MenuCard

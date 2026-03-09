@@ -11,6 +11,9 @@ interface MenuListProps {
     selectedCategory: number | null;
     searchQuery: string;
     mode?: MenuMode;
+    /** 외부에서 메뉴 상태를 관리할 경우 사용 */
+    menus?: MenuResponse[];
+    setMenus?: React.Dispatch<React.SetStateAction<MenuResponse[] | undefined>>;
     /** 카드를 커스터마이징할 수 있는 렌더 함수 */
     renderCard?: (menu: MenuResponse) => React.ReactNode;
     /** 빈 상태에 추가할 액션 */
@@ -18,7 +21,7 @@ interface MenuListProps {
     /** 에러 상태에 추가할 액션 */
     errorAction?: React.ReactNode;
     /** 메뉴 상태 변경 시 부모에게 전달 */
-    onMenusChange?: (menus: MenuResponse[]) => void;
+    onMenusChange?: (menus: MenuResponse[] | undefined) => void;
 }
 
 const ITEMS_PER_PAGE = 9;
@@ -31,12 +34,19 @@ export const MenuList = ({
     emptyAction,
     errorAction,
     onMenusChange,
+    menus: externalMenus,
+    setMenus: externalSetMenus,
 }: MenuListProps) => {
-    const { menus, setMenus, total, isLoading, error } = useMenus({
+    const internalState = useMenus({
         categoryId: selectedCategory,
         searchQuery,
         mode,
     });
+
+    // 외부 상태가 있으면 그것을 사용, 없으면 hook 내부 상태 사용
+    const menus = externalMenus !== undefined ? externalMenus : internalState.menus;
+    const setMenus = externalSetMenus !== undefined ? externalSetMenus : internalState.setMenus;
+    const { total, isLoading, error } = internalState;
 
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -45,8 +55,10 @@ export const MenuList = ({
     }, [selectedCategory, searchQuery]);
 
     useEffect(() => {
-        onMenusChange?.(menus);
-    }, [menus, onMenusChange]);
+        if (!isLoading) {
+            onMenusChange?.(internalState.menus);
+        }
+    }, [internalState.menus, onMenusChange, isLoading]);
 
     const paginatedMenus = useMemo(() => {
         const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;

@@ -42,10 +42,10 @@ export const MenuCard = ({
     return (
         <BaseMenuCard
             menu={menu}
-            className={!menu.isOrderable ? styles.hiddenOverlay : ''}
+            className={!menu.isAvailable ? styles.hiddenOverlay : ''}
             onImageClick={handleImageClick}
             extraBadges={
-                !menu.isOrderable ? (
+                !menu.isAvailable ? (
                     <span className={styles.hiddenBadge}>숨김</span>
                 ) : null
             }

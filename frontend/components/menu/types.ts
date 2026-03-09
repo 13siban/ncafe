@@ -13,6 +13,7 @@ export interface MenuResponse {
     price: number;
     categoryName: string;
     imageSrc: string;
+    isAvailable: boolean;
     isOrderable: boolean;
     isSoldOut: boolean;
     sortOrder: number;
