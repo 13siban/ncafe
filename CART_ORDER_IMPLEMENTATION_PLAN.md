@@ -681,54 +681,54 @@ backend/src/main/java/com/new_cafe/app/backend/order/
 
 ### 🔵 Phase 1: 데이터베이스 & 백엔드 기반 구축
 
-- [ ] **1-1.** `orders`, `order_items`, `order_option_selections` JPA Entity 생성
-- [ ] **1-2.** `daily_menu_sales` JPA Entity 생성
-- [ ] **1-3.** `store_settings` JPA Entity 생성 (싱글턴 레코드, 영업 상태 관리)
-- [ ] **1-4.** JPA Repository 인터페이스 생성
-- [ ] **1-5.** `OrderStatus` enum 생성
-- [ ] **1-6.** Domain Model 생성 (`Order`, `OrderItem`, `StoreSettings`)
-- [ ] **1-7.** 빌드 확인 (`./gradlew build -x test`)
+- [x] **1-1.** `orders`, `order_items`, `order_option_selections` JPA Entity 생성
+- [x] **1-2.** `daily_menu_sales` JPA Entity 생성
+- [x] **1-3.** `store_settings` JPA Entity 생성 (싱글턴 레코드, 영업 상태 관리)
+- [x] **1-4.** JPA Repository 인터페이스 생성
+- [x] **1-5.** `OrderStatus` enum 생성
+- [x] **1-6.** Domain Model 생성 (`Order`, `OrderItem`, `StoreSettings`)
+- [x] **1-7.** 빌드 확인 (`./gradlew build -x test`)
 
 ---
 
 ### 🟢 Phase 2: 백엔드 주문 API 구현
 
-- [ ] **2-1.** `GET /store/status` — 매장 영업 상태 조회 API
-- [ ] **2-2.** `PUT /admin/store/open` — 매장 영업 개시 API
+- [x] **2-1.** `GET /store/status` — 매장 영업 상태 조회 API
+- [x] **2-2.** `PUT /admin/store/open` — 매장 영업 개시 API
     - `is_open = true`, `opened_at = NOW()`
-- [ ] **2-3.** `PUT /admin/store/close` — 매장 영업 종료 API
+- [x] **2-3.** `PUT /admin/store/close` — 매장 영업 종료 API
     - `is_open = false`, `closed_at = NOW()`
     - **주문번호 순번 초기화** (다음 영업 시 #1부터 시작)
-- [ ] **2-4.** `POST /orders` — 주문 생성 API
+- [x] **2-4.** `POST /orders` — 주문 생성 API
     - **매장 영업 중(`is_open = true`)일 때만 허용** (아니면 403 반환)
     - `order_date = 오늘 날짜`, `order_number = 오늘의 MAX+1`
     - 고객에게 `orderDate + orderNumber` 즉시 반환 (예: `#3`)
     - 메뉴명, 가격 등 스냅샷 저장 / 총 금액 자동 계산
     - **생성 즉시 `status = PREPARING`** (관리자 확인 단계 없음)
     - 회원이면 `customer_name = 회원이름`, 비회원이면 `customer_name = "비회원"`
-- [ ] **2-5.** `GET /orders/{date}/{number}` — 주문 조회 API
-- [ ] **2-6.** `GET /orders/my` — 내 주문 내역 API (세션 기반, 회원만)
-- [ ] **2-7.** `GET /admin/orders` — 관리자 주문 목록 API (필터: status, date)
+- [x] **2-5.** `GET /orders/{date}/{number}` — 주문 조회 API
+- [x] **2-6.** `GET /orders/my` — 내 주문 내역 API (세션 기반, 회원만)
+- [x] **2-7.** `GET /admin/orders` — 관리자 주문 목록 API (필터: status, date)
     - 응답에 `isGuest` 필드 포함 (`user_id == null`이면 true)
-- [ ] **2-8.** `GET /admin/orders/{id}` — 관리자 주문 상세 API
-- [ ] **2-9.** `PUT /admin/orders/{id}/status` — 상태 변경 API
+- [x] **2-8.** `GET /admin/orders/{id}` — 관리자 주문 상세 API
+- [x] **2-9.** `PUT /admin/orders/{id}/status` — 상태 변경 API
     - **COMPLETED 처리 시 `daily_menu_sales` 자동 집계** (UPSERT)
-- [ ] **2-10.** `PUT /admin/orders/{id}/reject` — 주문 반려 API (사유 필수)
-- [ ] **2-11.** 빌드 및 API 테스트
+- [x] **2-10.** `PUT /admin/orders/{id}/reject` — 주문 반려 API (사유 필수)
+- [x] **2-11.** 빌드 및 API 테스트
 
 ---
 
 ### 🟡 Phase 3: 프론트엔드 — 장바구니
 
-- [ ] **3-1.** Zustand Cart Store 생성 (`useCartStore.ts`)
+- [x] **3-1.** Zustand Cart Store 생성 (`useCartStore.ts`)
     - localStorage persist 미들웨어 적용
     - addItem, removeItem, updateQuantity, clearCart 구현
-- [ ] **3-2.** 메뉴 상세 페이지 `/menus/[id]` — "장바구니 담기" 버튼 연동
+- [x] **3-2.** 메뉴 상세 페이지 `/menus/[id]` — "장바구니 담기" 버튼 연동
     - 선택한 옵션 정보와 함께 cart store에 추가
     - 담기 성공 시 토스트 메시지 또는 카트 아이콘 애니메이션
     - **매장 영업 종료 시 "현재 주문이 불가합니다" 안내 표시 + 장바구니/주문 버튼 비활성화**
-- [ ] **3-3.** Nav 헤더에 장바구니 아이콘 + 수량 뱃지 추가
-- [ ] **3-4.** 장바구니 페이지 (`/cart`) 구현
+- [x] **3-3.** Nav 헤더에 장바구니 아이콘 + 수량 뱃지 추가
+- [x] **3-4.** 장바구니 페이지 (`/cart`) 구현
     - 아이템 리스트 (이미지, 이름, 선택 옵션, 수량, 가격)
     - 수량 변경 (+/-), 개별 삭제
     - 전체 비우기
@@ -739,13 +739,13 @@ backend/src/main/java/com/new_cafe/app/backend/order/
 
 ### 🟠 Phase 4: 프론트엔드 — 주문 프로세스
 
-- [ ] **4-1.** 주문 확인 페이지 (`/order/confirm`)
+- [x] **4-1.** 주문 확인 페이지 (`/order/confirm`)
     - 장바구니 내용 최종 확인
     - 고객명 입력 (비회원) 또는 자동 채우기 (회원)
     - 요청사항(memo) 입력
     - "주문 접수" 버튼 → `POST /orders` API 호출
     - 성공 시 장바구니 비우기 + 주문 상태 페이지로 이동
-- [ ] **4-2.** 주문 상태 페이지 (`/order/[orderNumber]`)
+- [x] **4-2.** 주문 상태 페이지 (`/order/[orderNumber]`)
     - 주문 번호, 주문내역, 현재 상태 표시
     - 상태별 아이콘/색상 시각 표시
     - 자동 새로고침 (polling, 30초 간격) 또는 수동 새로고침 버튼
@@ -754,8 +754,8 @@ backend/src/main/java/com/new_cafe/app/backend/order/
 
 ### 🔴 Phase 5: 프론트엔드 — 관리자 주문 관리
 
-- [ ] **5-1.** 관리자 사이드바 "주문 관리" 링크 활성화 (이미 `/admin/orders` 링크가 존재)
-- [ ] **5-2.** 주문 관리 페이지 (`/admin/orders`) 구현
+- [x] **5-1.** 관리자 사이드바 "주문 관리" 링크 활성화 (이미 `/admin/orders` 링크가 존재)
+- [x] **5-2.** 주문 관리 페이지 (`/admin/orders`) 구현
     - 상태별 탭 필터 (전체/제조중/완료/수령완료/반려) — ~~대기중/확인 탭 없음~~
     - 주문 카드 리스트 표시 내용:
       - **주문번호** (`#3`) — 당일 순번 숫자만 표시
@@ -767,60 +767,60 @@ backend/src/main/java/com/new_cafe/app/backend/order/
       - 완료 → **[수령완료]**
       - 반려/수령완료 → 버튼 없음 (최종 상태)
     - **반려 시 사유 입력 모달** (사유 필수)
-- [ ] **5-3.** 주문 상세 모달 (또는 페이지)
+- [x] **5-3.** 주문 상세 모달 (또는 페이지)
     - 주문한 메뉴 상세 (옵션 포함)
     - 요청사항 표시
     - 회원/비회원 여부 표시
-- [ ] **5-4.** 자동 새로고침 (polling, 10~15초 간격) — 새 주문 알림
+- [x] **5-4.** 자동 새로고침 (polling, 10~15초 간격) — 새 주문 알림
 
 ---
 
 ### ⚪ Phase 6: 대시보드 & 매출 분석 리메이크
 
 #### 6-A. 백엔드 API
-- [ ] **6-1.** `GET /admin/dashboard/stats?period=daily|weekly|monthly` — 기간별 통계 API
+- [x] **6-1.** `GET /admin/dashboard/stats?period=daily|weekly|monthly` — 기간별 통계 API
     - 주문 수, 매출 합계, 고객 수 (COMPLETED 기준)
     - 이전 기간 대비 변화율 자동 계산
     - 현재 제조 중 주문 수
-- [ ] **6-2.** `GET /admin/dashboard/recent-orders` — 최근 5건 주문
-- [ ] **6-3.** `GET /admin/sales/summary?period=daily&date=YYYY-MM-DD` — 매출 요약
+- [x] **6-2.** `GET /admin/dashboard/recent-orders` — 최근 5건 주문
+- [x] **6-3.** `GET /admin/sales/summary?period=daily&date=YYYY-MM-DD` — 매출 요약
     - 총 매출, 총 주문, 평균 주문금액, 회원/비회원 비율
-- [ ] **6-4.** `GET /admin/sales/orders?date=YYYY-MM-DD` — 완료 주문 내역 리스트
-- [ ] **6-5.** `GET /admin/sales/menu-ranking?period=daily&date=YYYY-MM-DD` — 상품별 판매량 랭킹
+- [x] **6-4.** `GET /admin/sales/orders?date=YYYY-MM-DD` — 완료 주문 내역 리스트
+- [x] **6-5.** `GET /admin/sales/menu-ranking?period=daily&date=YYYY-MM-DD` — 상품별 판매량 랭킹
     - `daily_menu_sales` 테이블에서 조회
     - 정렬: 판매량 순 (내림차순)
-- [ ] **6-6.** `GET /admin/sales/chart?period=weekly&date=YYYY-MM-DD` — 매출 차트 데이터
+- [x] **6-6.** `GET /admin/sales/chart?period=weekly&date=YYYY-MM-DD` — 매출 차트 데이터
     - 기간별 시계열 데이터 (일간=시간대별, 주간=일별, 월간=일별)
 
 #### 6-B. 프론트엔드 — 대시보드 페이지 리메이크 (`/admin`)
-- [ ] **6-7.** 일간/주간/월간 기간 전환 탭 구현
-- [ ] **6-8.** 통계 카드 4개 API 연동 (하드코딩 제거)
+- [x] **6-7.** 일간/주간/월간 기간 전환 탭 구현
+- [x] **6-8.** 통계 카드 4개 API 연동 (하드코딩 제거)
     - 로딩 스켈레톤 추가
-- [ ] **6-9.** **영업 상태 토글 UI (대시보드 상단)**
+- [x] **6-9.** **영업 상태 토글 UI (대시보드 상단)**
     - 영업 중: 🟢 표시 + [영업 종료] 버튼
     - 영업 종료: 🔴 표시 + [영업 개시] 버튼
     - 영업 종료 클릭 시 확인 모달 ("영업을 종료하시겠습니까? 주문번호가 초기화됩니다.")
-- [ ] **6-10.** 제조 중 주문 알림 배너
-- [ ] **6-11.** 최근 주문 위젯 (5건)
+- [x] **6-10.** 제조 중 주문 알림 배너
+- [x] **6-11.** 최근 주문 위젯 (5건)
     - 주문번호 `#N` 형식 + 시간 표시
     - "전체 보기" 링크 → `/admin/orders` 이동
-- [ ] **6-12.** 인기 메뉴 TOP 5 위젯
+- [x] **6-12.** 인기 메뉴 TOP 5 위젯
     - `daily_menu_sales` 기반
     - "상세보기" 링크 → `/admin/sales` 이동
 
 #### 6-C. 프론트엔드 — 매출 상세 페이지 (`/admin/sales`) ⭐ 신규
-- [ ] **6-13.** 매출 상세 페이지 레이아웃
+- [x] **6-13.** 매출 상세 페이지 레이아웃
     - 일간/주간/월간 기간 전환 + 날짜 이동 (`◀ ▶`)
-- [ ] **6-14.** **탭 1: 매출 요약**
+- [x] **6-14.** **탭 1: 매출 요약**
     - 총 매출, 총 주문, 평균 주문금액, 회원/비회원 비율
     - 매출 추이 차트 (Recharts 사용)
-- [ ] **6-15.** **탭 2: 주문 완료 내역**
+- [x] **6-15.** **탭 2: 주문 완료 내역**
     - 해당 기간 COMPLETED 주문 리스트 (주문번호, 고객명, 메뉴, 금액)
     - 페이지네이션
-- [ ] **6-16.** **탭 3: 상품별 판매량**
+- [x] **6-16.** **탭 3: 상품별 판매량**
     - 메뉴별 판매 수량 + 매출 테이블 (랭킹 정렬)
     - 카테고리별 매출 비율 파이 차트
-- [ ] **6-17.** 관리자 사이드바에 **"매출 분석"** 메뉴 추가
+- [x] **6-17.** 관리자 사이드바에 **"매출 분석"** 메뉴 추가
 
 ---
 

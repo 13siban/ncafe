@@ -13,6 +13,7 @@ public interface GetOrderUseCase {
     OrderDto getOrderById(Long id);
     List<OrderListDto> getMyOrders(String userId);
     List<OrderListDto> getAllOrders(String status, LocalDate date);
+    List<OrderListDto> getOrdersByRange(String status, LocalDate start, LocalDate end);
 
     @Getter
     @Builder

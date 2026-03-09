@@ -8,6 +8,9 @@ import com.new_cafe.app.backend.order.domain.model.Order;
 import com.new_cafe.app.backend.order.domain.model.OrderStatus;
 import com.new_cafe.app.backend.sales.adapter.out.persistence.DailyMenuSalesJpaEntity;
 import com.new_cafe.app.backend.sales.adapter.out.persistence.DailyMenuSalesJpaRepository;
+import com.new_cafe.app.backend.admin.menu.adapter.out.persistence.AdminMenuJpaEntity;
+import com.new_cafe.app.backend.admin.menu.adapter.out.persistence.AdminMenuJpaRepository;
+import com.new_cafe.app.backend.category.adapter.out.persistence.CategoryJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,8 +24,10 @@ import java.util.stream.Collectors;
 public class ManageOrderStatusService implements ManageOrderStatusUseCase {
 
     private final OrderRepositoryPort orderRepository;
-    private final OrderItemJpaRepository orderItemRepository; // Using JPA directly for read simplicity here
+    private final OrderItemJpaRepository orderItemRepository; 
     private final DailyMenuSalesJpaRepository dailyMenuSalesRepository;
+    private final AdminMenuJpaRepository menuRepository;
+    private final CategoryJpaRepository categoryRepository;
 
     @Override
     public void changeOrderStatus(Long id, String statusStr) {
@@ -45,8 +50,11 @@ public class ManageOrderStatusService implements ManageOrderStatusUseCase {
 
         orderRepository.save(updatedOrder);
 
-        // When status is COMPLETED, aggregate daily sales
-        if (newStatus == OrderStatus.COMPLETED) {
+        // When status moves to COMPLETED or PICKED_UP from a non-final state, aggregate daily sales
+        boolean isNowFinal = (newStatus == OrderStatus.COMPLETED || newStatus == OrderStatus.PICKED_UP);
+        boolean wasNotFinal = (order.getStatus() != OrderStatus.COMPLETED && order.getStatus() != OrderStatus.PICKED_UP);
+        
+        if (isNowFinal && wasNotFinal) {
             aggregateDailySales(order);
         }
     }
@@ -81,15 +89,23 @@ public class ManageOrderStatusService implements ManageOrderStatusUseCase {
             DailyMenuSalesJpaEntity salesEntity = dailyMenuSalesRepository.findAll().stream()
                     .filter(s -> s.getSaleDate().equals(order.getOrderDate()) && s.getMenuId().equals(item.getMenuId()))
                     .findFirst()
-                    .orElseGet(() -> DailyMenuSalesJpaEntity.builder()
-                            .saleDate(order.getOrderDate())
-                            .menuId(item.getMenuId())
-                            .menuName(item.getMenuName())
-                            .categoryName(null) // we don't fetch category name here for simplicity, can be fetched if needed
-                            .quantitySold(0)
-                            .totalSales(0)
-                            .build()
-                    );
+                    .orElseGet(() -> {
+                        AdminMenuJpaEntity menu = menuRepository.findById(item.getMenuId()).orElse(null);
+                        String categoryName = "기타";
+                        if (menu != null && menu.getCategoryId() != null) {
+                            categoryName = categoryRepository.findById(menu.getCategoryId())
+                                    .map(c -> c.getName())
+                                    .orElse("기타");
+                        }
+                        return DailyMenuSalesJpaEntity.builder()
+                                .saleDate(order.getOrderDate())
+                                .menuId(item.getMenuId())
+                                .menuName(item.getMenuName())
+                                .categoryName(categoryName)
+                                .quantitySold(0)
+                                .totalSales(0)
+                                .build();
+                    });
             
             salesEntity.addSales(item.getQuantity(), item.getSubtotal());
             dailyMenuSalesRepository.save(salesEntity);

@@ -16,4 +16,12 @@ public interface OrderRepositoryPort {
     List<Order> findByUserId(String userId);
     List<Order> findAll();
     Integer getNextOrderNumber(LocalDate orderDate);
+    
+    long countByOrderDate(LocalDate orderDate);
+    long countByOrderDateAndStatus(LocalDate orderDate, com.new_cafe.app.backend.order.domain.model.OrderStatus status);
+    long sumTotalPriceByOrderDateAndStatusCompleted(LocalDate date);
+    long countDistinctUserIdsByOrderDate(LocalDate date);
+    long countGuestOrdersByOrderDate(LocalDate date);
+    List<Order> findByOrderDateOrderByCreatedAtDesc(LocalDate date);
+    List<Order> findByOrderDateBetween(LocalDate start, LocalDate end);
 }

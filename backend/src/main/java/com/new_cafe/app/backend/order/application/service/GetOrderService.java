@@ -65,6 +65,16 @@ public class GetOrderService implements GetOrderUseCase {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<OrderListDto> getOrdersByRange(String status, LocalDate start, LocalDate end) {
+        return orderRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt")).stream()
+                .filter(o -> (status == null || o.getStatus().name().equalsIgnoreCase(status)))
+                .filter(o -> (start == null || !o.getOrderDate().isBefore(start)))
+                .filter(o -> (end == null || !o.getOrderDate().isAfter(end)))
+                .map(this::mapToListDto)
+                .collect(Collectors.toList());
+    }
+
     private OrderDto mapToDto(OrderJpaEntity order) {
         List<OrderItemJpaEntity> items = orderItemRepository.findAll().stream()
                 .filter(i -> i.getOrderId().equals(order.getId()))

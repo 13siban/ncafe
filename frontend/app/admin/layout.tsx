@@ -46,6 +46,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         };
       }
     }
+    if (path === '/admin/sales') {
+      return {
+        title: '매출 분석',
+        breadcrumbs: [{ label: '홈' }, { label: '매출 분석' }]
+      };
+    }
     // 기본값 (대시보드 등)
     return {
       title: '대시보드',

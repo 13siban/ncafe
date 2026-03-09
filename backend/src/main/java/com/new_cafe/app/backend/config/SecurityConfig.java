@@ -34,15 +34,15 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                     // 공개 API: 인증 없이 접근 가능
-                    .requestMatchers("/auth/**").permitAll()
-                    .requestMatchers("/menus/**").permitAll()
-                    .requestMatchers("/categories/**").permitAll()
+                    .requestMatchers("/auth/**", "/api/auth/**").permitAll()
+                    .requestMatchers("/menus/**", "/api/menus/**").permitAll()
+                    .requestMatchers("/categories/**", "/api/categories/**").permitAll()
                     .requestMatchers("/**/*.png", "/**/*.jpg", "/**/*.jpeg", "/**/*.gif", "/**/*.svg").permitAll()
-                    .requestMatchers("/store/status").permitAll()
-                    .requestMatchers("/orders/**").permitAll()
+                    .requestMatchers("/store/status", "/api/store/status").permitAll()
+                    .requestMatchers("/orders/**", "/api/orders/**").permitAll()
 
                     // 관리자 API: ADMIN 권한이 있는 사용자만 접근 가능
-                    .requestMatchers("/admin/**").hasRole("ADMIN")
+                    .requestMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN")
                     
                     // 에러 페이지 접근 허용 (상세 에러메시지 전달을 위함)
                     .requestMatchers("/error").permitAll()

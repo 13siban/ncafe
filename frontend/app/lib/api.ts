@@ -115,3 +115,30 @@ export const adminStoreAPI = {
         }),
 };
 
+// 대시보드 및 통계 API 모음
+export const adminDashboardAPI = {
+    /** 기간별 대시보드 통계 조회 (period: daily, weekly, monthly) */
+    getStats: (period: string = 'daily') => fetchAPI(`/admin/dashboard/stats?period=${period}`),
+
+    /** 최근 주문 5건 조회 */
+    getRecentOrders: () => fetchAPI('/admin/dashboard/recent-orders'),
+};
+
+// 매출 분석 API 모음
+export const adminSalesAPI = {
+    /** 기간별 매출 요약 조회 */
+    getSummary: (period: string = 'daily', date?: string) =>
+        fetchAPI(`/admin/sales/summary?period=${period}${date ? `&date=${date}` : ''}`),
+
+    /** 특정 기간의 완료 주문 내역 조회 */
+    getOrders: (period: string = 'daily', date: string) => fetchAPI(`/admin/sales/orders?period=${period}&date=${date}`),
+
+    /** 상품별 판매량 랭킹 조회 */
+    getMenuRanking: (period: string = 'daily', date?: string) =>
+        fetchAPI(`/admin/sales/menu-ranking?period=${period}${date ? `&date=${date}` : ''}`),
+
+    /** 매출 차트 데이터 조회 */
+    getChart: (period: string = 'daily', date?: string) =>
+        fetchAPI(`/admin/sales/chart?period=${period}${date ? `&date=${date}` : ''}`),
+};
+

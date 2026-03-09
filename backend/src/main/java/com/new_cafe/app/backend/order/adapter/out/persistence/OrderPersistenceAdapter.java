@@ -75,16 +75,17 @@ public class OrderPersistenceAdapter implements OrderRepositoryPort, OrderOption
 
     @Override
     public Optional<Order> findByOrderDateAndOrderNumber(LocalDate orderDate, Integer orderNumber) {
-        return orderRepository.findAll().stream()
-                .filter(o -> o.getOrderDate().equals(orderDate) && o.getOrderNumber().equals(orderNumber))
+        return orderRepository.findByOrderDateOrderByCreatedAtDesc(orderDate).stream()
+                .filter(o -> o.getOrderNumber().equals(orderNumber))
                 .findFirst()
                 .map(this::mapToDomain);
     }
 
     @Override
     public List<Order> findByUserId(String userId) {
-        return orderRepository.findAll().stream()
+        return orderRepository.findAll().stream() // Ideally add findByUserId to repo, but keeping current if needed
                 .filter(o -> userId.equals(o.getUserId()))
+                .filter(o -> o.getUserId() != null)
                 .map(this::mapToDomain)
                 .collect(Collectors.toList());
     }
@@ -99,11 +100,46 @@ public class OrderPersistenceAdapter implements OrderRepositoryPort, OrderOption
 
     @Override
     public Integer getNextOrderNumber(LocalDate orderDate) {
-        return orderRepository.findAll().stream()
-                .filter(o -> o.getOrderDate().equals(orderDate))
-                .mapToInt(OrderJpaEntity::getOrderNumber)
-                .max()
-                .orElse(0) + 1;
+        return (int) orderRepository.countByOrderDate(orderDate) + 1;
+    }
+
+    @Override
+    public long countByOrderDate(LocalDate orderDate) {
+        return orderRepository.countByOrderDate(orderDate);
+    }
+
+    @Override
+    public long countByOrderDateAndStatus(LocalDate orderDate, com.new_cafe.app.backend.order.domain.model.OrderStatus status) {
+        return orderRepository.countByOrderDateAndStatus(orderDate, status);
+    }
+
+    @Override
+    public long sumTotalPriceByOrderDateAndStatusCompleted(LocalDate date) {
+        return orderRepository.sumTotalPriceByOrderDateAndStatusCompleted(date);
+    }
+
+    @Override
+    public long countDistinctUserIdsByOrderDate(LocalDate date) {
+        return orderRepository.countDistinctUserIdsByOrderDate(date);
+    }
+
+    @Override
+    public long countGuestOrdersByOrderDate(LocalDate date) {
+        return orderRepository.countGuestOrdersByOrderDate(date);
+    }
+
+    @Override
+    public List<Order> findByOrderDateOrderByCreatedAtDesc(LocalDate date) {
+        return orderRepository.findByOrderDateOrderByCreatedAtDesc(date).stream()
+                .map(this::mapToDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Order> findByOrderDateBetween(LocalDate start, LocalDate end) {
+        return orderRepository.findByOrderDateBetween(start, end).stream()
+                .map(this::mapToDomain)
+                .collect(Collectors.toList());
     }
 
     private Order mapToDomain(OrderJpaEntity entity) {

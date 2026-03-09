@@ -14,6 +14,7 @@ import {
   ChevronRight,
   Users,
   Sliders,
+  BarChart3,
 } from 'lucide-react';
 import styles from './AdminSidebar.module.css';
 import { apiFetch } from '@/lib/api';
@@ -88,6 +89,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     },
     { label: '옵션 관리', href: '/admin/options', icon: <Sliders size={20} /> },
     { label: '주문 관리', href: '/admin/orders', icon: <ShoppingBag size={20} /> },
+    { label: '매출 분석', href: '/admin/sales', icon: <BarChart3 size={20} /> },
     { label: '회원 관리', href: '/admin/users', icon: <Users size={20} /> },
   ];
 
