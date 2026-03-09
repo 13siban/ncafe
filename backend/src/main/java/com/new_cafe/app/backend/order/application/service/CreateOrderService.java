@@ -12,6 +12,7 @@ import com.new_cafe.app.backend.order.application.port.out.OrderRepositoryPort;
 import com.new_cafe.app.backend.order.domain.model.Order;
 import com.new_cafe.app.backend.order.domain.model.OrderItem;
 import com.new_cafe.app.backend.order.domain.model.OrderStatus;
+import com.new_cafe.app.backend.store.application.port.in.GetStoreSettingsUseCase;
 import com.new_cafe.app.backend.store.application.port.out.StoreSettingsRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CreateOrderService implements CreateOrderUseCase {
 
-    private final StoreSettingsRepositoryPort storeSettingsRepository;
+    private final GetStoreSettingsUseCase getStoreSettingsUseCase;
     private final OrderRepositoryPort orderRepository;
     private final OrderOptionRepositoryPort orderOptionRepository;
     
@@ -38,7 +39,7 @@ public class CreateOrderService implements CreateOrderUseCase {
     @Override
     @Transactional
     public OrderResponse createOrder(CreateOrderCommand command, String userId) {
-        if (!storeSettingsRepository.getStoreSettings().getIsOpen()) {
+        if (!getStoreSettingsUseCase.isStoreOpen()) {
             throw new IllegalStateException("Store is closed");
         }
 

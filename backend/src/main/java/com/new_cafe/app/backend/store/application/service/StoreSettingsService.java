@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
@@ -20,13 +21,51 @@ public class StoreSettingsService implements GetStoreSettingsUseCase, ManageStor
 
     @Override
     public boolean isStoreOpen() {
-        return repositoryPort.getStoreSettings().getIsOpen();
+        StoreSettings settings = repositoryPort.getStoreSettings();
+        return calculateStoreOpenStatus(settings);
+    }
+
+    private boolean calculateStoreOpenStatus(StoreSettings settings) {
+        // If master switch is off, it's definitely closed
+        if (!settings.getIsOpen()) {
+            return false;
+        }
+
+        // Check operating hours if they are set
+        if (settings.getOpenTime() != null && !settings.getOpenTime().isEmpty() &&
+            settings.getCloseTime() != null && !settings.getCloseTime().isEmpty()) {
+            try {
+                LocalTime now = LocalTime.now();
+                LocalTime open = LocalTime.parse(settings.getOpenTime());
+                LocalTime close = LocalTime.parse(settings.getCloseTime());
+
+                if (open.isBefore(close)) {
+                    // Standard: 09:00 - 22:00
+                    return !now.isBefore(open) && now.isBefore(close);
+                } else {
+                    // Overnight: 22:00 - 05:00
+                    return !now.isBefore(open) || now.isBefore(close);
+                }
+            } catch (Exception e) {
+                // Fallback to manual switch if parse fails
+                return settings.getIsOpen();
+            }
+        }
+
+        return settings.getIsOpen();
     }
 
     @Override
     public GetStoreSettingsUseCase.StoreSettingsResponse getStoreSettings() {
         StoreSettings settings = repositoryPort.getStoreSettings();
-        return toGetResponse(settings);
+        boolean actualOpen = calculateStoreOpenStatus(settings);
+        return new GetStoreSettingsUseCase.StoreSettingsResponse(
+                actualOpen,
+                settings.getOpenedAt() != null ? settings.getOpenedAt().format(formatter) : null,
+                settings.getClosedAt() != null ? settings.getClosedAt().format(formatter) : null,
+                settings.getOpenTime(),
+                settings.getCloseTime()
+        );
     }
 
     @Override
@@ -56,19 +95,10 @@ public class StoreSettingsService implements GetStoreSettingsUseCase, ManageStor
         return toManageResponse(updated);
     }
 
-    private GetStoreSettingsUseCase.StoreSettingsResponse toGetResponse(StoreSettings settings) {
-        return new GetStoreSettingsUseCase.StoreSettingsResponse(
-                settings.getIsOpen(),
-                settings.getOpenedAt() != null ? settings.getOpenedAt().format(formatter) : null,
-                settings.getClosedAt() != null ? settings.getClosedAt().format(formatter) : null,
-                settings.getOpenTime(),
-                settings.getCloseTime()
-        );
-    }
-
     private ManageStoreSettingsUseCase.StoreSettingsResponse toManageResponse(StoreSettings settings) {
+        boolean actualOpen = calculateStoreOpenStatus(settings);
         return new ManageStoreSettingsUseCase.StoreSettingsResponse(
-                settings.getIsOpen(),
+                actualOpen,
                 settings.getOpenedAt() != null ? settings.getOpenedAt().format(formatter) : null,
                 settings.getClosedAt() != null ? settings.getClosedAt().format(formatter) : null,
                 settings.getOpenTime(),
