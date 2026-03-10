@@ -17,6 +17,12 @@ export default function PublicMenusPage() {
     return (
         <div className={styles.wrapper}>
             <Header />
+            <div className={styles.banner}>
+                <div className={styles.bannerContent}>
+                    <h1 className={styles.bannerTitle}>Explore Our Menu</h1>
+                    <p className={styles.bannerSubtitle}>최고의 재료와 정성으로 준비한 커피와 디저트를 만나보세요.</p>
+                </div>
+            </div>
 
             <main className={styles.container}>
                 <CategoryTabs

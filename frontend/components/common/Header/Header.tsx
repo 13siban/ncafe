@@ -75,7 +75,8 @@ const Header = () => {
     };
 
     const isHomePage = pathname === '/';
-    const displayScrolled = !isHomePage || isScrolled;
+    const isMenuPage = pathname === '/menus';
+    const displayScrolled = (!isHomePage && !isMenuPage) || isScrolled;
 
     return (
         <nav className={`${styles.nav} ${displayScrolled ? styles.scrolled : styles.transparent}`}>

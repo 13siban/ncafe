@@ -46,14 +46,14 @@
 .title {
     font-size: 14px;
     color: var(--color-primary-600);
-    font-weight: var(--font-semithin);
+    font-weight: var(--font-normal);
     letter-spacing: 1px;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     text-transform: uppercase;
 }
 
 .subtitle {
-    font-family: serif;
+    font-family: var(--font-serif);
     font-size: 56px;
     font-weight: var(--font-semithin);
     color: #1a1a1a;
@@ -99,7 +99,7 @@
 
 .tabText {
     font-size: var(--text-base);
-    font-weight: var(--font-medium);
+    font-weight: var(--font-superbold);
     color: #1a1a1a;
     text-transform: uppercase;
     letter-spacing: 0.5px;

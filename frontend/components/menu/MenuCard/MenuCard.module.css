@@ -84,7 +84,7 @@
 
 .engName {
   font-size: var(--text-xl);
-  font-weight: var(--font-semibold);
+  font-weight: var(--font-superbold);
   color: var(--color-gray-900);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -94,7 +94,7 @@
 .korName {
   font-size: var(--text-xs);
   color: var(--color-gray-500);
-  font-weight: var(--font-semithin);
+  font-weight: var(--font-normal);
   text-transform: uppercase;
   margin-bottom: 4px;
   letter-spacing: 1px;
@@ -103,7 +103,7 @@
 .description {
   font-size: var(--text-sm);
   color: var(--color-gray-600);
-  font-weight: var(--font-regular);
+  font-weight: var(--font-bold);
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -118,7 +118,7 @@
 
 .price {
   font-size: var(--text-xl);
-  font-weight: var(--font-regular);
+  font-weight: var(--font-bold);
   letter-spacing: -0.02em;
   color: var(--color-primary-600);
 }
