@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 @Service
@@ -35,7 +36,7 @@ public class StoreSettingsService implements GetStoreSettingsUseCase, ManageStor
         if (settings.getOpenTime() != null && !settings.getOpenTime().isEmpty() &&
             settings.getCloseTime() != null && !settings.getCloseTime().isEmpty()) {
             try {
-                LocalTime now = LocalTime.now();
+                LocalTime now = LocalTime.now(ZoneId.of("Asia/Seoul"));
                 LocalTime open = LocalTime.parse(settings.getOpenTime());
                 LocalTime close = LocalTime.parse(settings.getCloseTime());
 
