@@ -7,21 +7,18 @@
 
 .mainContent {
   flex: 1;
-  /* Removed margin-left so content sits underneath the sidebar */
-  margin-left: 0;
+  margin-left: var(--sidebar-width);
   background-color: var(--bg-primary);
   min-height: 100vh;
-  /* We remove the transition on margin-left since it won't change, 
-     but you can add padding-left if you want the header pushed */
+  transition: margin-left var(--transition-base);
 }
 
-/* mainContentCollapsed is no longer needed since margin-left is 0 */
 .mainContentCollapsed {
   margin-left: 0;
 }
 
 .pageContent {
-  padding: 0;
+  padding: 0 30px;
   /* Full width container as requested */
   width: 100%;
 }

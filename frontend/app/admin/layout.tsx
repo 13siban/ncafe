@@ -11,12 +11,32 @@ interface AdminLayoutProps {
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile
-  const [isCollapsed, setIsCollapsed] = useState(false); // Desktop
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile toggle
+  const [isCollapsed, setIsCollapsed] = useState(false); // Desktop toggle
   const pathname = usePathname();
 
-  const getPageConfig = (path: string) => {
+  // Auto-collapse on medium screens
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1200) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
 
+      if (window.innerWidth > 768) {
+        setSidebarOpen(false);
+      }
+    };
+
+    // Initial check
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const getPageConfig = (path: string) => {
     if (path === '/admin/menus') {
       return {
         title: '메뉴 관리',
@@ -80,9 +100,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         onToggleCollapse={toggleCollapse}
       />
 
-      <div className={styles.mainContent}>
+      <div className={`${styles.mainContent} ${isCollapsed ? styles.mainContentCollapsed : ''}`}>
         <AdminHeader
-          onMenuClick={isCollapsed ? toggleCollapse : toggleSidebar}
+          onMenuClick={typeof window !== 'undefined' && window.innerWidth > 768 ? toggleCollapse : toggleSidebar}
           title={title}
           breadcrumbs={breadcrumbs}
         />

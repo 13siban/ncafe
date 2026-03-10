@@ -4,6 +4,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+  width: 100%;
 }
 
 /* Header Section */
@@ -85,104 +86,20 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 30px;
+  width: 100%;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 990px) {
   .grid {
-    grid-template-columns: repeat(2, 1fr);
+    /* 카드를 2열로 맞추고 전체 그리드를 중앙 정렬 */
+    grid-template-columns: repeat(2, minmax(0, 250px));
+    justify-content: center;
+    gap: 30px 20px;
+    width: 100%;
   }
 }
 
-
-
-/* Empty State */
-.emptyState {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-12);
-  text-align: center;
-}
-
-.emptyIcon {
-  width: 80px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--color-gray-100);
-  border-radius: var(--radius-full);
-  color: var(--color-gray-400);
-  margin-bottom: var(--space-4);
-}
-
-.emptyTitle {
-  font-size: var(--text-lg);
-  font-weight: var(--font-semibold);
-  color: var(--color-gray-900);
-  margin-bottom: var(--space-2);
-}
-
-.emptyDescription {
-  font-size: var(--text-sm);
-  color: var(--color-gray-500);
-  margin-bottom: var(--space-6);
-}
-
-/* Loading State */
-.loadingState {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-12);
-  text-align: center;
-  gap: var(--space-4);
-  color: var(--color-gray-500);
-}
-
-.spinner {
-  animation: spin 1s linear infinite;
-  color: var(--color-primary-500);
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Error State */
-.errorState {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-12);
-  text-align: center;
-  gap: var(--space-3);
-  color: var(--color-gray-500);
-}
-
-.errorState h2 {
-  font-size: var(--text-lg);
-  font-weight: var(--font-semibold);
-  color: var(--color-gray-900);
-  margin: 0;
-}
-
-.errorState p {
-  font-size: var(--text-sm);
-  color: var(--color-gray-500);
-  margin: 0;
-}
-
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .titleRow {
     flex-direction: column;
     align-items: flex-start;
@@ -198,7 +115,19 @@
   }
 
   .grid {
-    grid-template-columns: 1fr;
+    /* 태블릿/모바일에서도 2열 유지 및 중앙 정렬 */
+    grid-template-columns: repeat(2, minmax(0, 250px));
+    justify-content: center;
+    gap: 20px 15px;
+  }
+}
+
+@media (max-width: 520px) {
+
+  /* 화면이 너무 좁아지면 1열로 전환하되 카드는 중앙에 고정 */
+  .grid {
+    grid-template-columns: minmax(0, 250px);
+    justify-content: center;
   }
 }
 

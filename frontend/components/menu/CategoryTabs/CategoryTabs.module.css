@@ -129,3 +129,91 @@
     font-size: var(--text-sm);
     color: var(--color-gray-500);
 }
+
+@media (max-width: 768px) {
+    .tabsContainer {
+        width: 100%;
+        position: static;
+        margin-bottom: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 0 20px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 40px;
+        gap: 8px;
+    }
+
+    .title {
+        color: #c79270;
+        /* Warm brown/gold color from image */
+        font-weight: 600;
+        margin-bottom: 5px;
+        font-size: 13px;
+    }
+
+    .subtitle {
+        font-size: 42px;
+        color: #1a1a1a;
+    }
+
+    .tabsList {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px 10px;
+        width: 100%;
+        max-width: 550px;
+        margin: 0 auto;
+    }
+
+    /* ALL 탭 (첫 번째 자식) - 한 줄을 다 차지하고 중앙 정렬 */
+    .tabsList>button:first-child {
+        grid-column: 1 / -1;
+        justify-self: center;
+        width: auto;
+        margin-bottom: 15px;
+    }
+
+    .tab {
+        justify-content: flex-start;
+        padding: 4px 0;
+        gap: 10px;
+        width: 100%;
+    }
+
+    /* ALL 탭의 정렬은 중앙으로 */
+    .tabsList>button:first-child.tab {
+        justify-content: center;
+    }
+
+    .checkbox {
+        width: 24px;
+        height: 24px;
+        border: 1px solid #d1d1d1;
+        border-radius: 4px;
+        background-color: white;
+    }
+
+    .tabActive .checkbox {
+        border-color: #c79270;
+        background-color: transparent;
+        color: #c79270;
+    }
+
+    .tabText {
+        font-size: 12px;
+        font-weight: 700;
+        color: #1a1a1a;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    .tabCount {
+        display: none;
+    }
+}
