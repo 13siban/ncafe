@@ -13,6 +13,18 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
   title: "mymyy - 특별한 미식 경험",
   description: "최고의 재료와 정성으로 준비한 커피와 디저트를 만나보세요.",
+  icons: {
+    icon: [
+      {
+        url: "/favicon-light.png",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        url: "/favicon-dark.png",
+        media: "(prefers-color-scheme: dark)",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({

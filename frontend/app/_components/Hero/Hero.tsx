@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import styles from '../../page.module.css';
+import styles from './Hero.module.css';
 import { TypeAnimation } from 'react-type-animation';
 
 import { motion, Variants } from 'framer-motion';
