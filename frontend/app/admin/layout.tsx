@@ -52,6 +52,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         breadcrumbs: [{ label: '홈' }, { label: '매출 분석' }]
       };
     }
+    if (path === '/admin/rag') {
+      return {
+        title: 'AI RAG 관리',
+        breadcrumbs: [{ label: '홈' }, { label: 'AI RAG 관리' }]
+      };
+    }
     // 기본값 (대시보드 등)
     return {
       title: '대시보드',

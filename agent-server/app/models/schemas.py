@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional, Any
+from datetime import datetime
 
 class Message(BaseModel):
     role: str
@@ -8,3 +9,21 @@ class Message(BaseModel):
 class ChatRequest(BaseModel):
     messages: List[Message]
     stream: bool = True
+
+class IngestRequest(BaseModel):
+    filename: str
+    content: str
+    metadata: Optional[dict] = None
+
+class SearchRequest(BaseModel):
+    query: str
+    limit: int = 5
+    threshold: float = 0.5
+
+class DocumentResponse(BaseModel):
+    id: int
+    filename: str
+    content: str
+    metadata: Optional[Any] = None
+    created_at: datetime
+    similarity: Optional[float] = None

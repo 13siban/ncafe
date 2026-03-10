@@ -15,6 +15,7 @@ import {
   Users,
   Sliders,
   BarChart3,
+  Brain,
 } from 'lucide-react';
 import styles from './AdminSidebar.module.css';
 import { apiFetch } from '@/lib/api';
@@ -92,6 +93,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     { label: '주문 관리', href: '/admin/orders', icon: <ShoppingBag size={20} /> },
     { label: '매출 분석', href: '/admin/sales', icon: <BarChart3 size={20} /> },
     { label: '회원 관리', href: '/admin/users', icon: <Users size={20} /> },
+    { label: 'AI RAG 관리', href: '/admin/rag', icon: <Brain size={20} /> },
   ];
 
   const isActive = (href: string) => {

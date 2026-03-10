@@ -3,3 +3,8 @@ uvicorn
 google-genai
 python-dotenv
 sse-starlette
+sentence-transformers
+psycopg2-binary
+numpy
+python-multipart
+torch --index-url https://download.pytorch.org/whl/cpu

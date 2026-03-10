@@ -1,2 +1,2 @@
-FROM postgres:17-alpine
+FROM pgvector/pgvector:pg17
 EXPOSE 5432
