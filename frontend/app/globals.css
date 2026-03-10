@@ -51,7 +51,7 @@
 }
 
 :root {
-  /* Primary - 따뜻한 갈색 계열 (커피 테마) */
+  /* Primary - 기존 따뜻한 갈색 계열 (커피 테마) - 주석 처리
   --color-primary-50: #fdf8f6;
   --color-primary-100: #f2e8e5;
   --color-primary-200: #eaddd7;
@@ -62,8 +62,23 @@
   --color-primary-700: #6f4a31;
   --color-primary-800: #5a3d2a;
   --color-primary-900: #4a3324;
+  */
+
+  /* Primary - 새로운 그린 계열 (#3d6d64) */
+  --color-primary-50: #f2f7f6;
+  --color-primary-100: #e5eeec;
+  --color-primary-200: #cfdfdb;
+  --color-primary-300: #abc6bf;
+  --color-primary-400: #7da59c;
+  --color-primary-500: #5b877d;
+  --color-primary-600: #3d6d64;
+  /* Base Color */
+  --color-primary-700: #355852;
+  --color-primary-800: #2d4944;
+  --color-primary-900: #263d3a;
 
   /* Neutral */
+  --color-gray-0: #ffffff;
   --color-gray-50: #fafafa;
   --color-gray-100: #f5f5f5;
   --color-gray-200: #e5e5e5;
@@ -92,7 +107,7 @@
 
   /* Typography */
   --font-sans: 'Sweet', 'Pretendard', -apple-system, sans-serif;
-  --font-serif: 'Fraunces', serif;
+  --font-serif: var(--font-fraunces), serif;
 
   --text-xs: 0.75rem;
   /* 12px */

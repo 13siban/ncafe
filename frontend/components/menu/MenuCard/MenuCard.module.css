@@ -120,7 +120,7 @@
   font-size: var(--text-xl);
   font-weight: var(--font-regular);
   letter-spacing: -0.02em;
-  color: #c5a47e;
+  color: var(--color-primary-600);
 }
 
 /* Footer */

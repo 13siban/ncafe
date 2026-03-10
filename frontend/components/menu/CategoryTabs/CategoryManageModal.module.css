@@ -93,7 +93,7 @@
 
 .nameInput:focus {
     outline: none;
-    border-color: #c5a47e;
+    border-color: var(--color-primary-600);
 }
 
 .deleteButton {
@@ -129,9 +129,9 @@
 }
 
 .addButton:hover {
-    border-color: #c5a47e;
-    color: #c5a47e;
-    background-color: #fdf8f6;
+    border-color: var(--color-primary-600);
+    color: var(--color-primary-600);
+    background-color: var(--color-primary-50);
 }
 
 .modalFooter {

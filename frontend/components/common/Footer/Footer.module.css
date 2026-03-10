@@ -29,7 +29,7 @@
 }
 
 .menuButton {
-    background-color: #be8e69;
+    background-color: var(--color-primary-600);
     color: white;
     padding: 16px 48px;
     border-radius: 40px 10px 40px 10px;
@@ -42,7 +42,7 @@
 
 .menuButton:hover {
     transform: scale(1.05);
-    background-color: #ab7b56;
+    background-color: var(--color-primary-700);
 }
 
 /* Main Footer */
@@ -90,7 +90,7 @@
 }
 
 .socials a:hover {
-    color: #be8e69;
+    color: var(--color-primary-400);
 }
 
 /* Nav Section */
@@ -109,7 +109,7 @@
 }
 
 .footerNav a:hover {
-    color: #be8e69;
+    color: var(--color-primary-400);
 }
 
 /* Bottom Bar */

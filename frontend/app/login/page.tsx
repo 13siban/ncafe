@@ -13,14 +13,14 @@ const LoginPage = () => {
         <>
             <Header />
             <div className={styles.splitLayout}>
-                <div className={styles.leftPanel}>
+                <div className={`${styles.leftPanel} ${styles.loginBg}`}>
                     <div className={styles.backgroundDecor}>
                         <div className={`${styles.circle} ${styles.circle1}`} />
                         <div className={`${styles.circle} ${styles.circle2}`} />
                     </div>
                     <div className={styles.placeholderContent}>
-                        <h2>추가 예정</h2>
-                        <p>새로운 콘텐츠가 여기에 추가됩니다.</p>
+                        <h2>Welllcome back!</h2>
+                        <p>최고의 커피와 영감이 공존하는 공간</p>
                     </div>
                 </div>
 

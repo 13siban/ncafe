@@ -13,14 +13,14 @@ const SignupPage = () => {
         <>
             <Header />
             <div className={styles.splitLayout}>
-                <div className={styles.leftPanel}>
+                <div className={`${styles.leftPanel} ${styles.signupBg}`}>
                     <div className={styles.backgroundDecor}>
                         <div className={`${styles.circle} ${styles.circle1}`} />
                         <div className={`${styles.circle} ${styles.circle2}`} />
                     </div>
                     <div className={styles.placeholderContent}>
-                        <h2>추가 예정</h2>
-                        <p>새로운 콘텐츠가 여기에 추가됩니다.</p>
+                        <h2>Join our Community</h2>
+                        <p>특별한 미식 경험의 시작, mymyy와 함께하세요</p>
                     </div>
                 </div>
 
