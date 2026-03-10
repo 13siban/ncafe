@@ -6,7 +6,7 @@
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%);
+    background-color: var(--color-primary-600);
     color: white;
     display: flex;
     align-items: center;
@@ -62,7 +62,7 @@
     align-items: center;
     justify-content: space-between;
     padding: var(--space-4) var(--space-5);
-    background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%);
+    background-color: var(--color-primary-600);
     color: white;
 }
 
@@ -178,7 +178,7 @@
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-primary-100) 0%, var(--color-primary-200) 100%);
+    background-color: var(--color-primary-100);
     display: flex;
     align-items: center;
     justify-content: center;

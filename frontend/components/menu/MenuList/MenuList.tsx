@@ -7,6 +7,8 @@ import styles from './MenuList.module.css';
 import { useMenus } from './useMenus';
 import { MenuResponse, MenuMode } from '../types';
 
+import { motion, Variants } from 'framer-motion';
+
 interface MenuListProps {
     selectedCategory: number | null;
     searchQuery: string;
@@ -25,6 +27,25 @@ interface MenuListProps {
 }
 
 const ITEMS_PER_PAGE = 9;
+
+// 애니메이션 베리언트 정의
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.08, // 각 카드별 등장 간격
+        },
+    },
+};
+
+const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 24 },
+    visible: {
+        opacity: 1,
+        y: 0,
+    },
+};
 
 export const MenuList = ({
     selectedCategory,
@@ -96,12 +117,30 @@ export const MenuList = ({
     return (
         <div className={styles.container}>
             {menus.length > 0 ? (
-                <div className={styles.grid}>
-                    {paginatedMenus.map((menu) =>
-                        renderCard
-                            ? <React.Fragment key={menu.id}>{renderCard(menu)}</React.Fragment>
-                            : <MenuCard key={menu.id} menu={menu} />
-                    )}
+                <div
+                    key={`${selectedCategory}-${searchQuery}-${currentPage}`}
+                    className={styles.grid}
+                >
+                    {paginatedMenus.map((menu, index) => (
+                        <motion.div
+                            key={menu.id}
+                            variants={itemVariants}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, amount: 0.2 }}
+                            transition={{
+                                duration: 0.5,
+                                ease: [0.21, 0.47, 0.32, 0.98],
+                                // 그리드 한 줄(3개) 안에서 주어지는 순차적 딜레이 효과 유지
+                                delay: (index % 3) * 0.1
+                            }}
+                        >
+                            {renderCard
+                                ? renderCard(menu)
+                                : <MenuCard menu={menu} />
+                            }
+                        </motion.div>
+                    ))}
                 </div>
             ) : (
                 <div className={styles.emptyState}>
