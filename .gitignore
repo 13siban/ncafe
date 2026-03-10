@@ -7,3 +7,4 @@ dist/
 build/
 .next/
 data/
+docker-compose.override.yml

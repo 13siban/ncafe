@@ -21,7 +21,7 @@
 }
 
 .pageContent {
-  padding: var(--space-6);
+  padding: 0;
   /* Full width container as requested */
   width: 100%;
 }
