@@ -139,6 +139,7 @@
   font-weight: 800;
   color: #ffffff;
   letter-spacing: -0.04em;
+  font-family: var(--font-serif);
 }
 
 .heroTitleType {
