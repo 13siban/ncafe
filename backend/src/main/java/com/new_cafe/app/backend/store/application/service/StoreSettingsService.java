@@ -27,32 +27,8 @@ public class StoreSettingsService implements GetStoreSettingsUseCase, ManageStor
     }
 
     private boolean calculateStoreOpenStatus(StoreSettings settings) {
-        // If master switch is off, it's definitely closed
-        if (!settings.getIsOpen()) {
-            return false;
-        }
-
-        // Check operating hours if they are set
-        if (settings.getOpenTime() != null && !settings.getOpenTime().isEmpty() &&
-            settings.getCloseTime() != null && !settings.getCloseTime().isEmpty()) {
-            try {
-                LocalTime now = LocalTime.now(ZoneId.of("Asia/Seoul"));
-                LocalTime open = LocalTime.parse(settings.getOpenTime());
-                LocalTime close = LocalTime.parse(settings.getCloseTime());
-
-                if (open.isBefore(close)) {
-                    // Standard: 09:00 - 22:00
-                    return !now.isBefore(open) && now.isBefore(close);
-                } else {
-                    // Overnight: 22:00 - 05:00
-                    return !now.isBefore(open) || now.isBefore(close);
-                }
-            } catch (Exception e) {
-                // Fallback to manual switch if parse fails
-                return settings.getIsOpen();
-            }
-        }
-
+        // Master override: If master switch is set, that is the truth.
+        // We will ignore operating hours for now and follow the admin's direct command.
         return settings.getIsOpen();
     }
 
