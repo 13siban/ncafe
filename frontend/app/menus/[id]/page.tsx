@@ -3,13 +3,13 @@
 import React, { use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronLeft, Loader2 } from 'lucide-react';
+import NextImage from 'next/image';
+import { ChevronLeft, Loader2, UtensilsCrossed } from 'lucide-react';
 import styles from './page.module.css';
 
 import { useMenuDetail } from './_components/useMenuDetail';
 import { MenuInfo } from './_components/MenuInfo/MenuInfo';
 import { MenuOptions } from './_components/MenuOptions/MenuOptions';
-import { CartActionBar } from './_components/CartActionBar/CartActionBar';
 import { Header, Footer } from '@/components/common';
 
 export default function PublicMenuDetailPage({ params }: { params: Promise<{ id: number }> }) {
@@ -23,9 +23,11 @@ export default function PublicMenuDetailPage({ params }: { params: Promise<{ id:
         error,
         isStoreOpen,
         selectedOptions,
+        quantity,
         totalPrice,
         isOrderable,
         handleOptionChange,
+        handleQuantityChange,
         handleAddToCart
     } = useMenuDetail(id);
 
@@ -61,6 +63,8 @@ export default function PublicMenuDetailPage({ params }: { params: Promise<{ id:
         );
     }
 
+    const imageSrc = menu?.images && menu.images.length > 0 ? menu.images[0].srcUrl : null;
+
     return (
         <div className={styles.wrapper}>
             <Header />
@@ -71,23 +75,75 @@ export default function PublicMenuDetailPage({ params }: { params: Promise<{ id:
                 </button>
 
                 <div className={styles.mainContent}>
-                    <MenuInfo menu={menu} />
-                    <MenuOptions
-                        optionsData={optionsData!}
-                        selectedOptions={selectedOptions}
-                        onOptionChange={handleOptionChange}
-                    />
+                    {/* Left Column: Image */}
+                    <div className={styles.imageSection}>
+                        {imageSrc ? (
+                            <NextImage
+                                src={`/images/${imageSrc}`}
+                                alt={menu.korName}
+                                fill
+                                style={{ objectFit: 'cover' }}
+                                sizes="(max-width: 900px) 100vw, 500px"
+                                priority
+                            />
+                        ) : (
+                            <div className={styles.placeholder}>
+                                <UtensilsCrossed size={64} strokeWidth={1} />
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Right Column: Info + Detail Actions */}
+                    <div className={styles.rightContent}>
+                        <MenuInfo menu={menu} />
+
+                        <div className={styles.detailActions}>
+                            <div className={styles.priceDisplay}>
+                                {new Intl.NumberFormat('ko-KR').format(menu.price)}원
+                            </div>
+
+                            <MenuOptions
+                                optionsData={optionsData!}
+                                selectedOptions={selectedOptions}
+                                onOptionChange={handleOptionChange}
+                            />
+
+                            <div className={styles.totalPrice}>
+                                ₩ {new Intl.NumberFormat('ko-KR').format(totalPrice)} KRW
+                            </div>
+
+                            <div className={styles.orderArea}>
+                                <div className={styles.quantityControl}>
+                                    <div>
+                                        <label className={styles.quantityLabel}>Quantity</label>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            value={quantity}
+                                            onChange={(e) => handleQuantityChange(parseInt(e.target.value) || 1)}
+                                            className={styles.quantityInput}
+                                        />
+                                    </div>
+                                </div>
+
+                                <button
+                                    className={styles.addToCartBtn}
+                                    disabled={!isOrderable || menu.isSoldOut || !isStoreOpen}
+                                    onClick={handleAddToCartSuccess}
+                                >
+                                    {!isStoreOpen ? '영업 종료' : (menu.isSoldOut ? '품절' : 'ADD TO CART')}
+                                </button>
+                            </div>
+
+                            {!isStoreOpen && (
+                                <div className={styles.storeClosedMessage} style={{ marginTop: '10px' }}>
+                                    현재 매장 영업 종료로 주문이 불가합니다.
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </main>
-
-            <CartActionBar
-                totalPrice={totalPrice}
-                isOrderable={isOrderable}
-                isSoldOut={menu.isSoldOut}
-                isStoreOpen={isStoreOpen}
-                isLoading={isLoading}
-                onAdd={handleAddToCartSuccess}
-            />
 
             {showModal && (
                 <div className={styles.modalOverlay} onClick={() => setShowModal(false)}>

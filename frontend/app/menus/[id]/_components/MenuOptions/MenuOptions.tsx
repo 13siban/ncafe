@@ -19,7 +19,7 @@ export function MenuOptions({ optionsData, selectedOptions, onOptionChange }: Me
                 <div key={group.id} className={styles.optionGroup}>
                     <div className={styles.optionGroupHeader}>
                         <h3 className={styles.optionGroupName}>{group.name}</h3>
-                        {group.isRequired && <span className={styles.requiredBadge}>필수</span>}
+                        {group.isRequired && <span className={styles.requiredBadge}>[필수]</span>}
                     </div>
                     <div className={styles.optionItems}>
                         {group.items?.map((item) => {

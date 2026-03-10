@@ -14,6 +14,7 @@ export function useMenuDetail(id: number) {
     const [isStoreOpen, setIsStoreOpen] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState<Record<number, number[]>>({});
 
+    const [quantity, setQuantity] = useState(1);
     const addItemToCart = useCartStore((state) => state.addItem);
 
     useEffect(() => {
@@ -74,6 +75,11 @@ export function useMenuDetail(id: number) {
         });
     };
 
+    const handleQuantityChange = (newQuantity: number) => {
+        if (newQuantity < 1) return;
+        setQuantity(newQuantity);
+    };
+
     const isOrderable = useMemo(() => {
         if (!optionsData?.optionGroups) return true;
         for (const group of optionsData.optionGroups) {
@@ -85,7 +91,7 @@ export function useMenuDetail(id: number) {
         return true;
     }, [optionsData, selectedOptions]);
 
-    const totalPrice = useMemo(() => {
+    const unitPrice = useMemo(() => {
         if (!menu) return 0;
         let total = menu.price;
         if (optionsData?.optionGroups) {
@@ -100,6 +106,10 @@ export function useMenuDetail(id: number) {
         }
         return total;
     }, [menu, optionsData, selectedOptions]);
+
+    const totalPrice = useMemo(() => {
+        return unitPrice * quantity;
+    }, [unitPrice, quantity]);
 
     const handleAddToCart = () => {
         if (!menu || !isOrderable || !isStoreOpen) return false;
@@ -135,10 +145,10 @@ export function useMenuDetail(id: number) {
             menuEngName: menu.engName,
             imageSrc: imageSrcStr,
             basePrice: menu.price,
-            quantity: 1,
+            quantity: quantity,
             selectedOptions: cartOptions,
             optionTotalPrice,
-            subtotal: menu.price + optionTotalPrice
+            subtotal: (menu.price + optionTotalPrice) * quantity
         });
 
         return true;
@@ -151,9 +161,11 @@ export function useMenuDetail(id: number) {
         error,
         isStoreOpen,
         selectedOptions,
+        quantity,
         totalPrice,
         isOrderable,
         handleOptionChange,
+        handleQuantityChange,
         handleAddToCart
     };
 }
