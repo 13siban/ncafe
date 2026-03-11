@@ -11,7 +11,9 @@ import {
     CheckCircle2,
     AlertCircle,
     Loader2,
-    RefreshCw
+    RefreshCw,
+    Edit3,
+    Send
 } from 'lucide-react';
 import styles from './page.module.css';
 
@@ -32,6 +34,9 @@ export default function RagManagementPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<Doc[]>([]);
     const [searching, setSearching] = useState(false);
+    const [directTitle, setDirectTitle] = useState('');
+    const [directContent, setDirectContent] = useState('');
+    const [submittingDirect, setSubmittingDirect] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const AGENT_URL = process.env.NEXT_PUBLIC_CHAT_SERVER_URL || 'http://localhost:8000';
@@ -114,6 +119,42 @@ export default function RagManagementPage() {
         }
     };
 
+    const handleDirectInputSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!directTitle.trim() || !directContent.trim()) {
+            alert('제목과 내용을 모두 입력해 주세요.');
+            return;
+        }
+
+        setSubmittingDirect(true);
+        try {
+            const res = await fetch(`${AGENT_URL}/api/vector/ingest`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    filename: directTitle.endsWith('.txt') ? directTitle : `${directTitle}.txt`,
+                    content: directContent,
+                    metadata: { type: 'manual_input', length: directContent.length }
+                })
+            });
+
+            if (res.ok) {
+                alert('문서가 성공적으로 등록되었습니다.');
+                setDirectTitle('');
+                setDirectContent('');
+                fetchDocs();
+            } else {
+                const err = await res.json();
+                alert(`등록 실패: ${err.detail}`);
+            }
+        } catch (error) {
+            console.error('Direct input error:', error);
+            alert('등록 중 오류가 발생했습니다.');
+        } finally {
+            setSubmittingDirect(false);
+        }
+    };
+
     const handleSearch = async () => {
         if (!searchQuery.trim()) return;
 
@@ -190,6 +231,35 @@ export default function RagManagementPage() {
                             onChange={handleFileUpload}
                         />
                     </div>
+
+                    <div className={styles.divider}>OR</div>
+
+                    <h2 className={styles.sectionTitle} style={{ borderBottom: 'none', paddingBottom: 0, marginTop: '1rem' }}>
+                        <Edit3 size={20} /> 직접 내용 입력
+                    </h2>
+                    <form className={styles.directInputForm} onSubmit={handleDirectInputSubmit}>
+                        <input
+                            className={styles.input}
+                            placeholder="문서 제목 (예: 커피 제조 가이드)"
+                            value={directTitle}
+                            onChange={(e) => setDirectTitle(e.target.value)}
+                        />
+                        <textarea
+                            className={`${styles.input} ${styles.textarea}`}
+                            placeholder="AI가 학습할 내용을 직접 입력하세요..."
+                            value={directContent}
+                            onChange={(e) => setDirectContent(e.target.value)}
+                            rows={5}
+                        />
+                        <button 
+                            className={styles.button} 
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                            disabled={submittingDirect}
+                        >
+                            {submittingDirect ? <Loader2 size={16} className={styles.spinner} /> : <Send size={16} />}
+                            {submittingDirect ? '학습 중...' : '학습 데이터 등록'}
+                        </button>
+                    </form>
                 </div>
 
                 {/* Search Playground */}
