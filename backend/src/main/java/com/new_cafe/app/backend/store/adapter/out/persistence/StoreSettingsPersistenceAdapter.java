@@ -32,6 +32,21 @@ public class StoreSettingsPersistenceAdapter implements StoreSettingsRepositoryP
         if (settings.getCloseTime() != null) {
             entity.setCloseTime(settings.getCloseTime());
         }
+        if (settings.getCafeName() != null) {
+            entity.setCafeName(settings.getCafeName());
+        }
+        if (settings.getDescription() != null) {
+            entity.setDescription(settings.getDescription());
+        }
+        if (settings.getContactNumber() != null) {
+            entity.setContactNumber(settings.getContactNumber());
+        }
+        if (settings.getAddress() != null) {
+            entity.setAddress(settings.getAddress());
+        }
+        if (settings.getFaviconUrl() != null) {
+            entity.setFaviconUrl(settings.getFaviconUrl());
+        }
         return mapToDomain(repository.save(entity));
     }
 
@@ -43,6 +58,11 @@ public class StoreSettingsPersistenceAdapter implements StoreSettingsRepositoryP
                 .closedAt(entity.getClosedAt())
                 .openTime(entity.getOpenTime())
                 .closeTime(entity.getCloseTime())
+                .cafeName(entity.getCafeName())
+                .description(entity.getDescription())
+                .contactNumber(entity.getContactNumber())
+                .address(entity.getAddress())
+                .faviconUrl(entity.getFaviconUrl())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
     }

@@ -11,23 +11,17 @@ import { DashboardStatsGrid } from './_components/DashboardStatsGrid/DashboardSt
 import { RecentOrdersList } from './_components/RecentOrdersList/RecentOrdersList';
 import { PopularMenusList } from './_components/PopularMenusList/PopularMenusList';
 import { QuickActions } from './_components/QuickActions/QuickActions';
-import { StoreSettings } from './_components/StoreSettings/StoreSettings';
 
 export default function AdminDashboardPage() {
   const [period, setPeriod] = useState('daily');
   const {
     storeStatus,
-    openTime,
-    closeTime,
     isUpdating,
     stats,
     recentOrders,
     popularMenus,
     isLoading,
-    setOpenTime,
-    setCloseTime,
     handleToggleStatus,
-    handleUpdateSettings
   } = useDashboard(period);
 
   return (
@@ -73,14 +67,6 @@ export default function AdminDashboardPage() {
 
         <div className={styles.rightColumn}>
           <PopularMenusList menus={popularMenus} />
-          <StoreSettings
-            openTime={openTime}
-            closeTime={closeTime}
-            isUpdating={isUpdating}
-            onOpenTimeChange={setOpenTime}
-            onCloseTimeChange={setCloseTime}
-            onSave={handleUpdateSettings}
-          />
         </div>
       </div>
     </div>

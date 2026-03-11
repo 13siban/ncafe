@@ -32,6 +32,21 @@ public class StoreSettingsJpaEntity {
     @Column(name = "close_time")
     private String closeTime;
 
+    @Column(name = "cafe_name")
+    private String cafeName;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "contact_number")
+    private String contactNumber;
+
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "favicon_url")
+    private String faviconUrl;
+
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
     

@@ -178,6 +178,10 @@ public class DataInitializer implements CommandLineRunner {
                     .isOpen(true)
                     .openTime("09:00")
                     .closeTime("22:00")
+                    .cafeName("mymyy cafe")
+                    .description("최고의 재료와 정성으로 준비한 특별한 미식 경험")
+                    .contactNumber("02-1234-5678")
+                    .address("서울특별시 강남구 테헤란로 123")
                     .updatedAt(LocalDateTime.now())
                     .build();
             storeSettingsRepository.save(settings);

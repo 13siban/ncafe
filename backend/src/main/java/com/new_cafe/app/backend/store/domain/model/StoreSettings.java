@@ -14,5 +14,10 @@ public class StoreSettings {
     private LocalDateTime closedAt;
     private String openTime;
     private String closeTime;
+    private String cafeName;
+    private String description;
+    private String contactNumber;
+    private String address;
+    private String faviconUrl;
     private LocalDateTime updatedAt;
 }

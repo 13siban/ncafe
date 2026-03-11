@@ -3,7 +3,18 @@ package com.new_cafe.app.backend.store.application.port.in;
 public interface ManageStoreSettingsUseCase {
     StoreSettingsResponse openStore();
     StoreSettingsResponse closeStore();
-    StoreSettingsResponse updateStoreSettings(String openTime, String closeTime);
+    StoreSettingsResponse updateStoreSettings(String openTime, String closeTime, String cafeName, String description, String contactNumber, String address, String faviconUrl);
 
-    record StoreSettingsResponse(boolean isOpen, String openedAt, String closedAt, String openTime, String closeTime) {}
+    record StoreSettingsResponse(
+            boolean isOpen,
+            String openedAt,
+            String closedAt,
+            String openTime,
+            String closeTime,
+            String cafeName,
+            String description,
+            String contactNumber,
+            String address,
+            String faviconUrl
+    ) {}
 }

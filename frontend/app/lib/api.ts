@@ -107,12 +107,30 @@ export const adminStoreAPI = {
     /** 매장 영업 종료 */
     closeStore: () => fetchAPI('/admin/store/close', { method: 'PUT' }),
 
-    /** 영업 시간 등 설정 업데이트 */
-    updateSettings: (openTime: string, closeTime: string) =>
+    /** 영업 시간 및 매장 정보 설정 업데이트 */
+    updateSettings: (params: {
+        openTime: string;
+        closeTime: string;
+        cafeName?: string;
+        description?: string;
+        contactNumber?: string;
+        address?: string;
+        faviconUrl?: string;
+    }) =>
         fetchAPI('/admin/store/settings', {
             method: 'PUT',
-            body: JSON.stringify({ openTime, closeTime }),
+            body: JSON.stringify(params),
         }),
+
+    /** 파비콘 업로드 */
+    uploadFavicon: (file: File) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return fetchAPI('/admin/store/favicon', {
+            method: 'POST',
+            body: formData,
+        });
+    }
 };
 
 // 대시보드 및 통계 API 모음

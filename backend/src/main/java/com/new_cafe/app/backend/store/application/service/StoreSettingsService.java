@@ -41,7 +41,12 @@ public class StoreSettingsService implements GetStoreSettingsUseCase, ManageStor
                 settings.getOpenedAt() != null ? settings.getOpenedAt().format(formatter) : null,
                 settings.getClosedAt() != null ? settings.getClosedAt().format(formatter) : null,
                 settings.getOpenTime(),
-                settings.getCloseTime()
+                settings.getCloseTime(),
+                settings.getCafeName(),
+                settings.getDescription(),
+                settings.getContactNumber(),
+                settings.getAddress(),
+                settings.getFaviconUrl()
         );
     }
 
@@ -63,10 +68,15 @@ public class StoreSettingsService implements GetStoreSettingsUseCase, ManageStor
 
     @Override
     @Transactional
-    public ManageStoreSettingsUseCase.StoreSettingsResponse updateStoreSettings(String openTime, String closeTime) {
+    public ManageStoreSettingsUseCase.StoreSettingsResponse updateStoreSettings(String openTime, String closeTime, String cafeName, String description, String contactNumber, String address, String faviconUrl) {
         StoreSettings settings = StoreSettings.builder()
                 .openTime(openTime)
                 .closeTime(closeTime)
+                .cafeName(cafeName)
+                .description(description)
+                .contactNumber(contactNumber)
+                .address(address)
+                .faviconUrl(faviconUrl)
                 .build();
         StoreSettings updated = repositoryPort.updateStoreSettings(settings);
         return toManageResponse(updated);
@@ -79,7 +89,12 @@ public class StoreSettingsService implements GetStoreSettingsUseCase, ManageStor
                 settings.getOpenedAt() != null ? settings.getOpenedAt().format(formatter) : null,
                 settings.getClosedAt() != null ? settings.getClosedAt().format(formatter) : null,
                 settings.getOpenTime(),
-                settings.getCloseTime()
+                settings.getCloseTime(),
+                settings.getCafeName(),
+                settings.getDescription(),
+                settings.getContactNumber(),
+                settings.getAddress(),
+                settings.getFaviconUrl()
         );
     }
 }

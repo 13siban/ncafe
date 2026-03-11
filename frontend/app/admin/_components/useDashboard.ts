@@ -84,7 +84,7 @@ export function useDashboard(period: string) {
     const handleUpdateSettings = async () => {
         setIsUpdating(true);
         try {
-            await adminStoreAPI.updateSettings(openTime, closeTime);
+            await adminStoreAPI.updateSettings({ openTime, closeTime });
             alert('영업 시간이 수정되었습니다.');
             fetchStoreStatus();
         } catch (error) {
