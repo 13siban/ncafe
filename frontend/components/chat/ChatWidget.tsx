@@ -5,6 +5,12 @@ import { MessageCircle, Send, X } from 'lucide-react';
 import styles from './ChatWidget.module.css';
 import { useChatStore } from '@/store/useChatStore';
 
+const FAQ_QUESTIONS = [
+    '영업시간',
+    '오늘의 추천 메뉴',
+    '주문 방법',
+];
+
 const ChatWidget = () => {
     const {
         messages,
@@ -38,6 +44,11 @@ const ChatWidget = () => {
 
         setInput('');
         await sendMessage(trimmed);
+    };
+
+    const handleFAQClick = async (question: string) => {
+        if (isLoading) return;
+        await sendMessage(question);
     };
 
     return (
@@ -118,6 +129,21 @@ const ChatWidget = () => {
                             <div ref={messagesEndRef} />
                         </div>
                     )}
+
+                    {/* FAQ 추천 질문 */}
+                    <div className={styles.faqContainer}>
+                        {FAQ_QUESTIONS.map((q, idx) => (
+                            <button
+                                key={idx}
+                                className={styles.faqItem}
+                                onClick={() => handleFAQClick(q)}
+                                disabled={isLoading}
+                                type="button"
+                            >
+                                {q}
+                            </button>
+                        ))}
+                    </div>
 
                     {/* 입력 영역 */}
                     <form className={styles.chatInput} onSubmit={handleSubmit}>
