@@ -19,6 +19,7 @@ services:
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
+      - TZ=${TZ}
     depends_on:
       db:
         condition: service_healthy
@@ -38,6 +39,7 @@ services:
       - CHAT_SERVER_URL=http://agent:8000
       - SESSION_SECRET=${SESSION_SECRET}
       - SESSION_SECURE=${SESSION_SECURE}
+      - TZ=${TZ}
     depends_on:
       - backend
       - agent
@@ -57,6 +59,7 @@ services:
       - DB_NAME=ncafedb
       - DB_USER=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
+      - TZ=${TZ}
     depends_on:
       db:
         condition: service_healthy
@@ -78,6 +81,7 @@ services:
       - POSTGRES_DB=ncafedb
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - TZ=${TZ}
     volumes:
       - /home/young/dist/ncafe/data:/var/lib/postgresql/data
       # [Named Volume 방식 참고] 도커가 관리하는 볼륨을 사용하려면 아래 주석을 풀고 위 경로를 주석처리하세요.

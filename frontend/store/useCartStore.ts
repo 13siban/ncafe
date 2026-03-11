@@ -27,6 +27,7 @@ interface CartState {
     addItem: (item: CartItem) => void;
     removeItem: (cartId: string) => void;
     updateQuantity: (cartId: string, quantity: number) => void;
+    updateOptions: (cartId: string, options: CartOption[]) => void;
     clearCart: () => void;
     getTotalPrice: () => number;
     getTotalItems: () => number;
@@ -87,6 +88,65 @@ export const useCartStore = create<CartState>()(
                         return item;
                     }),
                 }));
+            },
+            updateOptions: (cartId, newOptions) => {
+                set((state) => {
+                    const itemToUpdate = state.items.find(i => i.cartId === cartId);
+                    if (!itemToUpdate) return state;
+
+                    const optionTotalPrice = newOptions.reduce((total, opt) => total + opt.priceDelta, 0);
+                    const newCartId = `${itemToUpdate.menuId}-${newOptions.map(o => `${o.optionGroupId}:${o.optionItemId}`).sort().join('-')}`;
+
+                    // If cartId didn't change, just update the options for this item
+                    if (newCartId === cartId) {
+                        return {
+                            items: state.items.map(item =>
+                                item.cartId === cartId
+                                    ? {
+                                        ...item,
+                                        selectedOptions: newOptions,
+                                        optionTotalPrice,
+                                        subtotal: (item.basePrice + optionTotalPrice) * item.quantity
+                                    }
+                                    : item
+                            )
+                        };
+                    }
+
+                    // If cartId changed, check if an item with newCartId already exists
+                    const existingItemIndex = state.items.findIndex(item => item.cartId === newCartId);
+
+                    if (existingItemIndex > -1) {
+                        // Merge current item into the existing one
+                        const updatedItems = [...state.items];
+                        const existingItem = updatedItems[existingItemIndex];
+                        const newQuantity = existingItem.quantity + itemToUpdate.quantity;
+
+                        updatedItems[existingItemIndex] = {
+                            ...existingItem,
+                            quantity: newQuantity,
+                            subtotal: (existingItem.basePrice + existingItem.optionTotalPrice) * newQuantity
+                        };
+
+                        // Remove the old item
+                        return { items: updatedItems.filter(item => item.cartId !== cartId) };
+                    } else {
+                        // Just update the item with new cartId and options
+                        return {
+                            items: state.items.map(item =>
+                                item.cartId === cartId
+                                    ? {
+                                        ...item,
+                                        cartId: newCartId,
+                                        selectedOptions: newOptions,
+                                        optionTotalPrice,
+                                        subtotal: (item.basePrice + optionTotalPrice) * item.quantity
+                                    }
+                                    : item
+                            )
+                        };
+                    }
+                });
             },
             clearCart: () => {
                 set({ items: [] });

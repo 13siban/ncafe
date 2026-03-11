@@ -127,7 +127,7 @@ export const MenuList = ({
                             variants={itemVariants}
                             initial="hidden"
                             whileInView="visible"
-                            viewport={{ once: true, amount: 0.4 }}
+                            viewport={{ once: true, amount: 0.3 }}
                             transition={{
                                 duration: 0.5,
                                 ease: [0.21, 0.47, 0.32, 0.98],

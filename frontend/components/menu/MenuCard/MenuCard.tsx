@@ -2,9 +2,11 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { UtensilsCrossed } from 'lucide-react';
+import { UtensilsCrossed, Plus } from 'lucide-react';
 import styles from './MenuCard.module.css';
 import { MenuResponse } from '../types';
+import { useCartStore } from '@/store/useCartStore';
+import { toast } from 'react-hot-toast';
 
 interface MenuCardProps {
     menu: MenuResponse;
@@ -28,11 +30,33 @@ export const MenuCard = ({
     onImageClick,
     className,
 }: MenuCardProps) => {
+    const addItem = useCartStore((state) => state.addItem);
     const imageSrc = menu?.imageSrc || '';
 
     const formatPrice = (price: number) => {
         const formatted = new Intl.NumberFormat('ko-KR').format(price || 0);
         return `₩\u00A0\u00A0${formatted}\u00A0\u00A0KRW`;
+    };
+
+    const handleQuickAdd = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        if (menu.isSoldOut) return;
+
+        addItem({
+            cartId: `${menu.id}-`,
+            menuId: menu.id,
+            menuName: menu.korName,
+            menuEngName: menu.engName,
+            imageSrc: menu.imageSrc || '',
+            basePrice: menu.price,
+            quantity: 1,
+            selectedOptions: [],
+            optionTotalPrice: 0,
+            subtotal: menu.price
+        });
+
+        toast.success(`장바구니에 ${menu.korName}을 담았습니다`);
     };
 
     return (
@@ -47,18 +71,33 @@ export const MenuCard = ({
                     if (e.key === 'Enter' || e.key === ' ') onImageClick();
                 } : undefined}
             >
-                {imageSrc ? (
-                    <Image
-                        src={`/images/${imageSrc}`}
-                        alt={menu.korName}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className={styles.menuImage}
-                        priority={false}
-                    />
-                ) : (
-                    <div className={styles.placeholder}>
-                        <UtensilsCrossed size={40} strokeWidth={1.5} />
+                <div className={styles.imageClipper}>
+                    {imageSrc ? (
+                        <Image
+                            src={`/images/${imageSrc}`}
+                            alt={menu.korName}
+                            fill
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            className={styles.menuImage}
+                            priority={false}
+                        />
+                    ) : (
+                        <div className={styles.placeholder}>
+                            <UtensilsCrossed size={40} strokeWidth={1.5} />
+                        </div>
+                    )}
+                </div>
+
+                {/* Quick Add Button */}
+                {!menu.isSoldOut && (
+                    <div
+                        className={styles.quickAddButton}
+                        onClick={handleQuickAdd}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        aria-label="장바구니에 담기"
+                        role="button"
+                    >
+                        <Plus size={24} strokeWidth={2.5} />
                     </div>
                 )}
 

@@ -17,6 +17,10 @@
 /* Image Container */
 .imageContainer {
   position: relative;
+}
+
+.imageClipper {
+  position: relative;
   aspect-ratio: 3 / 4;
   overflow: hidden;
   background-color: var(--color-gray-100);
@@ -159,4 +163,33 @@
 .soldOutOverlay .korName,
 .soldOutOverlay .price {
   color: var(--color-gray-400);
+}
+
+.quickAddButton {
+  position: absolute;
+  right: var(--space-4);
+  bottom: 0;
+  transform: translateY(50%);
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-gray-900);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.1s ease;
+  /* box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.4); */
+}
+
+.quickAddButton:hover {
+  background-color: var(--color-primary-600);
+  transform: translateY(50%);
+}
+
+.quickAddButton:active {
+  transform: translateY(50%);
 }

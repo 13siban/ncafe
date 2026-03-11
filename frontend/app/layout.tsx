@@ -27,6 +27,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { Toaster } from 'react-hot-toast';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -37,6 +39,7 @@ export default function RootLayout({
       <body>
         <AuthErrorHandler />
         {children}
+        <Toaster position="bottom-center" toastOptions={{ duration: 2000 }} />
         <ChatWidget />
       </body>
     </html>
