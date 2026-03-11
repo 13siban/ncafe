@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/app/lib/session';
 
 const API_BASE = process.env.API_BASE_URL || 'http://localhost:8080';
+const CHAT_SERVER_BASE = process.env.CHAT_SERVER_URL || 'http://localhost:8000';
 
 /**
  * BFF 패턴의 핵심: Catch-all API 프록시
@@ -88,23 +89,22 @@ async function unifiedHandler(req: NextRequest) {
         return NextResponse.json({ user: session.user });
     }
 
-    // 4. [프록시] 그 외 모든 요청 Spring Boot로 전달
+    // 4. [프록시] 대상 서버 및 경로 결정
     let backendPath = pathname;
-    // Next.js rewrite로 들어온 경우 req.nextUrl.pathname에 /api 가 없을 수 있음.
-    // 기존 /api/ 경로는 제거
-    if (backendPath.startsWith('/api/')) {
-        backendPath = backendPath.replace(/^\/api/, '');
-    }
-    // /images/ 경로는 백엔드의 /upload/ 폴더에 매핑
-    else if (backendPath.startsWith('/images/')) {
-        backendPath = backendPath.replace(/^\/images/, '/upload');
-    }
-    // 프론트엔드의 /upload/ 경로 요청은 그대로 백엔드의 /upload/ 로 매핑
-    else if (!backendPath.startsWith('/upload/')) {
-        // 만약 api나 images, upload등으로 시작하지 않는 예상치 못한 요청이면
+    let targetBase = API_BASE;
+
+    if (pathname.startsWith('/api/vector/')) {
+        // AI 에이전트 서비스로 전달 (FastAPI는 /api/vector 경로를 포함해서 받음)
+        targetBase = CHAT_SERVER_BASE;
+    } else if (pathname.startsWith('/api/')) {
+        // Spring Boot 백엔드로 전달 (Spring Boot는 /api 접두어 없이 호출됨)
+        backendPath = pathname.replace(/^\/api/, '');
+    } else if (pathname.startsWith('/images/')) {
+        // 이미지 요청은 백엔드의 /upload로 매핑
+        backendPath = pathname.replace(/^\/images/, '/upload');
     }
 
-    const targetUrl = `${API_BASE}${backendPath}${search}`;
+    const targetUrl = `${targetBase}${backendPath}${search}`;
 
     const headers: Record<string, string> = {};
     const contentType = req.headers.get('content-type');

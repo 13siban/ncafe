@@ -39,14 +39,14 @@ export default function RagManagementPage() {
     const [submittingDirect, setSubmittingDirect] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const AGENT_URL = process.env.NEXT_PUBLIC_CHAT_SERVER_URL || 'http://localhost:8000';
+    // const AGENT_URL = process.env.NEXT_PUBLIC_CHAT_SERVER_URL || 'http://localhost:8000';
 
     const fetchDocs = async () => {
         setLoading(true);
         setError(null);
         try {
-            console.log(`Fetching docs from: ${AGENT_URL}/api/vector/documents`);
-            const res = await fetch(`${AGENT_URL}/api/vector/documents`);
+            console.log(`Fetching docs from: /api/vector/documents`);
+            const res = await fetch(`/api/vector/documents`);
             if (res.ok) {
                 const data = await res.json();
                 setDocs(data);
@@ -78,7 +78,7 @@ export default function RagManagementPage() {
         setUploading(true);
         try {
             const content = await file.text();
-            const res = await fetch(`${AGENT_URL}/api/vector/ingest`, {
+            const res = await fetch(`/api/vector/ingest`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -108,7 +108,7 @@ export default function RagManagementPage() {
         if (!confirm('정말로 이 문서를 삭제하시겠습니까?')) return;
 
         try {
-            const res = await fetch(`${AGENT_URL}/api/vector/documents/${id}`, {
+            const res = await fetch(`/api/vector/documents/${id}`, {
                 method: 'DELETE'
             });
             if (res.ok) {
@@ -128,7 +128,7 @@ export default function RagManagementPage() {
 
         setSubmittingDirect(true);
         try {
-            const res = await fetch(`${AGENT_URL}/api/vector/ingest`, {
+            const res = await fetch(`/api/vector/ingest`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -160,7 +160,7 @@ export default function RagManagementPage() {
 
         setSearching(true);
         try {
-            const res = await fetch(`${AGENT_URL}/api/vector/search`, {
+            const res = await fetch(`/api/vector/search`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
