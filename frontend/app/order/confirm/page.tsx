@@ -16,6 +16,7 @@ export default function OrderConfirmPage() {
     const [isMounted, setIsMounted] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isOrdering, setIsOrdering] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
 
     const [username, setUsername] = useState("비회원");
     const [memo, setMemo] = useState("");
@@ -41,10 +42,10 @@ export default function OrderConfirmPage() {
     }, []);
 
     useEffect(() => {
-        if (isMounted && items.length === 0 && !isOrdering) {
+        if (isMounted && items.length === 0 && !isOrdering && !isSuccess) {
             router.push("/menus");
         }
-    }, [isMounted, items.length, isOrdering, router]);
+    }, [isMounted, items.length, isOrdering, isSuccess, router]);
 
     const submitOrder = async (paymentId?: string, method?: string) => {
         const orderItems = items.map(item => ({
@@ -72,6 +73,7 @@ export default function OrderConfirmPage() {
 
         if (response.ok) {
             const result = await response.json();
+            setIsSuccess(true);
             clearCart();
             router.push(`/order/${result.orderDate}/${result.orderNumber}`);
         } else {

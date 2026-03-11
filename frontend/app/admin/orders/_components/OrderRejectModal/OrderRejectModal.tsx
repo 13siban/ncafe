@@ -33,7 +33,7 @@ export function OrderRejectModal({
                 />
                 <div className={styles.modalActions}>
                     <button
-                        className={styles.secondaryAction}
+                        className={`${styles.secondaryAction} ${styles.actionButton}`}
                         onClick={onCancel}
                     >
                         취소

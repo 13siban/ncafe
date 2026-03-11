@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { UtensilsCrossed, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { MenuCard } from '../MenuCard/MenuCard';
 import styles from './MenuList.module.css';
@@ -58,6 +58,21 @@ export const MenuList = ({
     menus: externalMenus,
     setMenus: externalSetMenus,
 }: MenuListProps) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    const scrollToContent = () => {
+        if (typeof window !== 'undefined' && containerRef.current) {
+            const offset = 80; // 헤더 높이 등을 고려한 여백
+            const elementPosition = containerRef.current.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
+    };
+
     const internalState = useMenus({
         categoryId: selectedCategory,
         searchQuery,
@@ -73,6 +88,8 @@ export const MenuList = ({
 
     useEffect(() => {
         setCurrentPage(1);
+        // 카테고리나 검색어 변경 시 메뉴 리스트 위치로 스크롤 이동
+        scrollToContent();
     }, [selectedCategory, searchQuery]);
 
     useEffect(() => {
@@ -80,6 +97,19 @@ export const MenuList = ({
             onMenusChange?.(internalState.menus);
         }
     }, [internalState.menus, onMenusChange, isLoading]);
+
+    // 페이지 번호 변경 시에도 메뉴 리스트 위치로 스크롤
+    useEffect(() => {
+        if (isMounted) {
+            scrollToContent();
+        }
+    }, [currentPage]);
+    
+    // isMounted check to prevent initial scroll on mount
+    const [isMounted, setIsMounted] = useState(false);
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const paginatedMenus = useMemo(() => {
         const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -115,7 +145,7 @@ export const MenuList = ({
     }
 
     return (
-        <div className={styles.container}>
+        <div className={styles.container} ref={containerRef}>
             {menus.length > 0 ? (
                 <div
                     key={`${selectedCategory}-${searchQuery}-${currentPage}`}

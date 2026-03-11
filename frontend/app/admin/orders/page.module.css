@@ -211,13 +211,15 @@
 
 .secondaryAction {
     background: white;
-    border: 1px solid var(--color-gray-200);
+    border: 1px solid var(--color-gray-300);
     color: var(--color-gray-600);
+    transition: all 0.2s ease;
 }
 
 .secondaryAction:hover {
     background: var(--color-gray-50);
     color: var(--color-gray-800);
+    border-color: var(--color-gray-400);
 }
 
 .dangerAction {
@@ -303,12 +305,20 @@
 
 .textarea {
     width: 100%;
-    padding: 0.75rem;
+    padding: 1rem;
     border: 1px solid var(--color-gray-200);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     margin-bottom: 1.5rem;
-    min-height: 100px;
+    min-height: 120px;
     resize: none;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+.textarea:focus {
+    outline: none;
+    border-color: var(--color-primary-600);
+    box-shadow: 0 0 0 3px var(--color-primary-100);
 }
 
 .modalActions {
