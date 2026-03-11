@@ -19,6 +19,8 @@ export default function OrderConfirmPage() {
     const [isSuccess, setIsSuccess] = useState(false);
 
     const [username, setUsername] = useState("비회원");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
     const [memo, setMemo] = useState("");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("KAKAOPAY");
@@ -30,6 +32,7 @@ export default function OrderConfirmPage() {
                 const session = await authAPI.getSession();
                 if (session && session.user) {
                     setUsername(session.user.nickname || session.user.username);
+                    setEmail(session.user.email || "");
                     setIsLoggedIn(true);
                 }
             } catch (e) {
@@ -102,11 +105,18 @@ export default function OrderConfirmPage() {
                 ? items[0].menuName
                 : `${items[0].menuName} 외 ${items.length - 1}건`;
 
+            // 이메일 유효성 검사 및 정리 (이니시스 필수값 대응)
+            const trimmedEmail = (email || "").trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const finalEmail = emailRegex.test(trimmedEmail) ? trimmedEmail : "consumer@ncafe.com";
+
             const paymentId = await requestPayment({
                 orderName,
                 totalAmount: getTotalPrice(),
                 method: paymentMethod,
                 customerName: username,
+                customerEmail: finalEmail,
+                customerPhoneNumber: phone || "010-0000-0000", // 이니시스 V2 필수값 대응
             });
 
             await submitOrder(paymentId, paymentMethod);
@@ -178,8 +188,36 @@ export default function OrderConfirmPage() {
                             placeholder="이름을 입력하세요"
                             disabled={isLoggedIn}
                         />
-                        {isLoggedIn && <p style={{ fontSize: '0.75rem', color: 'var(--primary)', marginTop: 4 }}>회원 정보로 자동 입렵되었습니다.</p>}
                     </div>
+                    {!isLoggedIn && (
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>
+                                이메일 (결제 알림용)
+                            </label>
+                            <input
+                                type="email"
+                                className={styles.input}
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="example@email.com"
+                            />
+                        </div>
+                    )}
+                    {!isLoggedIn && (
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>
+                                휴대폰 번호 (결제 알림용)
+                            </label>
+                            <input
+                                type="tel"
+                                className={styles.input}
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                placeholder="010-0000-0000"
+                            />
+                        </div>
+                    )}
+                    {isLoggedIn && <p style={{ fontSize: '0.75rem', color: 'var(--primary)', marginTop: 4 }}>회원 정보로 자동 입력되었습니다.</p>}
                     <div className={styles.formGroup}>
                         <label className={styles.label}>
                             <MessageCircle size={14} style={{ marginRight: 4 }} /> 요청 사항
@@ -212,6 +250,13 @@ export default function OrderConfirmPage() {
                         >
                             <span className={styles.paymentIcon}>💚</span>
                             네이버페이
+                        </button>
+                        <button
+                            className={`${styles.paymentButton} ${paymentMethod === "INICIS" ? styles.selected : ""}`}
+                            onClick={() => setPaymentMethod("INICIS")}
+                        >
+                            <span className={styles.paymentIcon}>💳</span>
+                            신용카드
                         </button>
                     </div>
                 </div>
