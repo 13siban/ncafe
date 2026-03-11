@@ -11,6 +11,7 @@ import com.new_cafe.app.backend.sales.adapter.out.persistence.DailyMenuSalesJpaR
 import com.new_cafe.app.backend.admin.menu.adapter.out.persistence.AdminMenuJpaEntity;
 import com.new_cafe.app.backend.admin.menu.adapter.out.persistence.AdminMenuJpaRepository;
 import com.new_cafe.app.backend.category.adapter.out.persistence.CategoryJpaRepository;
+import com.new_cafe.app.backend.payment.PaymentVerificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ public class ManageOrderStatusService implements ManageOrderStatusUseCase {
     private final DailyMenuSalesJpaRepository dailyMenuSalesRepository;
     private final AdminMenuJpaRepository menuRepository;
     private final CategoryJpaRepository categoryRepository;
+    private final PaymentVerificationService paymentVerificationService;
 
     @Override
     public void changeOrderStatus(Long id, String statusStr) {
@@ -44,11 +46,19 @@ public class ManageOrderStatusService implements ManageOrderStatusUseCase {
                 .totalPrice(order.getTotalPrice())
                 .rejectReason(order.getRejectReason())
                 .memo(order.getMemo())
+                .paymentId(order.getPaymentId())
+                .paymentMethod(order.getPaymentMethod())
+                .paymentStatus(order.getPaymentStatus())
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
                 .build();
 
         orderRepository.save(updatedOrder);
+
+        // 결제 취소 처리: CANCELLED 상태로 변경될 때 (주문자 취소 등)
+        if (newStatus == OrderStatus.CANCELLED && order.getPaymentId() != null) {
+            paymentVerificationService.cancelPayment(order.getPaymentId(), "고객 또는 관리자에 의한 주문 취소");
+        }
 
         // When status moves to COMPLETED or PICKED_UP from a non-final state, aggregate daily sales
         boolean isNowFinal = (newStatus == OrderStatus.COMPLETED || newStatus == OrderStatus.PICKED_UP);
@@ -73,11 +83,19 @@ public class ManageOrderStatusService implements ManageOrderStatusUseCase {
                 .totalPrice(order.getTotalPrice())
                 .rejectReason(reason) // required
                 .memo(order.getMemo())
+                .paymentId(order.getPaymentId())
+                .paymentMethod(order.getPaymentMethod())
+                .paymentStatus(order.getPaymentStatus())
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
                 .build();
 
         orderRepository.save(updatedOrder);
+
+        // 결제 취소 처리: 주문 거절 시 자동 환불
+        if (order.getPaymentId() != null) {
+            paymentVerificationService.cancelPayment(order.getPaymentId(), "주문 거절: " + reason);
+        }
     }
 
     private void aggregateDailySales(Order order) {

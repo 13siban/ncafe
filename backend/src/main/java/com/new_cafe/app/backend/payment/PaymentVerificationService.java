@@ -69,4 +69,35 @@ public class PaymentVerificationService {
             throw new RuntimeException("결제 검증 중 오류 발생: " + e.getMessage());
         }
     }
+
+    /**
+     * 포트원 결제 취소(환불)를 요청합니다.
+     * @param paymentId 포트원 결제 고유 ID
+     * @param reason 취소 사유
+     */
+    public void cancelPayment(String paymentId, String reason) {
+        if (paymentId == null || paymentId.isEmpty()) {
+            return; // 결제 ID가 없으면 취소할 결제도 없음 (테스트 결제 등)
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "PortOne " + apiSecret);
+        headers.set("Content-Type", "application/json");
+
+        Map<String, String> body = Map.of("reason", reason != null ? reason : "고객 요청 또는 주문 거절");
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
+
+        try {
+            // 포트원 V2 API: 결제 취소
+            restTemplate.exchange(
+                "https://api.portone.io/payments/" + paymentId + "/cancel",
+                HttpMethod.POST,
+                entity,
+                Map.class
+            );
+        } catch (Exception e) {
+            // 로그를 남기고 비즈니스 로직은 계속 진행할 수도 있지만, 여기서는 런타임 예외로 던짐
+            throw new RuntimeException("결제 취소 중 오류 발생: " + e.getMessage());
+        }
+    }
 }
