@@ -10,9 +10,10 @@ interface CartItemProps {
     item: CartItemType;
     onRemove: (id: string) => void;
     onUpdateQuantity: (id: string, q: number) => void;
+    onValidityChange?: (id: string, isValid: boolean) => void;
 }
 
-export function CartItem({ item, onRemove, onUpdateQuantity }: CartItemProps) {
+export function CartItem({ item, onRemove, onUpdateQuantity, onValidityChange }: CartItemProps) {
     const updateOptions = useCartStore((state) => state.updateOptions);
     const [optionsData, setOptionsData] = useState<MenuOptionsResponse | null>(null);
     const [showAdditional, setShowAdditional] = useState(false);
@@ -50,6 +51,22 @@ export function CartItem({ item, onRemove, onUpdateQuantity }: CartItemProps) {
         };
         fetchOptions();
     }, [item.menuId]);
+    
+    // Check if mandatory options are selected
+    const isItemValid = useMemo(() => {
+        if (!optionsData) return true; // Assume valid while loading to avoid flickering
+        return optionsData.optionGroups.every(group => {
+            if (!group.isRequired) return true;
+            const selections = selectedIds[group.id] || [];
+            return selections.length > 0;
+        });
+    }, [optionsData, selectedIds]);
+
+    useEffect(() => {
+        if (onValidityChange) {
+            onValidityChange(item.stableId || item.cartId, isItemValid);
+        }
+    }, [isItemValid, item.stableId, onValidityChange]);
 
     const handleOptionToggle = (group: OptionGroup, itemId: number, checked: boolean) => {
         const currentGroupIds = selectedIds[group.id] || [];
@@ -110,6 +127,9 @@ export function CartItem({ item, onRemove, onUpdateQuantity }: CartItemProps) {
             <div className={styles.itemInfo}>
                 <div className={styles.itemHeader}>
                     <h3 className={styles.itemName}>{item.menuName}</h3>
+                    {!isItemValid && (
+                        <span className={styles.invalidBadge}>필수 옵션 선택 필요</span>
+                    )}
                     <button
                         className={styles.deleteButton}
                         onClick={() => onRemove(item.cartId)}

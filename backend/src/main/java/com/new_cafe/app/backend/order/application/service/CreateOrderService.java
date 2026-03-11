@@ -72,11 +72,16 @@ public class CreateOrderService implements CreateOrderUseCase {
             totalOrderPrice += (menu.getPrice() + optionPriceSum) * itemCommand.getQuantity();
         }
 
-        // --- 2단계: 결제 검증 (결제 ID가 있는 경우) ---
+        // --- 2단계: 결제 검증 (실제 결제 수단 선택 시 필수) ---
         String paymentStatus = "NONE";
-        if (command.getPaymentId() != null && !command.getPaymentId().isBlank()) {
+        if (command.getPaymentMethod() != null && !command.getPaymentMethod().isBlank()) {
+            if (command.getPaymentId() == null || command.getPaymentId().isBlank()) {
+                throw new IllegalArgumentException("실제 결제 수단 사용 시 결제 ID(Payment ID)가 필수입니다.");
+            }
             paymentVerificationService.verifyPayment(command.getPaymentId(), totalOrderPrice);
             paymentStatus = "PAID";
+        } else {
+            paymentStatus = "TEST"; // 테스트 주문임을 표시
         }
 
         Order order = Order.builder()

@@ -7,9 +7,10 @@ interface CartSummaryProps {
     totalPrice: number;
     isOrdering: boolean;
     onOrder: () => void;
+    disabled?: boolean;
 }
 
-export function CartSummary({ totalPrice, isOrdering, onOrder }: CartSummaryProps) {
+export function CartSummary({ totalPrice, isOrdering, onOrder, disabled }: CartSummaryProps) {
     return (
         <div className={styles.summarySection}>
             <div className={styles.summaryRow}>
@@ -21,7 +22,7 @@ export function CartSummary({ totalPrice, isOrdering, onOrder }: CartSummaryProp
             <button
                 className={styles.orderButton}
                 onClick={onOrder}
-                disabled={isOrdering}
+                disabled={isOrdering || disabled}
             >
                 {isOrdering ? '주문 처리 중...' : `${new Intl.NumberFormat('ko-KR').format(totalPrice)}원 주문하기`}
             </button>

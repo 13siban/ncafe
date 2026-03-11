@@ -31,7 +31,9 @@ export function useOptionGroups() {
             if (catsRes.ok) {
                 const data = await catsRes.json();
                 if (Array.isArray(data)) {
-                    catsTemp = data.sort((a, b) => a.sortOrder - b.sortOrder);
+                    catsTemp = data
+                        .filter((cat: Category) => !cat.name.includes('---'))
+                        .sort((a, b) => a.sortOrder - b.sortOrder);
                 }
             }
             setCategories(catsTemp);

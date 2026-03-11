@@ -50,6 +50,22 @@ export default function OrderConfirmPage() {
         }
     }, [isMounted, items.length, isOrdering, isSuccess, router]);
 
+    const handleConfirmSuccess = () => {
+        router.push("/order/history");
+    };
+
+    const handleTestOrder = async () => {
+        if (items.length === 0) return;
+        setIsOrdering(true);
+        try {
+            await submitOrder();
+        } catch (error: any) {
+            alert(`주문 실패: ${error.message}`);
+        } finally {
+            setIsOrdering(false);
+        }
+    };
+
     const submitOrder = async (paymentId?: string, method?: string) => {
         const orderItems = items.map(item => ({
             menuId: item.menuId,
@@ -85,17 +101,6 @@ export default function OrderConfirmPage() {
         }
     };
 
-    const handleTestOrder = async () => {
-        if (items.length === 0) return;
-        setIsOrdering(true);
-        try {
-            await submitOrder();
-        } catch (error: any) {
-            alert(`주문 실패: ${error.message}`);
-        } finally {
-            setIsOrdering(false);
-        }
-    };
 
     const handlePaymentOrder = async () => {
         if (items.length === 0) return;

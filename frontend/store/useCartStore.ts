@@ -11,6 +11,7 @@ export interface CartOption {
 
 export interface CartItem {
     cartId: string; // Unique ID for the cart item (a combination of menuId and options or UUID)
+    stableId?: string; // A persistent ID for the component key to prevent unmounting during option changes
     menuId: number;
     menuName: string;
     menuEngName: string;
@@ -65,7 +66,11 @@ export const useCartStore = create<CartState>()(
                         };
                         return { items: updatedItems };
                     } else {
-                        return { items: [...state.items, newItem] };
+                        const itemWithStableId = {
+                            ...newItem,
+                            stableId: newItem.stableId || `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+                        };
+                        return { items: [...state.items, itemWithStableId] };
                     }
                 });
             },
@@ -138,6 +143,7 @@ export const useCartStore = create<CartState>()(
                                     ? {
                                         ...item,
                                         cartId: newCartId,
+                                        stableId: item.stableId || item.cartId,
                                         selectedOptions: newOptions,
                                         optionTotalPrice,
                                         subtotal: (item.basePrice + optionTotalPrice) * item.quantity
