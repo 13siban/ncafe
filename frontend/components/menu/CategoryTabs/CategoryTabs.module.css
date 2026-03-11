@@ -122,6 +122,20 @@
     font-weight: 700;
 }
 
+/* Divider Style */
+.divider {
+    height: 1px;
+    background: var(--color-gray-200);
+    margin: 12px 0;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .divider {
+        display: none;
+    }
+}
+
 /* Loading & Error States */
 .loadingState,
 .errorState {

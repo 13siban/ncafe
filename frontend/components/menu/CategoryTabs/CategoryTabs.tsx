@@ -74,21 +74,27 @@ export default function CategoryTabs({
                     </button>
 
                     {/* Categories */}
-                    {categories.map((category) => (
-                        <button
-                            key={category.id}
-                            role="tab"
-                            aria-selected={selected === category.id}
-                            className={`${styles.tab} ${selected === category.id ? styles.tabActive : ''}`}
-                            onClick={() => onSelect(category.id)}
-                        >
-                            <div className={styles.checkbox}>
-                                <Check size={16} strokeWidth={3} />
-                            </div>
-                            <span className={styles.tabText}>{category.name}</span>
-                            <span className={styles.tabCount}>{category.menuCount || 0}</span>
-                        </button>
-                    ))}
+                    {categories.map((category) => {
+                        if (category.name === '---') {
+                            return <div key={category.id} className={styles.divider} />;
+                        }
+
+                        return (
+                            <button
+                                key={category.id}
+                                role="tab"
+                                aria-selected={selected === category.id}
+                                className={`${styles.tab} ${selected === category.id ? styles.tabActive : ''}`}
+                                onClick={() => onSelect(category.id)}
+                            >
+                                <div className={styles.checkbox}>
+                                    <Check size={16} strokeWidth={3} />
+                                </div>
+                                <span className={styles.tabText}>{category.name}</span>
+                                <span className={styles.tabCount}>{category.menuCount || 0}</span>
+                            </button>
+                        );
+                    })}
                 </div>
 
             </aside>

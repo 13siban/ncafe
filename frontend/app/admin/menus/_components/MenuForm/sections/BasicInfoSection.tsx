@@ -46,9 +46,11 @@ export const BasicInfoSection = ({ register, errors, categories }: BasicInfoSect
           </FormField>
           <FormField label="카테고리">
             <select {...register("categoryId")} className={styles.select}>
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
-              ))}
+              {categories
+                .filter(cat => cat.name !== '---')
+                .map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
             </select>
           </FormField>
         </div>

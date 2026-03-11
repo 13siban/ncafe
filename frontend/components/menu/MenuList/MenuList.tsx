@@ -127,12 +127,12 @@ export const MenuList = ({
                             variants={itemVariants}
                             initial="hidden"
                             whileInView="visible"
-                            viewport={{ once: true, amount: 0.2 }}
+                            viewport={{ once: true, amount: 0.4 }}
                             transition={{
                                 duration: 0.5,
                                 ease: [0.21, 0.47, 0.32, 0.98],
                                 // 그리드 한 줄(3개) 안에서 주어지는 순차적 딜레이 효과 유지
-                                delay: (index % 3) * 0.1
+                                delay: (index % 3) * 0.15
                             }}
                         >
                             {renderCard

@@ -184,13 +184,18 @@ export function CategoryManageModal({ isOpen, onClose, categories, refetch, onSa
                                 <div className={styles.dragHandle}>
                                     <GripVertical size={16} />
                                 </div>
-                                <input
-                                    type="text"
-                                    className={styles.nameInput}
-                                    value={item.name}
-                                    onChange={(e) => handleNameChange(item.uid, e.target.value)}
-                                    placeholder="카테고리명"
-                                />
+                                <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                                    <input
+                                        type="text"
+                                        className={styles.nameInput}
+                                        value={item.name}
+                                        onChange={(e) => handleNameChange(item.uid, e.target.value)}
+                                        placeholder="카테고리명"
+                                    />
+                                    {item.name === '---' && (
+                                        <span className={styles.dividerHint}>* 구분선으로 표시됩니다</span>
+                                    )}
+                                </div>
                                 <button
                                     className={styles.deleteButton}
                                     onClick={() => handleDelete(item.uid)}
@@ -205,6 +210,10 @@ export function CategoryManageModal({ isOpen, onClose, categories, refetch, onSa
                     <button className={styles.addButton} onClick={handleAdd}>
                         <Plus size={16} /> 카테고리 추가하기
                     </button>
+
+                    <div className={styles.helpText}>
+                        💡 카테고리 이름에 <span>---</span> 을 입력하면 해당 위치에 <strong>중간 구분선</strong>이 표시됩니다.
+                    </div>
                 </div>
 
                 <div className={styles.modalFooter}>

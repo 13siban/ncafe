@@ -38,7 +38,7 @@ export function FeatureSections() {
                     className={styles.featureTextContent}
                     initial="hidden"
                     whileInView="visible"
-                    viewport={{ once: true, amount: 0.2 }}
+                    viewport={{ once: true, amount: 0.4 }}
                     variants={containerVariants}
                 >
                     <motion.span variants={childVariants} className={styles.sectionLabel}>OUR COFFEE</motion.span>
@@ -85,7 +85,7 @@ export function FeatureSections() {
                     className={styles.featureTextContent}
                     initial="hidden"
                     whileInView="visible"
-                    viewport={{ once: true, amount: 0.2 }}
+                    viewport={{ once: true, amount: 0.4 }}
                     variants={containerVariants}
                 >
                     <motion.span variants={childVariants} className={styles.sectionLabel}>OUR DESSERTS</motion.span>
