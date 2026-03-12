@@ -15,36 +15,34 @@ export const CategoryTabs = ({ selected, onSelect }: AdminCategoryTabsProps) => 
     const [isManageModalOpen, setIsManageModalOpen] = useState(false);
 
     return (
-        <>
-            <BaseCategoryTabs
-                selected={selected}
-                onSelect={onSelect}
-                mode="admin"
-                renderHeaderAction={(categories, refetch) => (
-                    <>
-                        <button
-                            className={styles.manageButton}
-                            onClick={() => setIsManageModalOpen(true)}
-                            title="카테고리 관리"
-                        >
-                            <Settings size={20} />
-                        </button>
-                        {isManageModalOpen && (
-                            <CategoryManageModal
-                                isOpen={isManageModalOpen}
-                                onClose={() => setIsManageModalOpen(false)}
-                                categories={categories}
-                                refetch={refetch}
-                                onSave={() => {
-                                    setIsManageModalOpen(false);
-                                    refetch();
-                                }}
-                            />
-                        )}
-                    </>
-                )}
-            />
-        </>
+        <BaseCategoryTabs
+            selected={selected}
+            onSelect={onSelect}
+            mode="admin"
+            renderHeaderAction={(categories, refetch) => (
+                <>
+                    <button
+                        className={styles.manageButton}
+                        onClick={() => setIsManageModalOpen(true)}
+                        title="카테고리 관리"
+                    >
+                        <Settings size={20} />
+                    </button>
+                    {isManageModalOpen && (
+                        <CategoryManageModal
+                            isOpen={isManageModalOpen}
+                            onClose={() => setIsManageModalOpen(false)}
+                            categories={categories}
+                            refetch={refetch}
+                            onSave={() => {
+                                setIsManageModalOpen(false);
+                                refetch();
+                            }}
+                        />
+                    )}
+                </>
+            )}
+        />
     );
 };
 
