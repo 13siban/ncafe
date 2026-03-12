@@ -75,6 +75,23 @@ public class GetOrderService implements GetOrderUseCase {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<OrderListDto> getOrdersByKeys(List<OrderKey> keys) {
+        if (keys == null || keys.isEmpty()) {
+            return List.of();
+        }
+        return orderRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt")).stream()
+                .filter(o -> keys.stream().anyMatch(k -> 
+                    k != null && 
+                    k.getDate() != null && 
+                    k.getNumber() != null &&
+                    LocalDate.parse(k.getDate()).equals(o.getOrderDate()) && 
+                    k.getNumber().equals(o.getOrderNumber())
+                ))
+                .map(this::mapToListDto)
+                .collect(Collectors.toList());
+    }
+
     private OrderDto mapToDto(OrderJpaEntity order) {
         List<OrderItemJpaEntity> items = orderItemRepository.findAll().stream()
                 .filter(i -> i.getOrderId().equals(order.getId()))

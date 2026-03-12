@@ -7,9 +7,10 @@
  * - 쿠키는 브라우저가 자동 전송 (same-origin 기본값)
  * - 401 에러 시 로그인 페이지로 리다이렉트
  */
-export async function fetchAPI(endpoint: string, options?: RequestInit) {
+export async function fetchAPI(endpoint: string, options?: RequestInit & { skipRedirect?: boolean }) {
     try {
         const isFormData = options?.body instanceof FormData;
+        const skipRedirect = options?.skipRedirect;
 
         const defaultHeaders: HeadersInit = {
             Accept: 'application/json',
@@ -39,8 +40,8 @@ export async function fetchAPI(endpoint: string, options?: RequestInit) {
                 /* no json body */
             }
 
-            // 401이면 로그인 페이지로 리다이렉트
-            if (status === 401 && typeof window !== 'undefined') {
+            // 401이면 로그인 페이지로 리다이렉트 (skipRedirect가 아닐 때만)
+            if (status === 401 && typeof window !== 'undefined' && !skipRedirect) {
                 const currentPath = window.location.pathname;
                 const isAuthEndpoint = endpoint.startsWith('/auth/');
                 if (!currentPath.startsWith('/login') && !isAuthEndpoint) {

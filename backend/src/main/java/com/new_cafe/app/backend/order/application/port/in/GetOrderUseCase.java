@@ -1,8 +1,10 @@
 package com.new_cafe.app.backend.order.application.port.in;
 
 import com.new_cafe.app.backend.order.domain.model.OrderStatus;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,6 +16,16 @@ public interface GetOrderUseCase {
     List<OrderListDto> getMyOrders(String userId);
     List<OrderListDto> getAllOrders(String status, LocalDate date);
     List<OrderListDto> getOrdersByRange(String status, LocalDate start, LocalDate end);
+    List<OrderListDto> getOrdersByKeys(List<OrderKey> keys);
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    class OrderKey {
+        private String date;
+        private Integer number;
+    }
 
     @Getter
     @Builder

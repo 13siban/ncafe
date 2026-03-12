@@ -43,11 +43,31 @@ export default function MyOrdersPage() {
     useEffect(() => {
         const fetchMyOrders = async () => {
             try {
-                // 백엔드 호출: /api/orders/my
-                const data = await fetchAPI('/orders/my');
-                setOrders(data);
+                // 1. 먼저 세션 확인 (또는 회원 주문 내역 호출 시도)
+                try {
+                    const data = await fetchAPI('/orders/my', { skipRedirect: true });
+                    setOrders(data);
+                } catch (error: any) {
+                    // 401 Unauthorized인 경우 비회원 로직 수행
+                    if (error.status === 401) {
+                        const guestOrders = JSON.parse(localStorage.getItem("guest-orders") || "[]");
+                        if (guestOrders.length > 0) {
+                            // 비회원 주문 목록 조회 API 호출 (새로 만든 POST /orders/list)
+                            const data = await fetchAPI('/orders/list', {
+                                method: 'POST',
+                                body: JSON.stringify(guestOrders)
+                            });
+                            setOrders(data);
+                        } else {
+                            setOrders([]);
+                        }
+                    } else {
+                        throw error;
+                    }
+                }
             } catch (error) {
                 console.error("Failed to fetch my orders:", error);
+                setOrders([]);
             } finally {
                 setLoading(false);
             }

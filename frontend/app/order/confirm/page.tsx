@@ -94,6 +94,19 @@ export default function OrderConfirmPage() {
             const result = await response.json();
             setIsSuccess(true);
             clearCart();
+            
+            // 비회원일 경우 로컬 스토리지에 주문 내역 저장
+            if (!isLoggedIn) {
+                const guestOrders = JSON.parse(localStorage.getItem("guest-orders") || "[]");
+                const newOrder = { date: result.orderDate, number: result.orderNumber };
+                
+                // 중복 체크 후 추가
+                const isDuplicate = guestOrders.some((o: any) => o.date === newOrder.date && o.number === newOrder.number);
+                if (!isDuplicate) {
+                    localStorage.setItem("guest-orders", JSON.stringify([newOrder, ...guestOrders].slice(0, 20))); // 최근 20개까지만 저장
+                }
+            }
+            
             router.push(`/order/${result.orderDate}/${result.orderNumber}`);
         } else {
             const error = await response.json();

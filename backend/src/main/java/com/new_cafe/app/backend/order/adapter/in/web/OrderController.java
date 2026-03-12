@@ -55,4 +55,13 @@ public class OrderController {
         }
         return ResponseEntity.ok(getOrderUseCase.getMyOrders(user.getId()));
     }
+
+    @PostMapping("/list")
+    public ResponseEntity<?> getOrdersByKeys(@RequestBody List<GetOrderUseCase.OrderKey> keys) {
+        try {
+            return ResponseEntity.ok(getOrderUseCase.getOrdersByKeys(keys));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(java.util.Map.of("message", "주문 내역 조회 중 오류: " + e.getMessage()));
+        }
+    }
 }
