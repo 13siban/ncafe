@@ -116,6 +116,7 @@ export const adminStoreAPI = {
         contactNumber?: string;
         address?: string;
         faviconUrl?: string;
+        faviconDarkUrl?: string;
     }) =>
         fetchAPI('/admin/store/settings', {
             method: 'PUT',

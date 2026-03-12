@@ -47,6 +47,9 @@ public class StoreSettingsJpaEntity {
     @Column(name = "favicon_url")
     private String faviconUrl;
 
+    @Column(name = "favicon_dark_url")
+    private String faviconDarkUrl;
+
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
     

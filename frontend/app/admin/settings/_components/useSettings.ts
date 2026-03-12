@@ -17,6 +17,7 @@ export function useSettings() {
     const [contactNumber, setContactNumber] = useState('');
     const [address, setAddress] = useState('');
     const [faviconUrl, setFaviconUrl] = useState('');
+    const [faviconDarkUrl, setFaviconDarkUrl] = useState('');
 
     const fetchSettings = async () => {
         setIsLoading(true);
@@ -29,6 +30,7 @@ export function useSettings() {
             setContactNumber(data.contactNumber || '');
             setAddress(data.address || '');
             setFaviconUrl(data.faviconUrl || '');
+            setFaviconDarkUrl(data.faviconDarkUrl || '');
         } catch (error) {
             console.error('Failed to fetch settings:', error);
         } finally {
@@ -50,7 +52,8 @@ export function useSettings() {
                 description,
                 contactNumber,
                 address,
-                faviconUrl
+                faviconUrl,
+                faviconDarkUrl
             });
             alert('설정이 저장되었습니다.');
         } catch (error: any) {
@@ -60,11 +63,15 @@ export function useSettings() {
         }
     };
 
-    const handleUploadFavicon = async (file: File) => {
+    const handleUploadFavicon = async (file: File, isDark: boolean = false) => {
         try {
             const result = await adminStoreAPI.uploadFavicon(file);
-            setFaviconUrl(result.faviconUrl);
-            alert('파비콘이 업로드되었습니다. 저장 버튼을 눌러야 최종 반영됩니다.');
+            if (isDark) {
+                setFaviconDarkUrl(result.faviconUrl);
+            } else {
+                setFaviconUrl(result.faviconUrl);
+            }
+            alert(`${isDark ? '다크모드용 ' : ''}파비콘이 업로드되었습니다. 저장 버튼을 눌러야 최종 반영됩니다.`);
         } catch (error: any) {
             alert('파비콘 업로드 실패: ' + error.message);
         }
@@ -80,6 +87,7 @@ export function useSettings() {
         contactNumber,
         address,
         faviconUrl,
+        faviconDarkUrl,
         setOpenTime,
         setCloseTime,
         setCafeName,
@@ -87,6 +95,7 @@ export function useSettings() {
         setContactNumber,
         setAddress,
         setFaviconUrl,
+        setFaviconDarkUrl,
         handleUpdateSettings,
         handleUploadFavicon
     };

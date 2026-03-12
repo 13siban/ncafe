@@ -3,6 +3,7 @@ import { Fraunces } from "next/font/google";
 import "./globals.css";
 import { AuthErrorHandler } from "@/components/auth/AuthErrorHandler";
 import ChatWidget from "@/components/chat/ChatWidget";
+import { Toaster } from 'react-hot-toast';
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -21,6 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
     const title = data.cafeName || "mymyy - 특별한 미식 경험";
     const description = data.description || "최고의 재료와 정성으로 준비한 커피와 디저트를 만나보세요.";
     const faviconUrl = data.faviconUrl ? `/images/${data.faviconUrl}` : "/favicon-light.png";
+    const faviconDarkUrl = data.faviconDarkUrl ? `/images/${data.faviconDarkUrl}` : "/favicon-dark.png";
 
     return {
       title,
@@ -32,7 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
             media: "(prefers-color-scheme: light)",
           },
           {
-            url: faviconUrl,
+            url: faviconDarkUrl,
             media: "(prefers-color-scheme: dark)",
           },
         ],
@@ -45,8 +47,6 @@ export async function generateMetadata(): Promise<Metadata> {
     };
   }
 }
-
-import { Toaster } from 'react-hot-toast';
 
 export default function RootLayout({
   children,

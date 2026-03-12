@@ -46,7 +46,8 @@ public class StoreSettingsService implements GetStoreSettingsUseCase, ManageStor
                 settings.getDescription(),
                 settings.getContactNumber(),
                 settings.getAddress(),
-                settings.getFaviconUrl()
+                settings.getFaviconUrl(),
+                settings.getFaviconDarkUrl()
         );
     }
 
@@ -68,7 +69,7 @@ public class StoreSettingsService implements GetStoreSettingsUseCase, ManageStor
 
     @Override
     @Transactional
-    public ManageStoreSettingsUseCase.StoreSettingsResponse updateStoreSettings(String openTime, String closeTime, String cafeName, String description, String contactNumber, String address, String faviconUrl) {
+    public ManageStoreSettingsUseCase.StoreSettingsResponse updateStoreSettings(String openTime, String closeTime, String cafeName, String description, String contactNumber, String address, String faviconUrl, String faviconDarkUrl) {
         StoreSettings settings = StoreSettings.builder()
                 .openTime(openTime)
                 .closeTime(closeTime)
@@ -77,6 +78,7 @@ public class StoreSettingsService implements GetStoreSettingsUseCase, ManageStor
                 .contactNumber(contactNumber)
                 .address(address)
                 .faviconUrl(faviconUrl)
+                .faviconDarkUrl(faviconDarkUrl)
                 .build();
         StoreSettings updated = repositoryPort.updateStoreSettings(settings);
         return toManageResponse(updated);
@@ -94,7 +96,8 @@ public class StoreSettingsService implements GetStoreSettingsUseCase, ManageStor
                 settings.getDescription(),
                 settings.getContactNumber(),
                 settings.getAddress(),
-                settings.getFaviconUrl()
+                settings.getFaviconUrl(),
+                settings.getFaviconDarkUrl()
         );
     }
 }

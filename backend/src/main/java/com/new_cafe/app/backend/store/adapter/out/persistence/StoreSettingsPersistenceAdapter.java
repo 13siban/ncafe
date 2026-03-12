@@ -47,6 +47,9 @@ public class StoreSettingsPersistenceAdapter implements StoreSettingsRepositoryP
         if (settings.getFaviconUrl() != null) {
             entity.setFaviconUrl(settings.getFaviconUrl());
         }
+        if (settings.getFaviconDarkUrl() != null) {
+            entity.setFaviconDarkUrl(settings.getFaviconDarkUrl());
+        }
         return mapToDomain(repository.save(entity));
     }
 
@@ -63,6 +66,7 @@ public class StoreSettingsPersistenceAdapter implements StoreSettingsRepositoryP
                 .contactNumber(entity.getContactNumber())
                 .address(entity.getAddress())
                 .faviconUrl(entity.getFaviconUrl())
+                .faviconDarkUrl(entity.getFaviconDarkUrl())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
     }

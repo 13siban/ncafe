@@ -11,7 +11,9 @@ import {
     Loader2, 
     Globe,
     FileText,
-    Settings
+    Settings,
+    Sun,
+    Moon
 } from 'lucide-react';
 import styles from './page.module.css';
 import { useSettings } from './_components/useSettings';
@@ -27,13 +29,13 @@ export default function AdminSettingsPage() {
         contactNumber,
         address,
         faviconUrl,
+        faviconDarkUrl,
         setOpenTime,
         setCloseTime,
         setCafeName,
         setDescription,
         setContactNumber,
         setAddress,
-        setFaviconUrl,
         handleUpdateSettings,
         handleUploadFavicon
     } = useSettings();
@@ -47,9 +49,9 @@ export default function AdminSettingsPage() {
         );
     }
 
-    const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onFileChange = (e: React.ChangeEvent<HTMLInputElement>, isDark: boolean = false) => {
         if (e.target.files && e.target.files[0]) {
-            handleUploadFavicon(e.target.files[0]);
+            handleUploadFavicon(e.target.files[0], isDark);
         }
     };
 
@@ -114,31 +116,66 @@ export default function AdminSettingsPage() {
                         <h2 className={styles.cardTitle}>카페 기본 정보</h2>
                     </div>
                     <div className={styles.cardContent}>
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>파비콘 (아이콘)</label>
-                            <div className={styles.faviconSection}>
-                                <div className={styles.faviconPreview}>
-                                    {faviconUrl ? (
-                                        <img src={`/images/${faviconUrl}`} alt="Favicon" />
-                                    ) : (
-                                        <div className={styles.noFavicon}>No Icon</div>
-                                    )}
+                        <div className={styles.formRow}>
+                            {/* Light Mode Favicon */}
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>
+                                    <Sun size={14} style={{ marginRight: '4px' }} />
+                                    파비콘 (라이트 모드)
+                                </label>
+                                <div className={styles.faviconSection}>
+                                    <div className={styles.faviconPreview}>
+                                        {faviconUrl ? (
+                                            <img src={`/images/${faviconUrl}`} alt="Favicon Light" />
+                                        ) : (
+                                            <div className={styles.noFavicon}>No Icon</div>
+                                        )}
+                                    </div>
+                                    <div className={styles.faviconUpload}>
+                                        <input 
+                                            type="file" 
+                                            id="faviconInput" 
+                                            accept="image/png,image/x-icon,image/svg+xml"
+                                            style={{ display: 'none' }}
+                                            onChange={(e) => onFileChange(e, false)}
+                                        />
+                                        <label htmlFor="faviconInput" className={styles.uploadBtn}>
+                                            이미지 선택
+                                        </label>
+                                    </div>
                                 </div>
-                                <div className={styles.faviconUpload}>
-                                    <input 
-                                        type="file" 
-                                        id="faviconInput" 
-                                        accept="image/png,image/x-icon,image/svg+xml"
-                                        style={{ display: 'none' }}
-                                        onChange={onFileChange}
-                                    />
-                                    <label htmlFor="faviconInput" className={styles.uploadBtn}>
-                                        이미지 선택
-                                    </label>
-                                    <p className={styles.uploadHint}>PNG, ICO, SVG 권장</p>
+                            </div>
+
+                            {/* Dark Mode Favicon */}
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>
+                                    <Moon size={14} style={{ marginRight: '4px' }} />
+                                    파비콘 (다크 모드용 화이트)
+                                </label>
+                                <div className={styles.faviconSection}>
+                                    <div className={`${styles.faviconPreview} ${styles.darkPreviewBackground}`}>
+                                        {faviconDarkUrl ? (
+                                            <img src={`/images/${faviconDarkUrl}`} alt="Favicon Dark" />
+                                        ) : (
+                                            <div className={styles.noFavicon}>No Icon</div>
+                                        )}
+                                    </div>
+                                    <div className={styles.faviconUpload}>
+                                        <input 
+                                            type="file" 
+                                            id="faviconDarkInput" 
+                                            accept="image/png,image/x-icon,image/svg+xml"
+                                            style={{ display: 'none' }}
+                                            onChange={(e) => onFileChange(e, true)}
+                                        />
+                                        <label htmlFor="faviconDarkInput" className={styles.uploadBtn}>
+                                            이미지 선택
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <p className={styles.uploadHint} style={{ marginBottom: '16px' }}>PNG, ICO, SVG 권장</p>
 
                         <div className={styles.formGroup}>
                             <label className={styles.label}>카페 이름 (사이트 제목)</label>
