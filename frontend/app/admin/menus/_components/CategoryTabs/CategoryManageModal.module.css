@@ -8,48 +8,49 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 10000;
 }
 
 .modalContent {
-    background-color: var(--bg-primary);
+    background-color: #fff;
     width: 100%;
     max-width: 450px;
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-xl);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     max-height: 80vh;
 }
 
 .modalHeader {
-    padding: var(--space-5);
-    border-bottom: 1px solid var(--color-gray-200);
+    padding: 20px;
+    border-bottom: 1px solid #eee;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .modalHeader h2 {
-    font-size: var(--text-lg);
-    font-weight: var(--font-bold);
-    color: var(--color-gray-900);
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
 }
 
 .closeButton {
     background: transparent;
     border: none;
-    color: var(--color-gray-500);
+    color: #999;
     cursor: pointer;
     transition: color 0.2s;
 }
 
 .closeButton:hover {
-    color: var(--color-gray-900);
+    color: #1a1a1a;
 }
 
 .modalBody {
-    padding: var(--space-5);
+    padding: 20px;
     overflow-y: auto;
     flex: 1;
 }
@@ -57,18 +58,18 @@
 .list {
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
-    margin-bottom: var(--space-4);
+    gap: 12px;
+    margin-bottom: 16px;
 }
 
 .listItem {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-2) var(--space-3);
-    background-color: var(--color-gray-50);
-    border: 1px solid var(--color-gray-200);
-    border-radius: var(--radius-md);
+    gap: 12px;
+    padding: 8px 12px;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 8px;
     cursor: grab;
 }
 
@@ -78,104 +79,121 @@
 }
 
 .dragHandle {
-    color: var(--color-gray-400);
+    color: #ccc;
     cursor: grab;
-}
-
-.dragHandle:active {
-    cursor: grabbing;
 }
 
 .nameInput {
     flex: 1;
-    padding: var(--space-2);
-    border: 1px solid var(--color-gray-300);
-    border-radius: var(--radius-sm);
-    font-size: var(--text-sm);
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
 }
 
 .nameInput:focus {
     outline: none;
-    border-color: var(--color-primary-500);
+    border-color: var(--color-primary-600);
 }
 
 .deleteButton {
     background: transparent;
     border: none;
-    color: var(--color-gray-400);
+    color: #ccc;
     cursor: pointer;
-    padding: var(--space-1);
-    border-radius: var(--radius-sm);
+    padding: 4px;
+    border-radius: 4px;
     transition: all 0.2s;
 }
 
 .deleteButton:hover {
-    color: var(--color-error);
-    background-color: var(--color-error-light);
+    color: #ff4d4f;
+    background-color: #fff1f0;
 }
 
 .addButton {
     width: 100%;
-    padding: var(--space-3);
+    padding: 12px;
     background-color: transparent;
-    border: 1px dashed var(--color-gray-300);
-    border-radius: var(--radius-md);
-    color: var(--color-gray-600);
-    font-size: var(--text-sm);
-    font-weight: var(--font-medium);
+    border: 1px dashed #ddd;
+    border-radius: 8px;
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(--space-2);
+    gap: 8px;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .addButton:hover {
-    border-color: var(--color-primary-500);
+    border-color: var(--color-primary-600);
     color: var(--color-primary-600);
     background-color: var(--color-primary-50);
 }
 
 .modalFooter {
-    padding: var(--space-4) var(--space-5);
-    border-top: 1px solid var(--color-gray-200);
+    padding: 16px 20px;
+    border-top: 1px solid #eee;
     display: flex;
     justify-content: flex-end;
-    gap: var(--space-3);
+    gap: 12px;
 }
 
 .cancelBtn {
-    padding: var(--space-2) var(--space-4);
+    padding: 8px 16px;
     background-color: transparent;
-    border: 1px solid var(--color-gray-300);
-    border-radius: var(--radius-md);
-    color: var(--color-gray-700);
-    font-size: var(--text-sm);
-    font-weight: var(--font-medium);
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
 }
 
 .cancelBtn:hover {
-    background-color: var(--color-gray-100);
+    background-color: #f5f5f5;
 }
 
 .saveBtn {
-    padding: var(--space-2) var(--space-4);
-    background-color: var(--color-primary-600);
+    padding: 8px 24px;
+    background-color: #1a1a1a;
     border: none;
-    border-radius: var(--radius-md);
+    border-radius: 6px;
     color: white;
-    font-size: var(--text-sm);
-    font-weight: var(--font-medium);
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
 }
 
 .saveBtn:hover {
-    background-color: var(--color-primary-700);
+    background-color: #333;
 }
 
 .saveBtn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.dividerHint {
+    font-size: 11px;
+    color: var(--color-primary-600);
+    margin-left: 8px;
+    font-weight: 500;
+}
+
+.helpText {
+    margin-top: 16px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+}
+
+.helpText span {
+    letter-spacing: 2px;
 }

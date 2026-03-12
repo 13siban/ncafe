@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, GripVertical, Trash2, Plus } from 'lucide-react';
 import styles from './CategoryManageModal.module.css';
 import { CategoryResponseDto } from '@/components/menu/types';
@@ -10,7 +11,7 @@ interface CategoryManageModalProps {
     isOpen: boolean;
     onClose: () => void;
     categories: CategoryResponseDto[];
-    refetch: () => void | Promise<void>;
+    refetch: () => Promise<void> | void;
     onSave: () => void;
 }
 
@@ -21,9 +22,14 @@ type EditCategory = {
     isDeleted: boolean;
 };
 
-export default function CategoryManageModal({ isOpen, onClose, categories, refetch, onSave }: CategoryManageModalProps) {
+export function CategoryManageModal({ isOpen, onClose, categories, refetch, onSave }: CategoryManageModalProps) {
     const [items, setItems] = useState<EditCategory[]>([]);
     const [isSaving, setIsSaving] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         if (isOpen) {
@@ -36,7 +42,7 @@ export default function CategoryManageModal({ isOpen, onClose, categories, refet
         }
     }, [isOpen, categories]);
 
-    if (!isOpen) return null;
+    if (!isOpen || !mounted) return null;
 
     const visibleItems = items.filter(item => !item.isDeleted);
 
@@ -82,7 +88,6 @@ export default function CategoryManageModal({ isOpen, onClose, categories, refet
         const dragIndex = parseInt(dragIndexStr, 10);
         if (dragIndex === targetIndex) return;
 
-        // items 배열 내에서 visibleItems의 실제 인덱스를 찾아야 함.
         const visibleToRealIndex = (visIndex: number) => {
             let v = -1;
             for (let i = 0; i < items.length; i++) {
@@ -101,8 +106,6 @@ export default function CategoryManageModal({ isOpen, onClose, categories, refet
 
         const newItems = [...items];
         const draggedItem = newItems.splice(realDragIndex, 1)[0];
-
-        // splice 과정에서 인덱스가 변경될 수 있으므로 다시 계산
         const adjustDropIndex = realDragIndex < realDropIndex ? realDropIndex - 1 : realDropIndex;
         newItems.splice(adjustDropIndex, 0, draggedItem);
 
@@ -117,26 +120,20 @@ export default function CategoryManageModal({ isOpen, onClose, categories, refet
             let sortOrderCounter = 1;
             const finalOrdered = items.filter(x => !x.isDeleted);
 
-            // Create & Update
             for (const item of finalOrdered) {
                 if (item.id === null) {
-                    // Create
                     promises.push(fetchAPI('/admin/categories', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name: item.name, sortOrder: sortOrderCounter++ })
                     }));
                 } else {
-                    // Update
                     promises.push(fetchAPI(`/admin/categories/${item.id}`, {
                         method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name: item.name, sortOrder: sortOrderCounter++ })
                     }));
                 }
             }
 
-            // Delete
             const deleted = items.filter(x => x.isDeleted && x.id !== null);
             for (const item of deleted) {
                 promises.push(fetchAPI(`/admin/categories/${item.id}`, {
@@ -144,17 +141,13 @@ export default function CategoryManageModal({ isOpen, onClose, categories, refet
                 }));
             }
 
-            // 모든 Promise 대기 (하나라도 실패하면 catch로 넘어감)
             await Promise.all(promises);
-
             alert('카테고리 수정이 완료되었습니다.');
             onSave();
         } catch (error: any) {
             console.error('Catch block error:', error);
-            const message = error.message || '카테고리 저장 중 오류가 발생했습니다.';
+            const msg = error.message || '카테고리 저장 중 오류가 발생했습니다.';
 
-            // [강력 수동 복원] 서버 응답 올 때까지 기다리지 말고,
-            // 우리가 이미 알고 있는 원본(categories)으로 화면을 즉시 갈아끼웁니다.
             const rollbackItems = categories.map(c => ({
                 uid: String(c.id),
                 id: c.id,
@@ -162,22 +155,15 @@ export default function CategoryManageModal({ isOpen, onClose, categories, refet
                 isDeleted: false
             }));
 
-            console.log('Rolling back state to:', rollbackItems);
             setItems(rollbackItems);
-
-            // 부모 컴포넌트도 싱크를 맞춰줍니다 (백그라운드에서 실행)
             refetch();
-
-            // 리액트가 화면을 바꿀 기회를 주기 위해 0.1초 뒤에 알림을 띄웁니다.
-            setTimeout(() => {
-                alert(message);
-            }, 100);
+            alert(msg);
         } finally {
             setIsSaving(false);
         }
     };
 
-    return (
+    return createPortal(
         <div className={styles.modalOverlay} onClick={onClose}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
@@ -199,23 +185,18 @@ export default function CategoryManageModal({ isOpen, onClose, categories, refet
                                 <div className={styles.dragHandle}>
                                     <GripVertical size={16} />
                                 </div>
-                                <input
-                                    type="text"
-                                    className={styles.nameInput}
-                                    value={item.name}
-                                    onChange={(e) => handleNameChange(item.uid, e.target.value)}
-                                    placeholder="카테고리명"
-                                />
-                                {item.id && (
-                                    <button
-                                        className={styles.optionsButton}
-                                        onClick={() => window.location.href = `/admin/categories/${item.id}/options`}
-                                        title="옵션 설정"
-                                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)', padding: '0.25rem', display: 'flex' }}
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21 16-4-4" /><path d="M17 12V2" /><path d="m3 8 4 4" /><path d="M7 12v10" /><path d="m14 2 4 4-4 4" /></svg>
-                                    </button>
-                                )}
+                                <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                                    <input
+                                        type="text"
+                                        className={styles.nameInput}
+                                        value={item.name}
+                                        onChange={(e) => handleNameChange(item.uid, e.target.value)}
+                                        placeholder="카테고리명"
+                                    />
+                                    {item.name === '---' && (
+                                        <span className={styles.dividerHint}>* 구분선으로 표시됩니다</span>
+                                    )}
+                                </div>
                                 <button
                                     className={styles.deleteButton}
                                     onClick={() => handleDelete(item.uid)}
@@ -230,6 +211,10 @@ export default function CategoryManageModal({ isOpen, onClose, categories, refet
                     <button className={styles.addButton} onClick={handleAdd}>
                         <Plus size={16} /> 카테고리 추가하기
                     </button>
+
+                    <div className={styles.helpText}>
+                        💡 카테고리 이름에 <span>---</span> 을 입력하면 해당 위치에 <strong>중간 구분선</strong>이 표시됩니다.
+                    </div>
                 </div>
 
                 <div className={styles.modalFooter}>
@@ -245,6 +230,7 @@ export default function CategoryManageModal({ isOpen, onClose, categories, refet
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

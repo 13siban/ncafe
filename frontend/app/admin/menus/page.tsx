@@ -8,7 +8,7 @@
 import React, { useState } from 'react';
 import { MenuList } from './_components/MenuList/MenuList';
 import { MenuActionBar } from './_components/MenuActionBar/MenuActionBar';
-import CategoryTabs from '@/components/menu/CategoryTabs/CategoryTabs';
+import CategoryTabs from './_components/CategoryTabs/CategoryTabs';
 import styles from './page.module.css';
 
 export default function AdminMenusPage() {
@@ -20,7 +20,6 @@ export default function AdminMenusPage() {
       <CategoryTabs
         selected={selectedCategory}
         onSelect={setSelectedCategory}
-        mode="admin"
       />
 
       <div className={styles.contentArea}>
