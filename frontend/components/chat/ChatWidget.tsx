@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, Send, X } from 'lucide-react';
 import styles from './ChatWidget.module.css';
 import { useChatStore } from '@/store/useChatStore';
+import { useRouter } from 'next/navigation';
 
 const FAQ_QUESTIONS = [
     '영업시간',
@@ -19,7 +20,11 @@ const ChatWidget = () => {
         toggleChat,
         closeChat,
         sendMessage,
+        pendingAction,
+        clearPendingAction,
     } = useChatStore();
+
+    const router = useRouter();
 
     const [input, setInput] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -36,6 +41,14 @@ const ChatWidget = () => {
             setTimeout(() => inputRef.current?.focus(), 300);
         }
     }, [isOpen]);
+
+    // 에이전트 요청에 따른 페이지 이동 처리
+    useEffect(() => {
+        if (pendingAction && pendingAction.type === 'navigate') {
+            router.push(pendingAction.path);
+            clearPendingAction();
+        }
+    }, [pendingAction, router, clearPendingAction]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

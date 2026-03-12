@@ -17,6 +17,8 @@ interface ChatState {
     closeChat: () => void;
     sendMessage: (content: string) => Promise<void>;
     clearMessages: () => void;
+    pendingAction: { type: 'navigate'; path: string } | null;
+    clearPendingAction: () => void;
 }
 
 function generateId(): string {
@@ -38,6 +40,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     isOpen: false,
     isLoading: false,
     sessionId: '',
+    pendingAction: null,
 
     toggleChat: () => set((state) => ({ isOpen: !state.isOpen })),
     openChat: () => set({ isOpen: true }),
@@ -78,19 +81,32 @@ export const useChatStore = create<ChatState>((set, get) => ({
             }
 
             const data = await res.json();
+            const rawContent = data.reply || '';
+            let finalContent = rawContent;
+            let action: { type: 'navigate'; path: string } | null = null;
+
+            // [NAVIGATE:/path] 태그 파싱
+            const navMatch = rawContent.match(/\[NAVIGATE:([^\]]+)\]/);
+            if (navMatch) {
+                action = { type: 'navigate', path: navMatch[1] };
+                // 출력 텍스트에서는 태그 제거
+                finalContent = rawContent.replace(/\[NAVIGATE:[^\]]+\]/g, '').trim();
+            }
 
             const assistantMessage: ChatMessage = {
                 id: generateId(),
                 role: 'assistant',
-                content: data.reply,
-                timestamp: data.timestamp,
+                content: finalContent,
+                timestamp: data.timestamp || Date.now(),
             };
 
             set((state) => ({
                 messages: [...state.messages, assistantMessage],
                 isLoading: false,
+                pendingAction: action,
             }));
-        } catch {
+        } catch (error) {
+            console.error('Chat Error:', error);
             // 에러 시 에러 메시지를 어시스턴트 응답으로 표시
             const errorMessage: ChatMessage = {
                 id: generateId(),
@@ -106,5 +122,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
         }
     },
 
+    clearPendingAction: () => set({ pendingAction: null }),
     clearMessages: () => set({ messages: [] }),
 }));
