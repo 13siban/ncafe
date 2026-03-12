@@ -12,7 +12,7 @@ import { MenuInfo } from './_components/MenuInfo/MenuInfo';
 import { MenuOptions } from './_components/MenuOptions/MenuOptions';
 import { Header, Footer } from '@/components/common';
 
-export default function PublicMenuDetailPage({ params }: { params: Promise<{ id: number }> }) {
+export default function PublicMenuDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const router = useRouter();
 

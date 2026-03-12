@@ -41,7 +41,7 @@ export default function PublicMenusPage() {
                         searchQuery={searchQuery}
                         renderCard={(menu) => (
                             <Link
-                                href={`/menus/${menu.id}`}
+                                href={`/menus/${menu.engName ? menu.engName.toLowerCase().replace(/\s+/g, '-') : menu.id}`}
                                 key={menu.id}
                                 style={{ display: 'flex', textDecoration: 'none', color: 'inherit' }}
                             >

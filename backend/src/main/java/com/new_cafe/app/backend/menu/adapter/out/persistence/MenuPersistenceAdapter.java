@@ -88,6 +88,13 @@ public class MenuPersistenceAdapter implements MenuRepositoryPort {
                 .orElse(null);
     }
 
+    @Override
+    public Menu findByEngName(String engName) {
+        return menuJpaRepository.findByEngNameIgnoreCase(engName)
+                .map(this::toDomain)
+                .orElse(null);
+    }
+
     // ========== 변환 메서드 ==========
 
     private Menu toDomain(MenuJpaEntity entity) {

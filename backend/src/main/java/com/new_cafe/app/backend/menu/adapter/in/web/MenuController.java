@@ -50,6 +50,15 @@ public class MenuController {
         return getMenuDetailUseCase.getMenu(command);
     }
 
+    // 메뉴 슬러그(영문이름)로 상세 조회
+    @GetMapping("/slug/{slug}")
+    public GetMenuDetailResult getMenuBySlug(@PathVariable String slug) {
+        GetMenuDetailCommand command = GetMenuDetailCommand.builder()
+                .engName(slug)
+                .build();
+        return getMenuDetailUseCase.getMenu(command);
+    }
+
     // 메뉴 이미지 조회 (상세 조회에서도 나오지만, 필요한 경우 별도 호출 가능)
     @GetMapping("/{id}/menu-images")
     public GetMenuImagesResult getImages(@PathVariable Long id) {

@@ -40,9 +40,8 @@ export default function NewMenuPage() {
       }
 
       router.push('/admin/menus');
-    } catch (error) {
-      console.error('Failed to create menu', error);
-      alert('메뉴 등록에 실패했습니다.');
+    } catch (error: any) {
+      alert(error.message || '메뉴 등록에 실패했습니다.');
     }
   };
 

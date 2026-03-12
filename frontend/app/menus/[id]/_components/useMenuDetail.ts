@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { MenuDetailResponse, MenuOptionsResponse, OptionGroup } from '../types';
 import { useCartStore, CartOption } from '@/store/useCartStore';
 
-export function useMenuDetail(id: number) {
+export function useMenuDetail(slug: string | number) {
     const router = useRouter();
     const [menu, setMenu] = useState<MenuDetailResponse | null>(null);
     const [optionsData, setOptionsData] = useState<MenuOptionsResponse | null>(null);
@@ -21,24 +21,36 @@ export function useMenuDetail(id: number) {
         const fetchMenuAndOptions = async () => {
             setIsLoading(true);
             try {
-                const [menuRes, optionsRes, storeRes] = await Promise.all([
-                    fetch(`/api/menus/${id}`),
-                    fetch(`/api/menus/${id}/options`),
+                // Determine if it's an ID or a slug
+                const isId = typeof slug === 'number' || (!isNaN(Number(slug)) && !String(slug).includes('-'));
+                const menuPath = isId ? `/api/menus/${slug}` : `/api/menus/slug/${slug}`;
+
+                const [menuRes, storeRes] = await Promise.all([
+                    fetch(menuPath),
                     fetch('/api/store/status')
                 ]);
 
                 if (!menuRes.ok) throw new Error('메뉴를 불러오는 데 실패했습니다.');
+                const menuData = await menuRes.json();
+                setMenu(menuData);
+
+                // Option fetch always needs the numeric ID for now
+                const optionsRes = await fetch(`/api/menus/${menuData.id}/options`);
                 if (!optionsRes.ok) throw new Error('옵션을 불러오는 데 실패했습니다.');
 
-                const menuData = await menuRes.json();
                 const optData: MenuOptionsResponse = await optionsRes.json();
 
-                setMenu(menuData);
                 setOptionsData(optData);
 
                 if (storeRes.ok) {
                     const storeData = await storeRes.json();
                     setIsStoreOpen(storeData.isOpen);
+                }
+
+                // If accessed via numeric ID but slug exists, redirect to slug URL
+                if (isId && menuData.engName) {
+                    const hyphenatedSlug = menuData.engName.toLowerCase().replace(/\s+/g, '-');
+                    router.replace(`/menus/${hyphenatedSlug}`);
                 }
 
                 const initialSelections: Record<number, number[]> = {};
@@ -58,7 +70,7 @@ export function useMenuDetail(id: number) {
         };
 
         fetchMenuAndOptions();
-    }, [id]);
+    }, [slug]);
 
     const handleOptionChange = (group: OptionGroup, itemId: number, checked: boolean) => {
         setSelectedOptions((prev) => {

@@ -14,4 +14,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GetMenuDetailCommand {
     private Long id;
+    private String engName;
 }

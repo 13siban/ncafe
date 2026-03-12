@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, Send, X } from 'lucide-react';
 import styles from './ChatWidget.module.css';
 import { useChatStore } from '@/store/useChatStore';
+import { useCartStore } from '@/store/useCartStore';
 import { useRouter } from 'next/navigation';
 
 const FAQ_QUESTIONS = [
@@ -42,13 +43,72 @@ const ChatWidget = () => {
         }
     }, [isOpen]);
 
-    // 에이전트 요청에 따른 페이지 이동 처리
+    const addItem = useCartStore((state) => state.addItem);
+
+    // 에이전트 요청에 따른 페이지 이동 및 장바구니 담기 처리
     useEffect(() => {
-        if (pendingAction && pendingAction.type === 'navigate') {
+        if (!pendingAction) return;
+
+        if (pendingAction.type === 'navigate') {
             router.push(pendingAction.path);
             clearPendingAction();
+        } else if (pendingAction.type === 'add_to_cart') {
+            const addCartAndClear = async () => {
+                try {
+                    const res = await fetch(`/api/menus/slug/${pendingAction.slug}`);
+                    if (res.ok) {
+                        const text = await res.text();
+                        if (!text) {
+                            console.warn(`메뉴 데이터를 찾을 수 없습니다: ${pendingAction.slug}`);
+                            return;
+                        }
+                        const menu = JSON.parse(text);
+                        
+                        // 기본 옵션 조회를 위해 옵션 API 호출
+                        const optRes = await fetch(`/api/menus/${menu.id}/options`);
+                        let cartOptions: any[] = [];
+                        let optionTotalPrice = 0;
+                        if (optRes.ok) {
+                            const optData = await optRes.json();
+                            optData.optionGroups?.forEach((group: any) => {
+                                if (group.isRequired && group.items?.length > 0) {
+                                    // 기본적으로 첫번째 항목 선택
+                                    const item = group.items[0];
+                                    cartOptions.push({
+                                        optionGroupId: group.id,
+                                        optionGroupName: group.name,
+                                        optionItemId: item.id,
+                                        optionItemName: item.name,
+                                        priceDelta: item.priceDelta || 0,
+                                    });
+                                    optionTotalPrice += item.priceDelta || 0;
+                                }
+                            });
+                        }
+
+                        const cartId = `${menu.id}-${cartOptions.map(o => `${o.optionGroupId}:${o.optionItemId}`).sort().join('-')}`;
+                        addItem({
+                            cartId,
+                            menuId: menu.id,
+                            menuName: menu.korName,
+                            menuEngName: menu.engName,
+                            imageSrc: menu.images && menu.images.length > 0 ? menu.images[0].srcUrl : '',
+                            basePrice: menu.price,
+                            quantity: pendingAction.quantity,
+                            selectedOptions: cartOptions,
+                            optionTotalPrice,
+                            subtotal: (menu.price + optionTotalPrice) * pendingAction.quantity
+                        });
+                    }
+                } catch (e) {
+                    console.error('Failed to add to cart automatically', e);
+                } finally {
+                    clearPendingAction();
+                }
+            };
+            addCartAndClear();
         }
-    }, [pendingAction, router, clearPendingAction]);
+    }, [pendingAction, router, clearPendingAction, addItem]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -130,8 +190,8 @@ const ChatWidget = () => {
                                 </div>
                             ))}
 
-                            {/* 로딩 인디케이터 */}
-                            {isLoading && (
+                            {/* 로딩 인디케이터 (메시지 목록의 마지막이 어시스턴트가 아닐 때만 표시) */}
+                            {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
                                 <div className={styles.typingIndicator}>
                                     <div className={styles.typingDot} />
                                     <div className={styles.typingDot} />

@@ -57,9 +57,8 @@ export default function EditMenuPage() {
 
       alert(`메뉴 [${data.korName}] 수정이 완료되었습니다.`);
       router.push(`/admin/menus`);
-    } catch (error) {
-      console.error('Failed to update menu', error);
-      alert('메뉴 수정에 실패했습니다.');
+    } catch (error: any) {
+      alert(error.message || '메뉴 수정에 실패했습니다.');
     }
   };
 

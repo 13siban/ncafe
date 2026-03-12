@@ -28,42 +28,57 @@ public class GetMenuDetailService implements GetMenuDetailUseCase {
 
     @Override
     public GetMenuDetailResult getMenu(GetMenuDetailCommand command) {
-        Menu menu = menuRepositoryPort.findById(command.getId());
-        if (menu == null) return null;
+        Menu menu;
+        if (command.getId() != null) {
+            menu = menuRepositoryPort.findById(command.getId());
+        } else if (command.getEngName() != null) {
+            String slug = command.getEngName();
+            menu = menuRepositoryPort.findByEngName(slug);
+            
+            // 만약 하이픈(-)이 포함된 슬러그라면, 공백으로 치환하여 다시 한 번 시도 (예: choco-chip -> choco chip)
+            if (menu == null && slug.contains("-")) {
+                menu = menuRepositoryPort.findByEngName(slug.replace("-", " "));
+            }
+        } else {
+            return null;
+        }
 
-        Category category = categoryRepositoryPort.findById(menu.getCategoryId());
+        if (menu == null) return null;
+        final Menu resolvedMenu = menu;
+
+        Category category = categoryRepositoryPort.findById(resolvedMenu.getCategoryId());
         String categoryName = (category != null) ? category.getName() : "미지정";
         
         // 4단계: 이미지 목록 통합 조회 (Aggregate)
-        List<MenuImage> images = menuImageRepositoryPort.findAllByMenuId(menu.getId());
+        List<MenuImage> images = menuImageRepositoryPort.findAllByMenuId(resolvedMenu.getId());
         List<MenuImageResult> imageResults;
 
         if (images.isEmpty()) {
-            String baseName = menu.getEngName() != null 
-                    ? menu.getEngName().toLowerCase().replaceAll("\\s+", "") 
+            String baseName = resolvedMenu.getEngName() != null 
+                    ? resolvedMenu.getEngName().toLowerCase().replaceAll("\\s+", "") 
                     : "blank";
             // DB에 이미지가 없을 경우 가상 이미지 리스트 반환
             imageResults = List.of(
                 MenuImageResult.builder()
                         .id(-1L)
-                        .menuId(menu.getId())
+                        .menuId(resolvedMenu.getId())
                         .srcUrl(baseName + ".png")
                         .sortOrder(1)
-                        .altText(menu.getKorName() + " 이미지")
+                        .altText(resolvedMenu.getKorName() + " 이미지")
                         .build(),
                 MenuImageResult.builder()
                         .id(-2L)
-                        .menuId(menu.getId())
+                        .menuId(resolvedMenu.getId())
                         .srcUrl(baseName + "1.png")
                         .sortOrder(2)
-                        .altText(menu.getKorName() + " 서브 1")
+                        .altText(resolvedMenu.getKorName() + " 서브 1")
                         .build(),
                 MenuImageResult.builder()
                         .id(-3L)
-                        .menuId(menu.getId())
+                        .menuId(resolvedMenu.getId())
                         .srcUrl(baseName + "2.png")
                         .sortOrder(3)
-                        .altText(menu.getKorName() + " 서브 2")
+                        .altText(resolvedMenu.getKorName() + " 서브 2")
                         .build()
             );
         } else {
@@ -73,25 +88,25 @@ public class GetMenuDetailService implements GetMenuDetailUseCase {
                             .menuId(img.getMenuId())
                             .srcUrl(img.getSrcUrl())
                             .sortOrder(img.getSortOrder())
-                            .altText(menu.getKorName() + " 이미지")
+                            .altText(resolvedMenu.getKorName() + " 이미지")
                             .build())
                     .toList();
         }
 
         return GetMenuDetailResult.builder()
-                .id(menu.getId())
-                .korName(menu.getKorName())
-                .engName(menu.getEngName())
-                .description(menu.getDescription())
-                .price(menu.getPrice())
+                .id(resolvedMenu.getId())
+                .korName(resolvedMenu.getKorName())
+                .engName(resolvedMenu.getEngName())
+                .description(resolvedMenu.getDescription())
+                .price(resolvedMenu.getPrice())
                 .categoryName(categoryName)
-                .isAvailable(menu.getIsAvailable())
-                .isSoldOut(menu.getIsSoldOut())
+                .isAvailable(resolvedMenu.getIsAvailable())
+                .isSoldOut(resolvedMenu.getIsSoldOut())
                 // 도메인 로직 활용
-                .isOrderable(menu.isOrderable())
+                .isOrderable(resolvedMenu.isOrderable())
                 .images(imageResults) // 통합된 이미지 결과
-                .createdAt(menu.getCreatedAt())
-                .updatedAt(menu.getUpdatedAt())
+                .createdAt(resolvedMenu.getCreatedAt())
+                .updatedAt(resolvedMenu.getUpdatedAt())
                 .build();
     }
 }

@@ -17,7 +17,7 @@ interface ChatState {
     closeChat: () => void;
     sendMessage: (content: string) => Promise<void>;
     clearMessages: () => void;
-    pendingAction: { type: 'navigate'; path: string } | null;
+    pendingAction: { type: 'navigate'; path: string } | { type: 'add_to_cart'; slug: string; quantity: number } | null;
     clearPendingAction: () => void;
 }
 
@@ -70,44 +70,102 @@ export const useChatStore = create<ChatState>((set, get) => ({
         }));
 
         try {
+            const aiMessageId = generateId();
+            let isFirstChunk = true;
+
             const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: content, sessionId }),
+                body: JSON.stringify({ message: content, sessionId, stream: true }),
             });
 
             if (!res.ok) {
                 throw new Error('채팅 응답을 가져오는데 실패했습니다.');
             }
 
-            const data = await res.json();
-            const rawContent = data.reply || '';
-            let finalContent = rawContent;
-            let action: { type: 'navigate'; path: string } | null = null;
-
-            // [NAVIGATE:/path] 태그 파싱
-            const navMatch = rawContent.match(/\[NAVIGATE:([^\]]+)\]/);
-            if (navMatch) {
-                action = { type: 'navigate', path: navMatch[1] };
-                // 출력 텍스트에서는 태그 제거
-                finalContent = rawContent.replace(/\[NAVIGATE:[^\]]+\]/g, '').trim();
+            if (!res.body) {
+                throw new Error('Response body is null');
             }
 
-            const assistantMessage: ChatMessage = {
-                id: generateId(),
-                role: 'assistant',
-                content: finalContent,
-                timestamp: data.timestamp || Date.now(),
-            };
+            const reader = res.body.getReader();
+            const decoder = new TextDecoder('utf-8', { fatal: false });
+            let sseBuffer = '';
+            let fullContent = '';
+            let action: { type: 'navigate'; path: string } | { type: 'add_to_cart'; slug: string; quantity: number } | null = null;
 
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                sseBuffer += decoder.decode(value, { stream: true });
+
+                const lines = sseBuffer.split('\n');
+                sseBuffer = lines.pop() || ''; // 불완전한 마지막 라인 보관
+
+                for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (trimmed.startsWith('data: ') || trimmed.startsWith('data:')) {
+                        const data = trimmed.startsWith('data: ') ? trimmed.slice(6) : trimmed.slice(5);
+                        if (data === '[DONE]') continue;
+
+                        try {
+                            const parsed = JSON.parse(data);
+
+                            // Function Calling 액션 (navigate, add_to_cart)
+                            if (parsed.action) {
+                                if (parsed.action === 'navigate' && parsed.url) {
+                                    action = { type: 'navigate', path: parsed.url };
+                                } else if (parsed.action === 'add_to_cart' && parsed.slug) {
+                                    action = {
+                                        type: 'add_to_cart',
+                                        slug: parsed.slug,
+                                        quantity: parsed.quantity || 1,
+                                    };
+                                }
+                            }
+                            // 텍스트 청크
+                            else if (parsed.content) {
+                                fullContent += parsed.content;
+
+                                if (isFirstChunk) {
+                                    set((state) => ({
+                                        messages: [...state.messages, {
+                                            id: aiMessageId,
+                                            role: 'assistant' as const,
+                                            content: fullContent,
+                                            timestamp: Date.now(),
+                                        }],
+                                    }));
+                                    isFirstChunk = false;
+                                } else {
+                                    set((state) => ({
+                                        messages: state.messages.map((msg) =>
+                                            msg.id === aiMessageId
+                                                ? { ...msg, content: fullContent }
+                                                : msg
+                                        ),
+                                    }));
+                                }
+                            }
+                        } catch {
+                            // 불완전한 JSON은 무시
+                        }
+                    }
+                }
+            }
+
+            // 스트리밍 완료 — 최종 상태 업데이트
             set((state) => ({
-                messages: [...state.messages, assistantMessage],
+                messages: state.messages.map((msg) =>
+                    msg.id === aiMessageId
+                        ? { ...msg, content: fullContent }
+                        : msg
+                ),
                 isLoading: false,
                 pendingAction: action,
             }));
         } catch (error) {
             console.error('Chat Error:', error);
-            // 에러 시 에러 메시지를 어시스턴트 응답으로 표시
             const errorMessage: ChatMessage = {
                 id: generateId(),
                 role: 'assistant',

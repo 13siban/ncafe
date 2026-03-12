@@ -59,6 +59,16 @@ public class AdminMenuPersistenceAdapter implements
     }
 
     @Override
+    public boolean existsByEngNameIgnoreCase(String engName) {
+        return adminMenuJpaRepository.existsByEngNameIgnoreCase(engName);
+    }
+
+    @Override
+    public boolean existsByEngNameAndIdNotIgnoreCase(String engName, Long id) {
+        return adminMenuJpaRepository.existsByEngNameAndIdNotIgnoreCase(engName, id);
+    }
+
+    @Override
     public Menu save(Menu menu) {
         AdminMenuJpaEntity entity = toMenuJpaEntity(menu);
         AdminMenuJpaEntity saved = adminMenuJpaRepository.save(entity);

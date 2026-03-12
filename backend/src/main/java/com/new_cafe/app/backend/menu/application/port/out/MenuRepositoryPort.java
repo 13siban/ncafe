@@ -13,4 +13,5 @@ public interface MenuRepositoryPort {
     List<Menu> findAllByCategoryAndSearchQuery(Long categoryId, String searchQuery);
     List<Menu> findPagedMenus(Long categoryId, String searchQuery, Integer page, Integer size, String sortBy, Boolean onlyAvailable);
     Menu findById(Long id);
+    Menu findByEngName(String engName);
 }

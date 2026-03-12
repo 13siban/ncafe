@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AdminMenuJpaRepository extends JpaRepository<AdminMenuJpaEntity, Long>, JpaSpecificationExecutor<AdminMenuJpaEntity> {
+    boolean existsByEngNameIgnoreCase(String engName);
+    boolean existsByEngNameAndIdNotIgnoreCase(String engName, Long id);
 }

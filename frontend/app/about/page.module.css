@@ -1,0 +1,131 @@
+.main {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #fcfbf7;
+    color: #1a1a1a;
+}
+
+.content {
+    flex: 1;
+}
+
+.heroSection {
+    padding: 160px 5% 100px;
+    background: linear-gradient(to bottom, #fcfbf7, #f5f0e8);
+    text-align: center;
+}
+
+.subtitle {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: #8b5e3c;
+    margin-bottom: 20px;
+}
+
+.title {
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    font-family: var(--font-fraunces);
+    line-height: 1.1;
+    margin-bottom: 30px;
+    color: #2c1810;
+}
+
+.description {
+    max-width: 800px;
+    margin: 0 auto;
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: #555;
+}
+
+.missionSection {
+    padding: 100px 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+}
+
+.imageWrapper {
+    width: 100%;
+    aspect-ratio: 4/5;
+    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+}
+
+.imageWrapper:hover .image {
+    transform: scale(1.05);
+}
+
+.sectionTitle {
+    font-size: 2.5rem;
+    font-family: var(--font-fraunces);
+    margin-bottom: 24px;
+    color: #2c1810;
+}
+
+.sectionText {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #666;
+    margin-bottom: 40px;
+}
+
+.stats {
+    display: flex;
+    gap: 40px;
+}
+
+.statItem {
+    display: flex;
+    flex-direction: column;
+}
+
+.statNumber {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #8b5e3c;
+    font-family: var(--font-fraunces);
+}
+
+.statLabel {
+    font-size: 0.9rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .heroSection {
+        padding: 120px 5% 60px;
+    }
+
+    .title {
+        font-size: 2.8rem;
+    }
+
+    .textWrapper {
+        order: -1;
+    }
+}
