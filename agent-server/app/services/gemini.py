@@ -46,7 +46,10 @@ async def chat_stream(
         parts = msg.get("parts", [])
         if not parts and "text" in msg:
             parts = [{"text": msg["text"]}]
-        contents.append(types.Content(role=role, parts=[types.Part.from_text(p["text"]) for p in parts if "text" in p]))
+        contents.append(types.Content(
+            role=role,
+            parts=[types.Part.from_text(text=p["text"]) for p in parts if "text" in p]
+        ))
 
     action = None  # 프론트엔드에 전달할 액션 (있다면)
     max_fc_loops = 5  # Function Calling 무한 루프 방지
@@ -79,7 +82,7 @@ async def chat_stream(
 
         # Function Call 실행 및 결과를 히스토리에 추가
         # 1) 모델의 function call 요청을 히스토리에 추가
-        fc_parts = [types.Part.from_function_call(fc) for fc in function_calls_in_turn]
+        fc_parts = [types.Part(function_call=fc) for fc in function_calls_in_turn]
         contents.append(types.Content(role="model", parts=fc_parts))
 
         # 2) 각 function call 실행하고 결과를 히스토리에 추가
