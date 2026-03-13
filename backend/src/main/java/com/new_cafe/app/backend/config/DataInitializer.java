@@ -230,7 +230,8 @@ public class DataInitializer implements CommandLineRunner {
         
         createUser("hong", "1234", "ROLE_ADMIN");
         createUser("admin", "1234", "ROLE_ADMIN");
-        createUser("newlec", "1234", "ROLE_USER");
+        createUser("subadmin", "1234", "ROLE_ADMIN");
+        createUser("user", "1234", "ROLE_USER");
         
         log.info("Initial users created.");
     }

@@ -127,20 +127,19 @@ const ChatWidget = () => {
     return (
         <>
             {/* 채팅 버블 버튼 */}
-            {!isOpen && (
-                <button
-                    className={styles.chatBubble}
-                    onClick={toggleChat}
-                    aria-label="채팅 열기"
-                    id="chat-bubble-button"
-                >
-                    <MessageCircle size={24} />
-                </button>
-            )}
+            <button
+                className={`${styles.chatBubble} ${isOpen ? styles.chatBubbleOpen : ''}`}
+                onClick={toggleChat}
+                aria-label={isOpen ? "채팅 닫기" : "채팅 열기"}
+                id="chat-bubble-button"
+            >
+                {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
+            </button>
 
             {/* 채팅 창 */}
             {isOpen && (
                 <div className={styles.chatWindow} id="chat-window">
+                    <div className={styles.chatWindowInner}>
                     {/* 헤더 */}
                     <div className={styles.chatHeader}>
                         <div className={styles.chatHeaderInfo}>
@@ -239,6 +238,7 @@ const ChatWidget = () => {
                             <Send size={16} />
                         </button>
                     </form>
+                    </div>
                 </div>
             )}
         </>

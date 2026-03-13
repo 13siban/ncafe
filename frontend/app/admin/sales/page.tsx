@@ -14,10 +14,19 @@ import { OrdersTable } from './_components/OrdersTable/OrdersTable';
 import { MenuRankingTable } from './_components/MenuRankingTable/MenuRankingTable';
 import { CategoryPieChart } from './_components/CategoryPieChart/CategoryPieChart';
 
+import { OrderDetailModal } from '../orders/_components/OrderDetailModal/OrderDetailModal';
+import { OrderFull } from '../orders/types';
+import { fetchAPI } from '@/app/lib/api';
+import toast from 'react-hot-toast';
+
 export default function SalesAnalysisPage() {
     const [period, setPeriod] = useState<SalesPeriod>('daily');
     const [currentDate, setCurrentDate] = useState(new Date());
     const [activeTab, setActiveTab] = useState('summary');
+
+    const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+    const [selectedOrder, setSelectedOrder] = useState<OrderFull | null>(null);
+    const [loadingDetail, setLoadingDetail] = useState(false);
 
     const {
         summary,
@@ -44,6 +53,39 @@ export default function SalesAnalysisPage() {
             const d = new Date(currentDate);
             d.setMonth(d.getMonth() + 1);
             setCurrentDate(d);
+        }
+    };
+
+    const handleOrderClick = async (id: number) => {
+        setLoadingDetail(true);
+        setSelectedOrderId(id);
+        try {
+            const data = await fetchAPI(`/admin/orders/${id}`);
+            setSelectedOrder(data);
+        } catch (error) {
+            console.error('Failed to fetch order detail:', error);
+            toast.error('주문 상세 정보를 가져오지 못했습니다.');
+            setSelectedOrderId(null);
+        } finally {
+            setLoadingDetail(false);
+        }
+    };
+
+    const closeDetail = () => {
+        setSelectedOrderId(null);
+        setSelectedOrder(null);
+    };
+
+    const handleStatusChange = async (id: number, newStatus: string) => {
+        try {
+            await fetchAPI(`/admin/orders/${id}/status`, {
+                method: 'PUT',
+                body: JSON.stringify({ status: newStatus }),
+            });
+            toast.success('주문 상태가 업데이트되었습니다.');
+            handleOrderClick(id); // Refresh detail
+        } catch (error) {
+            toast.error('상태 변경에 실패했습니다.');
         }
     };
 
@@ -88,7 +130,7 @@ export default function SalesAnalysisPage() {
 
                 {activeTab === 'orders' && (
                     <div className={styles.tabContent}>
-                        <OrdersTable orders={orders} />
+                        <OrdersTable orders={orders} onRowClick={handleOrderClick} />
                     </div>
                 )}
 
@@ -101,6 +143,15 @@ export default function SalesAnalysisPage() {
                     </div>
                 )}
             </div>
+
+            {selectedOrderId && selectedOrder && (
+                <OrderDetailModal
+                    order={selectedOrder}
+                    onClose={closeDetail}
+                    onStatusChange={handleStatusChange}
+                    onRejectClick={() => toast('주문 거절은 지원되지 않습니다.')}
+                />
+            )}
         </div>
     );
 }

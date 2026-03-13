@@ -48,11 +48,11 @@ public class GetDashboardStatsService implements GetDashboardStatsUseCase {
         long prevOrderCount = prevOrders.size();
         
         long totalSales = currentOrders.stream()
-                .filter(o -> o.getStatus() == OrderStatus.COMPLETED)
+                .filter(o -> o.getStatus() == OrderStatus.COMPLETED || o.getStatus() == OrderStatus.PICKED_UP)
                 .mapToLong(o -> o.getTotalPrice())
                 .sum();
         long prevTotalSales = prevOrders.stream()
-                .filter(o -> o.getStatus() == OrderStatus.COMPLETED)
+                .filter(o -> o.getStatus() == OrderStatus.COMPLETED || o.getStatus() == OrderStatus.PICKED_UP)
                 .mapToLong(o -> o.getTotalPrice())
                 .sum();
         
@@ -63,7 +63,7 @@ public class GetDashboardStatsService implements GetDashboardStatsUseCase {
                            + prevOrders.stream().filter(o -> o.getUserId() == null).count();
 
         long preparingOrders = currentOrders.stream().filter(o -> o.getStatus() == OrderStatus.PREPARING).count();
-        long completedOrders = currentOrders.stream().filter(o -> o.getStatus() == OrderStatus.COMPLETED).count();
+        long completedOrders = currentOrders.stream().filter(o -> o.getStatus() == OrderStatus.COMPLETED || o.getStatus() == OrderStatus.PICKED_UP).count();
         long rejectedOrders = currentOrders.stream().filter(o -> o.getStatus() == OrderStatus.REJECTED).count();
 
         return DashboardStats.builder()

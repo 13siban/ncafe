@@ -7,9 +7,10 @@ import { SalesOrderItem } from '../../types';
 
 interface OrdersTableProps {
     orders: SalesOrderItem[];
+    onRowClick?: (id: number) => void;
 }
 
-export function OrdersTable({ orders }: OrdersTableProps) {
+export function OrdersTable({ orders, onRowClick }: OrdersTableProps) {
     return (
         <div className={styles.tableCard}>
             <h3 className={styles.sectionTitle}>완료된 주문 내역</h3>
@@ -26,7 +27,11 @@ export function OrdersTable({ orders }: OrdersTableProps) {
                     </thead>
                     <tbody>
                         {orders.length > 0 ? orders.map(order => (
-                            <tr key={order.id}>
+                            <tr 
+                                key={order.id} 
+                                onClick={() => onRowClick && onRowClick(order.id)}
+                                className={onRowClick ? styles.clickableRow : ''}
+                            >
                                 <td>{order.displayNumber}</td>
                                 <td>{order.customerName} {order.isGuest ? '(비회원)' : ''}</td>
                                 <td className={styles.summaryCell}>{order.summary}</td>

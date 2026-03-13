@@ -22,7 +22,7 @@
 }
 
 .orderNumber {
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     font-weight: 700;
     font-size: 1.25rem;
 }
@@ -33,7 +33,7 @@
 }
 
 .sectionLabel {
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     font-size: 0.875rem;
     font-weight: 700;
     margin-bottom: 0.75rem;

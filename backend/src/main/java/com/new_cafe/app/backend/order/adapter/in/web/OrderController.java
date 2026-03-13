@@ -3,6 +3,7 @@ package com.new_cafe.app.backend.order.adapter.in.web;
 import com.new_cafe.app.backend.auth.domain.model.User;
 import com.new_cafe.app.backend.order.application.port.in.CreateOrderUseCase;
 import com.new_cafe.app.backend.order.application.port.in.GetOrderUseCase;
+import com.new_cafe.app.backend.order.application.port.in.ManageOrderStatusUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,6 +19,7 @@ public class OrderController {
 
     private final CreateOrderUseCase createOrderUseCase;
     private final GetOrderUseCase getOrderUseCase;
+    private final ManageOrderStatusUseCase manageOrderStatusUseCase;
 
     @PostMapping
     public ResponseEntity<CreateOrderUseCase.OrderResponse> createOrder(@RequestBody CreateOrderUseCase.CreateOrderCommand command, @AuthenticationPrincipal User user) {
@@ -46,6 +48,13 @@ public class OrderController {
     @GetMapping("/{date}/{number}")
     public ResponseEntity<GetOrderUseCase.OrderDto> getOrder(@PathVariable String date, @PathVariable Integer number) {
         return ResponseEntity.ok(getOrderUseCase.getOrder(LocalDate.parse(date), number));
+    }
+
+    @PutMapping("/{date}/{number}/pickup")
+    public ResponseEntity<?> pickupOrder(@PathVariable String date, @PathVariable Integer number) {
+        GetOrderUseCase.OrderDto order = getOrderUseCase.getOrder(LocalDate.parse(date), number);
+        manageOrderStatusUseCase.changeOrderStatus(order.getId(), "PICKED_UP");
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/my")

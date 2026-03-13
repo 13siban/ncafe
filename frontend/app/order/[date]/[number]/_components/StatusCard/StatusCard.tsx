@@ -34,9 +34,10 @@ const STATUS_INFO: Record<OrderStatus, StatusInfo> = {
 
 interface StatusCardProps {
     order: OrderDetail;
+    onPickup?: () => void;
 }
 
-export function StatusCard({ order }: StatusCardProps) {
+export function StatusCard({ order, onPickup }: StatusCardProps) {
     const currentStatus = STATUS_INFO[order.status];
     const statusSteps: OrderStatus[] = ['PREPARING', 'COMPLETED', 'PICKED_UP'];
     const currentStepIndex = statusSteps.indexOf(order.status);
@@ -68,6 +69,17 @@ export function StatusCard({ order }: StatusCardProps) {
                         <span className={styles.stepLabel}>수령완료</span>
                     </div>
                 </div>
+            )}
+
+            {order.status === 'COMPLETED' && onPickup && (
+                <button 
+                    onClick={onPickup}
+                    className={styles.primaryButton}
+                    style={{ width: '100%', marginTop: '1rem', border: 'none', cursor: 'pointer' }}
+                >
+                    <ShoppingBag size={20} />
+                    픽업 완료 확인
+                </button>
             )}
 
             {isRejected && (

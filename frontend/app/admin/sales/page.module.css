@@ -284,6 +284,15 @@
     border-bottom: none;
 }
 
+.clickableRow {
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.clickableRow:hover {
+    background-color: var(--color-gray-50);
+}
+
 .summaryCell {
     max-width: 300px;
     white-space: nowrap;

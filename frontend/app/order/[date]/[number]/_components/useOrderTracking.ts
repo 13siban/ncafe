@@ -38,11 +38,25 @@ export function useOrderTracking(date: string, number: string) {
         return () => clearInterval(interval);
     }, [fetchOrder, order?.status]);
 
+    const markAsPickedUp = async () => {
+        try {
+            setLoading(true);
+            await fetchAPI(`/orders/${date}/${number}/pickup`, { method: 'PUT' });
+            await fetchOrder();
+        } catch (error) {
+            console.error("Failed to mark order as picked up:", error);
+            alert("픽업 완료 처리 중 오류가 발생했습니다.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return {
         order,
         loading,
         lastUpdated,
         isRefreshing,
-        fetchOrder
+        fetchOrder,
+        markAsPickedUp
     };
 }

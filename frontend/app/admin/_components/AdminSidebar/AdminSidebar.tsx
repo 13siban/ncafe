@@ -129,8 +129,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
         </button>
 
         {/* Logo */}
+        {/* Logo */}
         <div className={styles.logo}>
-          <Logo variant="black" className={styles.adminLogo} />
+          <Link href="/" className={styles.logoLink}>
+            <Logo variant="black" className={styles.adminLogo} />
+          </Link>
           <div className={styles.logoInfo}>
             <div className={styles.logoText}>mymyy</div>
             <div className={styles.logoSubtext}>Admin Panel</div>

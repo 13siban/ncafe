@@ -34,14 +34,40 @@
     z-index: 1000;
     width: 380px;
     height: 520px;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease;
+}
+
+.chatWindowInner {
+    flex: 1;
     background: var(--bg-primary);
     border-radius: var(--radius-xl);
     box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    animation: slideUp 0.3s ease;
     border: 1px solid var(--color-gray-200);
+}
+
+.chatWindow::before {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    right: 18px; 
+    border-width: 10px 10px 0;
+    border-style: solid;
+    border-color: var(--color-gray-200) transparent transparent transparent;
+}
+
+.chatWindow::after {
+    content: '';
+    position: absolute;
+    bottom: -8px; /* Slightly up to overlap border smoothly */
+    right: 19px;
+    border-width: 9px 9px 0;
+    border-style: solid;
+    border-color: var(--bg-primary) transparent transparent transparent;
 }
 
 @keyframes slideUp {

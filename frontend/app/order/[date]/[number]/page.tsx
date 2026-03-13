@@ -13,7 +13,7 @@ import { LoadingState, NotFoundState } from "./_components/TrackingStates";
 
 export default function OrderTrackingPage() {
     const { date, number } = useParams();
-    const { order, loading, lastUpdated, isRefreshing } = useOrderTracking(date as string, number as string);
+    const { order, loading, lastUpdated, isRefreshing, markAsPickedUp } = useOrderTracking(date as string, number as string);
 
     if (loading && !order) {
         return <LoadingState />;
@@ -28,7 +28,7 @@ export default function OrderTrackingPage() {
             <TrackingHeader lastUpdated={lastUpdated} isRefreshing={isRefreshing} />
 
             <main className={styles.container}>
-                <StatusCard order={order} />
+                <StatusCard order={order} onPickup={markAsPickedUp} />
                 <OrderDetailsSummary order={order} />
                 <TrackingFooter />
             </main>

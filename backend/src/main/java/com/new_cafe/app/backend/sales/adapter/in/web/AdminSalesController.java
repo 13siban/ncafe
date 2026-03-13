@@ -42,7 +42,11 @@ public class AdminSalesController {
             end = date.withDayOfMonth(date.lengthOfMonth());
         }
 
-        return getOrderUseCase.getOrdersByRange("COMPLETED", start, end);
+        List<GetOrderUseCase.OrderListDto> allOrders = getOrderUseCase.getOrdersByRange(null, start, end);
+        return allOrders.stream()
+                .filter(o -> o.getStatus() != null && 
+                             (o.getStatus().name().equals("COMPLETED") || o.getStatus().name().equals("PICKED_UP")))
+                .toList();
     }
 
     @GetMapping("/menu-ranking")
