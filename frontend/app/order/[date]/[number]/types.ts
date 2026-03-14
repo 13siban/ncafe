@@ -12,6 +12,8 @@ export interface OrderDetail {
     totalPrice: number;
     memo: string;
     rejectReason?: string;
+    usedPoints?: number;
+    earnPoints?: number;
     createdAt: string;
     items: {
         menuName: string;

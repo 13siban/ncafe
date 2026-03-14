@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import styles from './LoginForm.module.css';
-import { authAPI } from '@/app/lib/api';
+import { authAPI, userAPI } from '@/app/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
 
 const LoginForm = () => {
@@ -14,6 +14,11 @@ const LoginForm = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+
+    // 탈퇴 복구 모달
+    const [showRestoreModal, setShowRestoreModal] = useState(false);
+    const [deleteInfo, setDeleteInfo] = useState<{ deletedAt: string; daysRemaining: number } | null>(null);
+    const [isRestoring, setIsRestoring] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -44,9 +49,34 @@ const LoginForm = () => {
             router.push(redirect);
             router.refresh(); // 서버 컴포넌트 재검증
         } catch (err: any) {
-            setError(err.message || '로그인 중 오류가 발생했습니다.');
+            const msg = err.message || '';
+            if (msg.startsWith('ACCOUNT_DELETED|')) {
+                const parts = msg.split('|');
+                setDeleteInfo({
+                    deletedAt: parts[1],
+                    daysRemaining: parseInt(parts[2]) || 0
+                });
+                setShowRestoreModal(true);
+                setError('');
+            } else {
+                setError(msg || '로그인 중 오류가 발생했습니다.');
+            }
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleRestore = async () => {
+        setIsRestoring(true);
+        try {
+            const res = await userAPI.restoreAccount(username, password);
+            alert(res.message || '계정이 복구되었습니다.');
+            setShowRestoreModal(false);
+            setDeleteInfo(null);
+        } catch (err: any) {
+            alert(err.message || '복구 중 오류가 발생했습니다.');
+        } finally {
+            setIsRestoring(false);
         }
     };
 
@@ -103,6 +133,40 @@ const LoginForm = () => {
                     </Link>
                 </div>
             </form>
+
+            {/* 탈퇴 복구 모달 */}
+            {showRestoreModal && deleteInfo && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalContent}>
+                        <h2 style={{ marginBottom: '12px', color: '#e74c3c' }}>⚠️ 탈퇴 요청된 계정</h2>
+                        <p style={{ fontSize: '0.9rem', color: '#666', lineHeight: 1.6, marginBottom: '16px' }}>
+                            이 계정은 탈퇴 요청된 상태입니다.<br/>
+                            <strong>탈퇴 요청일:</strong> {new Date(deleteInfo.deletedAt + 'T00:00:00').toLocaleDateString('ko-KR')}<br/>
+                            <strong>삭제 예정일:</strong> {(() => {
+                                const d = new Date(deleteInfo.deletedAt + 'T00:00:00');
+                                d.setDate(d.getDate() + 30);
+                                return d.toLocaleDateString('ko-KR');
+                            })()}<br/>
+                            <strong>복구 가능 기간:</strong> 탈퇴 요청 후 30일 이내 ({deleteInfo.daysRemaining}일 남음)
+                        </p>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            <button
+                                className={styles.restoreBtn}
+                                onClick={handleRestore}
+                                disabled={isRestoring}
+                            >
+                                {isRestoring ? '복구 중...' : '🔄 계정 복구'}
+                            </button>
+                            <button
+                                className={styles.modalCloseBtn}
+                                onClick={() => { setShowRestoreModal(false); setDeleteInfo(null); }}
+                            >
+                                닫기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -13,6 +13,8 @@ interface SessionUser {
     email: string;
     nickname: string;
     role: string;
+    grade?: string;
+    pointBalance?: number;
 }
 
 import { Logo } from '../Logo/Logo';
@@ -23,6 +25,16 @@ const Header = () => {
     const [user, setUser] = useState<SessionUser | null>(null);
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
+
+    const getGradeBadge = (grade?: string) => {
+        switch(grade) {
+            case 'GREEN_BEAN': return { text: '🌱 Green Bean', bg: '#8BC34A', color: '#fff' };
+            case 'GOLDEN_BROWN': return { text: '✨ Golden Brown', bg: '#D4A574', color: '#fff' };
+            case 'DEEP_BROWN': return { text: '🫘 Deep Brown', bg: '#6D4C41', color: '#fff' };
+            case 'BLACK_ROAST': return { text: '🖤 Black Roast', bg: '#212121', color: '#fff' };
+            default: return null;
+        }
+    };
 
     const cartItemsCount = useCartStore((state) => state.getTotalItems());
 
@@ -106,7 +118,31 @@ const Header = () => {
                     )}
                     <div className={styles.authLinks}>
                         {isMounted && user ? (
-                            <div className={styles.userSection}>
+                            <div className={styles.userSection} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                {user.grade && (() => {
+                                    const badge = getGradeBadge(user.grade);
+                                    if (!badge) return null;
+                                    return (
+                                        <span style={{
+                                            background: badge.bg, color: badge.color, 
+                                            padding: '2px 8px', borderRadius: '12px', 
+                                            fontSize: '0.75rem', fontWeight: 600,
+                                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                        }}>
+                                            {badge.text}
+                                        </span>
+                                    );
+                                })()}
+                                
+                                {user.pointBalance !== undefined && (
+                                    <span style={{
+                                        fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-primary-600)',
+                                        marginRight: '8px'
+                                    }}>
+                                        {user.pointBalance.toLocaleString()} P
+                                    </span>
+                                )}
+
                                 <span className={styles.username}>{user.nickname}님</span>
                                 <button onClick={handleLogout} className={styles.logoutButton}>
                                     Logout

@@ -90,3 +90,43 @@
 .error {
     color: #c81e1e;
 }
+
+.lockBtn {
+    background: rgba(231, 76, 60, 0.1);
+    border: 1px solid rgba(231, 76, 60, 0.3);
+    color: #e74c3c;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.lockBtn:hover {
+    background: rgba(231, 76, 60, 0.2);
+}
+
+.lockBtn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.unlockBtn {
+    background: rgba(46, 204, 113, 0.1);
+    border: 1px solid rgba(46, 204, 113, 0.3);
+    color: #27ae60;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.unlockBtn:hover {
+    background: rgba(46, 204, 113, 0.2);
+}
+
+.unlockBtn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}

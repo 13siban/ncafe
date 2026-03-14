@@ -84,6 +84,8 @@ public class AuthController {
                 .nickname(user.getNickname() != null ? user.getNickname() : username)
                 .phoneNumber(user.getPhoneNumber())
                 .role(role)
+                .grade(user.getGrade())
+                .pointBalance(user.getPointBalance() != null ? user.getPointBalance() : 0)
                 .build()))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body((MeResponse) null));

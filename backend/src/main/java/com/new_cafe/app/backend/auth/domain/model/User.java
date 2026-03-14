@@ -35,8 +35,47 @@ public class User implements UserDetails {
     private String password;
     private String role;
 
+    @Column(name = "grade")
+    private String grade;
+
+    @Column(name = "total_order_count")
+    private Integer totalOrderCount;
+
+    @Column(name = "total_order_amount")
+    private Integer totalOrderAmount;
+
+    @Column(name = "point_balance")
+    private Integer pointBalance;
+
+    @Column(name = "is_enabled")
+    private Boolean isEnabled;
+
+    @Column(name = "deleted_at")
+    private java.time.LocalDateTime deletedAt;
+
     public void updateRole(String role) {
         this.role = role;
+    }
+
+    public void updateGrade(String grade) {
+        this.grade = grade;
+    }
+
+    public void addOrderStats(int amount) {
+        if (this.totalOrderCount == null) this.totalOrderCount = 0;
+        if (this.totalOrderAmount == null) this.totalOrderAmount = 0;
+        this.totalOrderCount++;
+        this.totalOrderAmount += amount;
+    }
+
+    public void addPoints(int amount) {
+        if (this.pointBalance == null) this.pointBalance = 0;
+        this.pointBalance += amount;
+    }
+
+    public void subtractPoints(int amount) {
+        if (this.pointBalance == null) this.pointBalance = 0;
+        this.pointBalance -= amount;
     }
 
     public void updateProfile(String nickname, String email, String phoneNumber) {
@@ -49,6 +88,22 @@ public class User implements UserDetails {
         this.password = password;
     }
 
+    public void requestDeletion() {
+        this.deletedAt = java.time.LocalDateTime.now();
+    }
+
+    public void restoreAccount() {
+        this.deletedAt = null;
+    }
+
+    public void lock() {
+        this.isEnabled = false;
+    }
+
+    public void unlock() {
+        this.isEnabled = true;
+    }
+
     private java.time.LocalDateTime createdAt;
     private java.time.LocalDateTime updatedAt;
 
@@ -56,6 +111,11 @@ public class User implements UserDetails {
     public void prePersist() {
         this.createdAt = java.time.LocalDateTime.now();
         this.updatedAt = java.time.LocalDateTime.now();
+        if (this.grade == null) this.grade = "GREEN_BEAN";
+        if (this.totalOrderCount == null) this.totalOrderCount = 0;
+        if (this.totalOrderAmount == null) this.totalOrderAmount = 0;
+        if (this.pointBalance == null) this.pointBalance = 0;
+        if (this.isEnabled == null) this.isEnabled = true;
     }
 
     @PreUpdate
@@ -90,6 +150,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.isEnabled != null ? this.isEnabled : true;
     }
 }

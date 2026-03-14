@@ -13,9 +13,12 @@ import com.new_cafe.app.backend.order.application.port.out.OrderRepositoryPort;
 import com.new_cafe.app.backend.order.domain.model.Order;
 import com.new_cafe.app.backend.order.domain.model.OrderItem;
 import com.new_cafe.app.backend.order.domain.model.OrderStatus;
+import com.new_cafe.app.backend.user.grade.application.service.UserGradeService;
+import com.new_cafe.app.backend.user.grade.adapter.in.web.dto.UserGradeResponse;
 import com.new_cafe.app.backend.payment.PaymentVerificationService;
 import com.new_cafe.app.backend.store.application.port.in.GetStoreSettingsUseCase;
 import com.new_cafe.app.backend.store.application.port.out.StoreSettingsRepositoryPort;
+import com.new_cafe.app.backend.auth.application.port.in.ManageUserPointUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +43,8 @@ public class CreateOrderService implements CreateOrderUseCase {
     private final OptionItemJpaRepository optionItemRepository;
 
     private final PaymentVerificationService paymentVerificationService;
+    private final UserGradeService userGradeService;
+    private final ManageUserPointUseCase userPointUseCase;
 
     @Override
     @Transactional
@@ -63,7 +68,7 @@ public class CreateOrderService implements CreateOrderUseCase {
 
         List<OrderItem> savedItems = new ArrayList<>();
         List<OrderItemResponse> itemResponses = new ArrayList<>();
-        int totalOrderPrice = 0;
+        int originalTotalPrice = 0;
 
         // --- 1단계: 주문 금액 사전 계산 (결제 검증용) ---
         for (OrderItemCommand itemCommand : command.getItems()) {
@@ -76,8 +81,22 @@ public class CreateOrderService implements CreateOrderUseCase {
                     optionPriceSum += item.getPriceDelta();
                 }
             }
-            totalOrderPrice += (menu.getPrice() + optionPriceSum) * itemCommand.getQuantity();
+            originalTotalPrice += (menu.getPrice() + optionPriceSum) * itemCommand.getQuantity();
         }
+
+        int usedPoints = (command.getUsePoints() != null && command.getUsePoints() > 0) ? command.getUsePoints() : 0;
+        
+        // 포인트 잔액 확인 로직
+        if (userId != null && usedPoints > 0) {
+            int currentBalance = userPointUseCase.getPointBalance(userId);
+            if (currentBalance < usedPoints) {
+                throw new IllegalArgumentException("사용 가능한 포인트가 부족합니다.");
+            }
+        } else if (userId == null && usedPoints > 0) {
+            throw new IllegalArgumentException("포인트 결제는 회원만 가능합니다.");
+        }
+
+        int finalOrderPrice = Math.max(0, originalTotalPrice - usedPoints);
 
         // --- 2단계: 결제 검증 (실제 결제 수단 선택 시 필수) ---
         String paymentStatus = "NONE";
@@ -85,10 +104,18 @@ public class CreateOrderService implements CreateOrderUseCase {
             if (command.getPaymentId() == null || command.getPaymentId().isBlank()) {
                 throw new IllegalArgumentException("실제 결제 수단 사용 시 결제 ID(Payment ID)가 필수입니다.");
             }
-            paymentVerificationService.verifyPayment(command.getPaymentId(), totalOrderPrice);
+            paymentVerificationService.verifyPayment(command.getPaymentId(), finalOrderPrice);
             paymentStatus = "PAID";
         } else {
             paymentStatus = "TEST"; // 테스트 주문임을 표시
+        }
+
+        int earnPoints = 0;
+        if (userId != null && finalOrderPrice > 0) {
+            UserGradeResponse gradeInfo = userGradeService.getUserGradeInfo(userId);
+            if (gradeInfo.getEarnRate() != null && gradeInfo.getEarnRate() > 0) {
+                earnPoints = (int) (finalOrderPrice * (gradeInfo.getEarnRate() / 100.0));
+            }
         }
 
         Order order = Order.builder()
@@ -103,7 +130,9 @@ public class CreateOrderService implements CreateOrderUseCase {
                 .paymentStatus(paymentStatus)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .totalPrice(totalOrderPrice)
+                .totalPrice(finalOrderPrice)
+                .usedPoints(usedPoints)
+                .earnPoints(earnPoints)
                 .build();
 
         Order savedOrder = orderRepository.save(order);
@@ -162,6 +191,20 @@ public class CreateOrderService implements CreateOrderUseCase {
                     .build());
         }
 
+        if (userId != null) {
+            // 포인트 사용
+            if (usedPoints > 0) {
+                userPointUseCase.usePoints(userId, savedOrder.getId().toString(), usedPoints, "주문 결제 포인트 사용");
+            }
+
+            // 포인트 적립 (실 결제 금액 기준)
+            if (earnPoints > 0) {
+                userPointUseCase.earnPoints(userId, savedOrder.getId().toString(), earnPoints, "주문 완료 적립");
+            }
+            
+            userGradeService.addOrderStatsAndCheckGrade(userId, finalOrderPrice);
+        }
+
         return OrderResponse.builder()
                 .orderDate(savedOrder.getOrderDate().toString())
                 .orderNumber(savedOrder.getOrderNumber())
@@ -169,6 +212,8 @@ public class CreateOrderService implements CreateOrderUseCase {
                 .status(savedOrder.getStatus())
                 .customerName(savedOrder.getCustomerName())
                 .totalPrice(savedOrder.getTotalPrice())
+                .usedPoints(usedPoints)
+                .earnPoints(earnPoints)
                 .createdAt(savedOrder.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                 .items(itemResponses)
                 .build();

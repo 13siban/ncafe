@@ -17,6 +17,8 @@ public class Order {
     private String customerName;
     private OrderStatus status;
     private Integer totalPrice;
+    private Integer usedPoints;
+    private Integer earnPoints;
     private String rejectReason;
     private String memo;
     private String paymentId;

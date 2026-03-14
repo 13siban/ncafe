@@ -11,6 +11,7 @@ export interface SessionUser {
     nickname: string;
     role: string;
     phoneNumber?: string;
+    grade?: string;
 }
 
 export interface SessionData {

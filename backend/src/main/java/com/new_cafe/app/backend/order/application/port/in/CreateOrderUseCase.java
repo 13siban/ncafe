@@ -23,6 +23,7 @@ public interface CreateOrderUseCase {
         private List<OrderItemCommand> items;
         private String paymentId;
         private String paymentMethod;
+        private Integer usePoints;
     }
 
     @Getter
@@ -53,6 +54,8 @@ public interface CreateOrderUseCase {
         private OrderStatus status;
         private String customerName;
         private Integer totalPrice;
+        private Integer usedPoints;
+        private Integer earnPoints;
         private String createdAt;
         private List<OrderItemResponse> items;
     }

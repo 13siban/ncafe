@@ -158,6 +158,8 @@ public class GetOrderService implements GetOrderUseCase {
                 .paymentId(order.getPaymentId())
                 .paymentMethod(order.getPaymentMethod())
                 .paymentStatus(order.getPaymentStatus())
+                .usedPoints(order.getUsedPoints())
+                .earnPoints(order.getEarnPoints())
                 .createdAt(order.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                 .items(itemResponses)
                 .build();
@@ -187,6 +189,8 @@ public class GetOrderService implements GetOrderUseCase {
                 .status(order.getStatus())
                 .summary(summary)
                 .totalPrice(order.getTotalPrice())
+                .usedPoints(order.getUsedPoints())
+                .earnPoints(order.getEarnPoints())
                 .createdAt(order.getCreatedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                 .build();
     }

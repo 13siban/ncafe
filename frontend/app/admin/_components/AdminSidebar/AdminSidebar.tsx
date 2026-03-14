@@ -16,6 +16,7 @@ import {
   Sliders,
   BarChart3,
   Brain,
+  Award,
 } from 'lucide-react';
 import styles from './AdminSidebar.module.css';
 import { apiFetch } from '@/lib/api';
@@ -33,6 +34,7 @@ interface NavItem {
 
 const settingsNavItems: NavItem[] = [
   { label: '설정', href: '/admin/settings', icon: <Settings size={20} /> },
+  { label: '등급 설정', href: '/admin/grade-settings', icon: <Award size={20} /> },
 ];
 
 interface AdminSidebarProps {

@@ -12,6 +12,7 @@ import com.new_cafe.app.backend.admin.menu.adapter.out.persistence.AdminMenuJpaE
 import com.new_cafe.app.backend.admin.menu.adapter.out.persistence.AdminMenuJpaRepository;
 import com.new_cafe.app.backend.category.adapter.out.persistence.CategoryJpaRepository;
 import com.new_cafe.app.backend.payment.PaymentVerificationService;
+import com.new_cafe.app.backend.auth.application.port.in.ManageUserPointUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ public class ManageOrderStatusService implements ManageOrderStatusUseCase {
     private final AdminMenuJpaRepository menuRepository;
     private final CategoryJpaRepository categoryRepository;
     private final PaymentVerificationService paymentVerificationService;
+    private final ManageUserPointUseCase userPointUseCase;
 
     @Override
     public void changeOrderStatus(Long id, String statusStr) {
@@ -44,6 +46,8 @@ public class ManageOrderStatusService implements ManageOrderStatusUseCase {
                 .customerName(order.getCustomerName())
                 .status(newStatus)
                 .totalPrice(order.getTotalPrice())
+                .usedPoints(order.getUsedPoints())
+                .earnPoints(order.getEarnPoints())
                 .rejectReason(order.getRejectReason())
                 .memo(order.getMemo())
                 .paymentId(order.getPaymentId())
@@ -56,8 +60,18 @@ public class ManageOrderStatusService implements ManageOrderStatusUseCase {
         orderRepository.save(updatedOrder);
 
         // 결제 취소 처리: CANCELLED 상태로 변경될 때 (주문자 취소 등)
-        if (newStatus == OrderStatus.CANCELLED && order.getPaymentId() != null) {
-            paymentVerificationService.cancelPayment(order.getPaymentId(), "고객 또는 관리자에 의한 주문 취소");
+        if (newStatus == OrderStatus.CANCELLED) {
+            if (order.getPaymentId() != null) {
+                paymentVerificationService.cancelPayment(order.getPaymentId(), "고객 또는 관리자에 의한 주문 취소");
+            }
+            if (order.getUserId() != null) {
+                if (order.getUsedPoints() != null && order.getUsedPoints() > 0) {
+                    userPointUseCase.cancelPoints(order.getUserId(), order.getId().toString(), order.getUsedPoints(), "주문 취소 환급");
+                }
+                if (order.getEarnPoints() != null && order.getEarnPoints() > 0) {
+                    userPointUseCase.usePoints(order.getUserId(), order.getId().toString(), order.getEarnPoints(), "주문 취소 적립 회수");
+                }
+            }
         }
 
         // When status moves to COMPLETED or PICKED_UP from a non-final state, aggregate daily sales
@@ -81,6 +95,8 @@ public class ManageOrderStatusService implements ManageOrderStatusUseCase {
                 .customerName(order.getCustomerName())
                 .status(OrderStatus.REJECTED)
                 .totalPrice(order.getTotalPrice())
+                .usedPoints(order.getUsedPoints())
+                .earnPoints(order.getEarnPoints())
                 .rejectReason(reason) // required
                 .memo(order.getMemo())
                 .paymentId(order.getPaymentId())
@@ -95,6 +111,14 @@ public class ManageOrderStatusService implements ManageOrderStatusUseCase {
         // 결제 취소 처리: 주문 거절 시 자동 환불
         if (order.getPaymentId() != null) {
             paymentVerificationService.cancelPayment(order.getPaymentId(), "주문 거절: " + reason);
+        }
+        if (order.getUserId() != null) {
+            if (order.getUsedPoints() != null && order.getUsedPoints() > 0) {
+                userPointUseCase.cancelPoints(order.getUserId(), order.getId().toString(), order.getUsedPoints(), "주문 거절 환급");
+            }
+            if (order.getEarnPoints() != null && order.getEarnPoints() > 0) {
+                userPointUseCase.usePoints(order.getUserId(), order.getId().toString(), order.getEarnPoints(), "주문 거절 적립 회수");
+            }
         }
     }
 

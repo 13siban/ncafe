@@ -64,6 +64,7 @@ async function unifiedHandler(req: NextRequest) {
                 nickname: user.nickname,
                 role: user.role,
                 phoneNumber: user.phoneNumber,
+                grade: user.grade,
             } : {
                 id: tokenData.username,
                 email: tokenData.username,
@@ -101,6 +102,7 @@ async function unifiedHandler(req: NextRequest) {
                     nickname: user.nickname,
                     role: user.role,
                     phoneNumber: user.phoneNumber,
+                    grade: user.grade,
                 };
                 await session.save();
             }

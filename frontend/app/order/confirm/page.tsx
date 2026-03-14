@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/useCartStore";
-import { authAPI } from "@/app/lib/api";
+import { authAPI, userAPI } from "@/app/lib/api";
 import { ChevronLeft, ShoppingBag, ClipboardList, User, MessageCircle, CreditCard, Loader2 } from "lucide-react";
 import styles from "./page.module.css";
 
@@ -25,6 +25,17 @@ export default function OrderConfirmPage() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("KAKAOPAY");
 
+    const [gradeName, setGradeName] = useState("");
+    const [pointBalance, setPointBalance] = useState(0);
+    const [usePoints, setUsePoints] = useState<number | string>("");
+    const [earnRate, setEarnRate] = useState(0);
+
+    const originalTotalPrice = getTotalPrice();
+    const parsedUsePoints = typeof usePoints === 'number' ? usePoints : (parseInt(usePoints, 10) || 0);
+    const validUsePoints = Math.floor(Math.min(parsedUsePoints, pointBalance, originalTotalPrice) / 100) * 100;
+    const finalPrice = Math.max(0, originalTotalPrice - validUsePoints);
+    const estimatedEarnPoints = (finalPrice > 0 && earnRate > 0) ? Math.floor(finalPrice * (earnRate / 100)) : 0;
+
     useEffect(() => {
         setIsMounted(true);
         const fetchSession = async () => {
@@ -35,6 +46,25 @@ export default function OrderConfirmPage() {
                     setEmail(session.user.email || "");
                     setPhone(session.user.phoneNumber || "");
                     setIsLoggedIn(true);
+
+                    try {
+                        const gradeInfo = await userAPI.getGradeInfo();
+                        if (gradeInfo) {
+                            setGradeName(gradeInfo.currentGradeName || "");
+                            setEarnRate(gradeInfo.earnRate || 0);
+                        }
+                    } catch (e) {
+                        console.error("Failed to fetch grade info", e);
+                    }
+
+                    try {
+                        const pointInfo = await userAPI.getPointBalance();
+                        if (pointInfo && pointInfo.pointBalance !== undefined) {
+                            setPointBalance(pointInfo.pointBalance);
+                        }
+                    } catch (e) {
+                        console.error("Failed to fetch point balance", e);
+                    }
                 }
             } catch (e) {
                 console.error("Failed to fetch session:", e);
@@ -86,6 +116,7 @@ export default function OrderConfirmPage() {
                 customerName: username,
                 memo: memo,
                 items: orderItems,
+                usePoints: validUsePoints,
                 ...(paymentId && { paymentId }),
                 ...(method && { paymentMethod: method })
             })
@@ -131,7 +162,7 @@ export default function OrderConfirmPage() {
 
             const paymentId = await requestPayment({
                 orderName,
-                totalAmount: getTotalPrice(),
+                totalAmount: finalPrice,
                 method: paymentMethod,
                 customerName: username,
                 customerEmail: finalEmail,
@@ -182,13 +213,77 @@ export default function OrderConfirmPage() {
                             </div>
                         ))}
                     </div>
+                    {validUsePoints > 0 && (
+                        <div className={styles.totalRow} style={{ borderTop: "none", paddingTop: 0, marginTop: "-8px" }}>
+                            <span className={styles.totalLabel} style={{ color: "var(--color-primary-600)" }}>포인트 사용</span>
+                            <span className={styles.totalValue} style={{ color: "var(--color-primary-600)" }}>
+                                - {new Intl.NumberFormat('ko-KR').format(validUsePoints)} P
+                            </span>
+                        </div>
+                    )}
                     <div className={styles.totalRow}>
                         <span className={styles.totalLabel}>총 결제 금액</span>
                         <span className={styles.totalValue}>
-                            {new Intl.NumberFormat('ko-KR').format(getTotalPrice())}원
+                            {new Intl.NumberFormat('ko-KR').format(finalPrice)}원
                         </span>
                     </div>
                 </div>
+
+                {isLoggedIn && (
+                    <div className={styles.section}>
+                        <h2 className={styles.sectionTitle}>
+                            <span style={{ fontSize: '1.2rem', marginRight: '8px' }}>💰</span> 포인트 사용
+                        </h2>
+                        <div className={styles.formGroup}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.9rem' }}>
+                                <span>
+                                    사용 가능 포인트: <strong>{new Intl.NumberFormat('ko-KR').format(pointBalance)}P</strong>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--color-gray-500)', marginLeft: '6px' }}>(100원 단위 사용)</span>
+                                </span>
+                                {estimatedEarnPoints > 0 && (
+                                    <span style={{ color: 'var(--color-primary-600)' }}>예상 적립: {new Intl.NumberFormat('ko-KR').format(estimatedEarnPoints)}P</span>
+                                )}
+                            </div>
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'stretch' }}>
+                                <div style={{ position: 'relative', flex: 1 }}>
+                                    <input
+                                        type="number"
+                                        step="100"
+                                        min="0"
+                                        max={Math.floor(Math.min(pointBalance, originalTotalPrice) / 100) * 100}
+                                        className={styles.input}
+                                        style={{ width: '100%', textAlign: 'right', fontSize: '1.1rem', padding: '12px 50px 12px 16px', fontWeight: '600' }}
+                                        value={usePoints}
+                                        onChange={(e) => {
+                                            let v = e.target.value;
+                                            setUsePoints(v === "" ? "" : parseInt(v, 10));
+                                        }}
+                                        placeholder="사용할 포인트 입력"
+                                    />
+                                    <span style={{ position: 'absolute', right: '32px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-gray-500)', fontWeight: '600', pointerEvents: 'none' }}>P</span>
+                                </div>
+                                <button
+                                    type="button"
+                                    style={{ 
+                                        width: 'auto', 
+                                        whiteSpace: 'nowrap', 
+                                        padding: '0 20px', 
+                                        background: 'var(--bg-secondary)', 
+                                        color: 'var(--text-secondary)', 
+                                        border: '1.5px solid var(--border)', 
+                                        borderRadius: 'var(--radius-md)', 
+                                        fontWeight: '600',
+                                        fontSize: '0.95rem',
+                                        cursor: 'pointer'
+                                    }}
+                                    onClick={() => setUsePoints(Math.floor(Math.min(pointBalance, originalTotalPrice) / 100) * 100)}
+                                >
+                                    전액 사용
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* 2. Customer Info Section */}
                 <div className={styles.section}>
@@ -289,10 +384,10 @@ export default function OrderConfirmPage() {
                     <button
                         className={styles.orderButton}
                         onClick={handlePaymentOrder}
-                        disabled={isOrdering || items.length === 0 || !username.trim()}
+                        disabled={isOrdering || items.length === 0 || !username.trim() || finalPrice < 0}
                     >
                         <CreditCard size={20} />
-                        {new Intl.NumberFormat('ko-KR').format(getTotalPrice())}원 결제하기
+                        {new Intl.NumberFormat('ko-KR').format(finalPrice)}원 결제하기
                     </button>
                 </div>
             </main>

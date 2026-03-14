@@ -186,6 +186,30 @@ export const userAPI = {
 
     /** 자주 주문한 메뉴 Top 5 조회 */
     getTopMenus: () => fetchAPI('/users/me/top-menus', { skipRedirect: true }),
+
+    /** 등급 정보 조회 */
+    getGradeInfo: () => fetchAPI('/users/me/grade', { skipRedirect: true }),
+
+    /** 계정 탈퇴 요청 (soft delete) */
+    deleteAccount: (password: string) =>
+        fetchAPI('/users/me', {
+            method: 'DELETE',
+            body: JSON.stringify({ password }),
+        }),
+
+    /** 탈퇴 취소 (복구) */
+    restoreAccount: (username: string, password: string) =>
+        fetchAPI('/users/me/restore', {
+            method: 'POST',
+            body: JSON.stringify({ username, password }),
+            skipRedirect: true,
+        }),
+
+    /** 포인트 잔액 조회 */
+    getPointBalance: () => fetchAPI('/users/me/points', { skipRedirect: true }),
+
+    /** 포인트 내역 조회 */
+    getPointHistory: (page: number = 0, size: number = 20) => fetchAPI(`/users/me/points/history?page=${page}&size=${size}`, { skipRedirect: true }),
 };
 
 // 사용자 즐겨찾기 API 모음

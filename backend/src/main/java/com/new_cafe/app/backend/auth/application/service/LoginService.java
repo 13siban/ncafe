@@ -3,6 +3,8 @@ package com.new_cafe.app.backend.auth.application.service;
 import com.new_cafe.app.backend.auth.application.port.in.LoginUseCase;
 import com.new_cafe.app.backend.auth.application.port.out.LoadUserPort;
 import com.new_cafe.app.backend.auth.domain.model.User;
+import com.new_cafe.app.backend.store.adapter.out.persistence.StoreSettingsJpaEntity;
+import com.new_cafe.app.backend.store.adapter.out.persistence.StoreSettingsJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.new_cafe.app.backend.config.security.JwtTokenProvider;
@@ -21,6 +23,7 @@ public class LoginService implements LoginUseCase {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final LoadUserPort loadUserPort;
+    private final StoreSettingsJpaRepository storeSettingsRepository;
 
     @Override
     public Result login(Command command) {
@@ -35,6 +38,28 @@ public class LoginService implements LoginUseCase {
         // 2. 비밀번호 일치 여부 확인
         if (!passwordEncoder.matches(command.getPassword(), user.getPassword())) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 3. 계정 잠금 여부 확인
+        if (!user.isEnabled()) {
+            String contactNumber = storeSettingsRepository.findById(1)
+                    .map(StoreSettingsJpaEntity::getContactNumber)
+                    .orElse(null);
+            String contactMsg = (contactNumber != null && !contactNumber.isBlank()) 
+                    ? " 대표전화: " + contactNumber 
+                    : "";
+            throw new RuntimeException("계정이 잠겨 있습니다. 관리자에게 문의해주세요." + contactMsg);
+        }
+
+        // 4. 탈퇴 요청 여부 확인
+        if (user.getDeletedAt() != null) {
+            long daysRemaining = java.time.temporal.ChronoUnit.DAYS.between(
+                    java.time.LocalDateTime.now(), user.getDeletedAt().plusDays(30));
+            if (daysRemaining <= 0) {
+                throw new RuntimeException("탈퇴 처리가 완료된 계정입니다.");
+            }
+            String deletedDate = user.getDeletedAt().toLocalDate().toString(); // yyyy-MM-dd
+            throw new RuntimeException("ACCOUNT_DELETED|" + deletedDate + "|" + daysRemaining);
         }
 
         try {

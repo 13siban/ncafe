@@ -10,7 +10,73 @@
 .pageWrapper {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    height: 100vh;
+}
+
+.gradeCard {
+    background: linear-gradient(135deg, #2b2b2b 0%, #1a1a1a 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.gradeCardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.gradeName {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.gradeBenefits {
+    display: flex;
+    gap: 16px;
+    font-size: 0.875rem;
+    opacity: 0.9;
+}
+
+.gradeProgressContainer {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 16px;
+    border-radius: 8px;
+}
+
+.progressLabel {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    margin-bottom: 8px;
+}
+
+.progressBar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.progressFill {
+    height: 100%;
+    background: #FFD700;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.nextGradeInfo {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: space-between;
+    line-height: 1.4;
 }
 
 .container {
@@ -444,4 +510,89 @@
     font-size: 0.875rem;
     color: var(--color-gray-500);
     font-weight: 500;
+}
+
+/* 계정 탈퇴 위험 영역 */
+.dangerSection {
+    border: 1px solid rgba(231, 76, 60, 0.2);
+    border-radius: 12px;
+    padding: 24px;
+    background: rgba(231, 76, 60, 0.03);
+    margin-top: 32px;
+}
+
+.dangerBtn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dangerBtn:hover {
+    background: #c0392b;
+    transform: translateY(-1px);
+}
+
+.cancelBtn {
+    background: #666;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cancelBtn:hover {
+    background: #555;
+}
+
+.deleteConfirmBox {
+    background: rgba(231, 76, 60, 0.05);
+    border: 1px solid rgba(231, 76, 60, 0.15);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.deleteInput {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: white;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.deleteInput:focus {
+    border-color: #e74c3c;
+}
+
+/* 관리자 잠금 배지 */
+.lockBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.lockBadgeLocked {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+.lockBadgeActive {
+    background: rgba(46, 204, 113, 0.1);
+    color: #27ae60;
 }

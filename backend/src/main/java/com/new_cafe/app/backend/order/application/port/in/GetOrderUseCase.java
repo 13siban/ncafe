@@ -43,6 +43,8 @@ public interface GetOrderUseCase {
         private String paymentId;
         private String paymentMethod;
         private String paymentStatus;
+        private Integer usedPoints;
+        private Integer earnPoints;
         private String createdAt;
         private List<CreateOrderUseCase.OrderItemResponse> items;
     }
@@ -59,6 +61,8 @@ public interface GetOrderUseCase {
         private OrderStatus status;
         private String summary;
         private Integer totalPrice;
+        private Integer usedPoints;
+        private Integer earnPoints;
         private String createdAt;
     }
 

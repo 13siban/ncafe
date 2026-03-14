@@ -9,6 +9,10 @@ import com.new_cafe.app.backend.admin.menu.adapter.out.persistence.AdminMenuImag
 import com.new_cafe.app.backend.menuoption.adapter.out.persistence.*;
 import com.new_cafe.app.backend.store.adapter.out.persistence.StoreSettingsJpaEntity;
 import com.new_cafe.app.backend.store.adapter.out.persistence.StoreSettingsJpaRepository;
+import com.new_cafe.app.backend.user.grade.adapter.out.persistence.GradeSettingsJpaEntity;
+import com.new_cafe.app.backend.user.grade.adapter.out.persistence.GradeSettingsJpaRepository;
+import com.new_cafe.app.backend.user.grade.adapter.out.persistence.GradeSystemConfigJpaEntity;
+import com.new_cafe.app.backend.user.grade.adapter.out.persistence.GradeSystemConfigJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.new_cafe.app.backend.auth.adapter.out.persistence.UserJpaRepository;
@@ -38,6 +42,8 @@ public class DataInitializer implements CommandLineRunner {
     private final CategoryOptionGroupMapJpaRepository categoryOptionGroupMapRepository;
     private final MenuOptionExclusionJpaRepository menuOptionExclusionRepository;
     private final StoreSettingsJpaRepository storeSettingsRepository;
+    private final GradeSettingsJpaRepository gradeSettingsRepository;
+    private final GradeSystemConfigJpaRepository gradeSystemConfigRepository;
 
     @Override
     @Transactional
@@ -187,6 +193,20 @@ public class DataInitializer implements CommandLineRunner {
             storeSettingsRepository.save(settings);
         }
 
+        if (gradeSettingsRepository.count() == 0) {
+            log.info("Initializing grade settings...");
+            createGradeSetting("GREEN_BEAN", "Green Bean 🌱", 1, null, null, 1);
+            createGradeSetting("GOLDEN_BROWN", "Golden Brown ✨", 2, 10, 50000, 2);
+            createGradeSetting("DEEP_BROWN", "Deep Brown \uD83E\uDDB8", 3, 30, 150000, 3);
+            createGradeSetting("BLACK_ROAST", "Black Roast 🖤", 5, 100, 500000, 4);
+            
+            GradeSystemConfigJpaEntity config = GradeSystemConfigJpaEntity.builder()
+                    .id(1L)
+                    .isEnabled(true)
+                    .build();
+            gradeSystemConfigRepository.save(config);
+        }
+
         log.info("Data initialization completed.");
     }
 
@@ -284,5 +304,18 @@ public class DataInitializer implements CommandLineRunner {
                 .optionGroupId(groupId)
                 .build();
         menuOptionExclusionRepository.save(exclusion);
+    }
+
+    private void createGradeSetting(String grade, String displayName, int earnRate, Integer count, Integer amount, int sortOrder) {
+        GradeSettingsJpaEntity entity = GradeSettingsJpaEntity.builder()
+                .grade(grade)
+                .displayName(displayName)
+                .earnRate(earnRate)
+                .upgradeOrderCount(count)
+                .upgradeOrderAmount(amount)
+                .sortOrder(sortOrder)
+                .updatedAt(LocalDateTime.now())
+                .build();
+        gradeSettingsRepository.save(entity);
     }
 }

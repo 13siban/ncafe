@@ -40,6 +40,12 @@ public class OrderJpaEntity {
     @Column(name = "total_price", nullable = false)
     private Integer totalPrice;
 
+    @Column(name = "used_points")
+    private Integer usedPoints;
+
+    @Column(name = "earn_points")
+    private Integer earnPoints;
+
     @Column(name = "reject_reason")
     private String rejectReason;
 

@@ -36,11 +36,6 @@ public class Menu {
         return Boolean.TRUE.equals(isAvailable) && !Boolean.TRUE.equals(isSoldOut);
     }
 
-    /** 특정 할인율이 적용된 가격 계산 */
-    public int calculateDiscountedPrice(double discountRate) {
-        if (discountRate <= 0) return this.price;
-        return (int) (this.price * (1 - discountRate));
-    }
 
     /** 신상품 여부 확인 (최근 7일 이내 등록) */
     public boolean isNew() {

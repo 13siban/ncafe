@@ -264,16 +264,16 @@
 > 📌 등급 체계 및 `users` 테이블 확장 필드는 상단 **목표 상태 (TO-BE)** 참조
 
 #### 백엔드
-- [ ] `User.java` 엔티티에 등급 관련 필드 추가 (`grade`, `totalOrderCount`, `totalOrderAmount` — 스키마 상단 참조)
-- [ ] `UserGrade` Enum 생성 — 등급 코드 정의 (실제 수치는 DB `grade_settings`에서 조회)
-- [ ] `GradeSettings` 엔티티 + `grade_settings` 테이블 생성 (스키마 상단 참조)
-- [ ] `UserGradeService.java` 신규 생성
+- [x] `User.java` 엔티티에 등급 관련 필드 추가 (`grade`, `totalOrderCount`, `totalOrderAmount` — 스키마 상단 참조)
+- [x] `UserGrade` Enum 생성 — 등급 코드 정의 (실제 수치는 DB `grade_settings`에서 조회)
+- [x] `GradeSettings` 엔티티 + `grade_settings` 테이블 생성 (스키마 상단 참조)
+- [x] `UserGradeService.java` 신규 생성
   - 주문 완료 이벤트 발생 시 누적 횟수/금액 갱신 → **DB의 `grade_settings`에서 승급 조건 조회** → 조건 충족 시 자동 등급 변경
   - `GET /users/me/grade` — 현재 등급, 다음 등급 조건, 진행 상황 조회 (DB에서 동적으로 읽어옴)
-- [ ] `AdminUserController.java`: 회원 등급 수동 변경 API 추가 (`PUT /admin/users/{id}/grade`)
+- [x] `AdminUserController.java`: 회원 등급 수동 변경 API 추가 (`PUT /admin/users/{id}/grade`)
 - [ ] 주문 생성 시 회원 등급에 따른 할인율 자동 적용 로직 (**`grade_settings.discount_rate` 참조**)
-- [ ] `DataInitializer.java`: 초기 사용자에 기본 등급(`GREEN_BEAN`) 설정 + **`grade_settings` 초기 데이터 삽입** (위 표의 기본값)
-- [ ] ⚙️ **등급 설정 관리 API** 신규 생성 (`AdminGradeSettingsController.java`)
+- [x] `DataInitializer.java`: 초기 사용자에 기본 등급(`GREEN_BEAN`) 설정 + **`grade_settings` 초기 데이터 삽입** (위 표의 기본값)
+- [x] ⚙️ **등급 설정 관리 API** 신규 생성 (`AdminGradeSettingsController.java`)
   - `GET /admin/grade-settings` — 전체 등급 설정 목록 조회
   - `PUT /admin/grade-settings/{grade}` — 등급별 설정 수정
     - Request Body: `{ discountRate, earnRate, upgradeOrderCount, upgradeOrderAmount }`
@@ -281,19 +281,19 @@
   - `ROLE_ADMIN`만 접근 가능 (부관리자도 조회는 가능하되 수정 불가)
 
 #### 프론트엔드
-- [ ] 관리자 회원 목록(`UserList.tsx`)에 **등급 변경 드롭다운** 추가 (관리자가 수동으로 등급 변경 가능하도록)
-- [ ] 마이페이지 내 **등급 카드** 섹션 구현
+- [x] 관리자 회원 목록(`UserList.tsx`)에 **등급 변경 드롭다운** 추가 (관리자가 수동으로 등급 변경 가능하도록)
+- [x] 마이페이지 내 **등급 카드** 섹션 구현
   - 현재 등급 아이콘/이름/컨셉 설명
   - 다음 등급까지의 **프로그레스 바** (주문 횟수/금액 기준, **DB의 승급 조건 기준**)
   - 현재 적용 중인 할인율 표시
-- [ ] `Header`에 등급 뱃지 아이콘 표시 (로그인 시)
+- [x] `Header`에 등급 뱃지 아이콘 표시 (로그인 시)
 - [ ] 주문 확인 페이지에 등급 할인 적용 내역 표시 (`할인: -500원 (Deep Brown 5%)`)
-- [ ] 등급별 고유 색상/아이콘 디자인
+- [x] 등급별 고유 색상/아이콘 디자인
   - 🌱 Green Bean: `#8BC34A` 연두
   - ✨ Golden Brown: `#D4A574` 골드
   - 🫘 Deep Brown: `#6D4C41` 브라운
   - 🖤 Black Roast: `#212121` 블랙 (프리미엄 느낌)
-- [ ] ⚙️ **관리자 등급 설정 페이지** (`/admin/grade-settings`) 신규 생성
+- [x] ⚙️ **관리자 등급 설정 페이지** (`/admin/grade-settings`) 신규 생성
   - 4개 등급 카드를 나란히 표시하고, 각 카드에서 할인율·적립률·승급 조건을 인라인 편집 가능
   - 수정 후 "저장" 버튼 클릭 시 `PUT /admin/grade-settings/{grade}` 호출
   - 변경 전후 값 비교 표시 (예: `적립률: 2% → 3%`)
@@ -305,24 +305,24 @@
 > **테스트 기준:** 사용자가 마이페이지에서 계정 탈퇴를 요청하면 soft delete 처리되고, 30일 이내 복구 가능하다. 관리자가 특정 계정을 잠금(lock)하면 해당 계정으로 로그인이 불가능하다.
 
 #### 백엔드
-- [ ] `User.java` 엔티티에 필드 추가 (`isEnabled`, `deletedAt` — 스키마 상단 참조)
-- [ ] `DELETE /users/me` — 계정 탈퇴 요청
+- [x] `User.java` 엔티티에 필드 추가 (`isEnabled`, `deletedAt` — 스키마 상단 참조)
+- [x] `DELETE /users/me` — 계정 탈퇴 요청
   - 비밀번호 재확인 후 `deletedAt = now()` 설정 (즉시 삭제 아님)
   - 탈퇴 후 JWT 무효화 (로그아웃 처리)
-- [ ] `POST /users/me/restore` — 탈퇴 취소 (30일 이내, 로그인 시 안내)
-- [ ] `PUT /admin/users/{id}/lock` — 관리자 계정 잠금/해제 (`isEnabled` 토글)
-- [ ] 로그인 시 `isEnabled == false`이면 "계정이 잠겨 있습니다" 에러 반환
-- [ ] 로그인 시 `deletedAt != null`이면 "탈퇴 처리 중입니다. 복구하시겠습니까?" 안내
+- [x] `POST /users/me/restore` — 탈퇴 취소 (30일 이내, 로그인 시 안내)
+- [x] `PUT /admin/users/{id}/lock` — 관리자 계정 잠금/해제 (`isEnabled` 토글)
+- [x] 로그인 시 `isEnabled == false`이면 "계정이 잠겨 있습니다" 에러 반환
+- [x] 로그인 시 `deletedAt != null`이면 "탈퇴 처리 중입니다. 복구하시겠습니까?" 안내
 - [ ] 스케줄러: `deletedAt`이 30일 이상 경과한 계정 hard delete (배치)
 
 #### 프론트엔드
-- [ ] 마이페이지 내 **"계정 탈퇴"** 섹션 (하단, 위험 영역 스타일)
+- [x] 마이페이지 내 **"계정 탈퇴"** 섹션 (하단, 위험 영역 스타일)
   - 비밀번호 재확인 모달 → 확인 시 탈퇴 처리
   - "탈퇴 후 30일 이내에 로그인하면 계정을 복구할 수 있습니다" 안내 문구
-- [ ] 탈퇴 처리된 계정으로 로그인 시도 시 **복구 안내 모달** 표시
+- [x] 탈퇴 처리된 계정으로 로그인 시도 시 **복구 안내 모달** 표시
   - "탈퇴 요청일: YYYY-MM-DD" / "삭제 예정일: YYYY-MM-DD"
   - "계정 복구" 버튼 + "확인" 버튼
-- [ ] 관리자 회원 목록(`UserList.tsx`)에 잠금 상태 표시 + 잠금/해제 토글 버튼
+- [x] 관리자 회원 목록(`UserList.tsx`)에 잠금 상태 표시 + 잠금/해제 토글 버튼
 
 ---
 
@@ -332,34 +332,34 @@
 > 📌 `user_points` 테이블 스키마 및 등급별 적립률은 상단 **목표 상태 (TO-BE)** 참조
 
 #### 백엔드
-- [ ] `UserPoint` 엔티티 + `user_points` 테이블 생성
-- [ ] `User.java`에 `pointBalance` (`INT`, 기본값 0) 필드 추가 — 현재 잔액 캐시
-- [ ] `UserPointController.java` 신규 생성
+- [x] `UserPoint` 엔티티 + `user_points` 테이블 생성
+- [x] `User.java`에 `pointBalance` (`INT`, 기본값 0) 필드 추가 — 현재 잔액 캐시
+- [x] `UserPointController.java` 신규 생성
   - `GET /users/me/points` — 현재 포인트 잔액 조회
   - `GET /users/me/points/history` — 적립/사용 내역 조회 (페이징)
-- [ ] `UserPointService.java` 신규 생성
+- [x] `UserPointService.java` 신규 생성
   - `earnPoints(userId, orderId, amount)` — 주문 완료 시 적립 (**`grade_settings.earn_rate`에서 등급별 적립률 동적 조회하여 적용**)
   - `usePoints(userId, orderId, amount)` — 주문 시 포인트 차감
   - `cancelPoints(userId, orderId)` — 주문 취소 시 포인트 환불
   - 잔액 부족 시 예외 처리
   - > ⚠️ 적립률을 Enum 상수가 아닌 **DB(`grade_settings`)에서 조회**하므로,  
     > 관리자가 적립률을 변경하면 다음 주문부터 즉시 반영됨
-- [ ] 주문 생성 로직 수정
+- [x] 주문 생성 로직 수정
   - 요청 시 `usePoints` 금액 포함 → 총 결제액에서 포인트 차감
   - 주문 완료 시 실결제 금액 기준 포인트 적립 (포인트 결제 부분은 적립 제외)
 - [ ] 스케줄러: 만료일 도래 포인트 자동 차감 (배치, 예: 적립일로부터 1년)
 
 #### 프론트엔드
-- [ ] 마이페이지 내 **"포인트"** 탭/섹션 구현
+- [x] 마이페이지 내 **"포인트"** 탭/섹션 구현
   - 현재 잔액 크게 표시 + 등급별 적립률 안내
   - 적립/사용 내역 타임라인 (날짜, 유형, 금액, 잔액)
   - 만료 예정 포인트 안내 ("🕔 7일 내 만료 예정: 500P")
-- [ ] 주문 확인 페이지에 **포인트 사용** 섹션 추가
+- [x] 주문 확인 페이지에 **포인트 사용** 섹션 추가
   - 사용 가능 포인트 표시 + 사용할 포인트 금액 입력 (또는 "전액 사용" 버튼)
   - 결제 요약: `상품 금액 - 등급 할인 - 포인트 사용 = 최종 결제액`
   - 예상 적립 포인트 미리보기 ("이 주문으로 150P 적립 예정")
-- [ ] `Header`에 포인트 잔액 표시 (로그인 시, 등급 뱃지 옥)
-- [ ] 마이페이지 탭 구조 확장: `프로필` | `주문 내역` | `즐겨찾기` | `자주 주문` | `포인트`
+- [x] `Header`에 포인트 잔액 표시 (로그인 시, 등급 뱃지 옥)
+- [x] 마이페이지 탭 구조 확장: `프로필` | `주문 내역` | `즐겨찾기` | `자주 주문` | `포인트`
 
 ---
 
@@ -372,6 +372,36 @@
 ### 추천 2: 주문 재주문 (Quick Reorder)
 - 과거 주문 내역에서 "다시 주문하기" 버튼 → 동일 메뉴+옵션을 장바구니에 추가
 - 자주 주문한 메뉴에서도 원클릭 장바구니 담기
+
+### Phase 10: 관리자 등급 관리 고도화 ⚙️
+> **테스트 기준:** 관리자 회원관리 페이지에서 등급 시스템 사용 여부를 토글할 수 있고, 등급 추가/삭제/순서 변경/이름 수정/적립률·승급 조건 수정이 가능하다. 등급 시스템을 비활성화하면 모든 회원에게 기본 적립률이 적용된다.
+
+#### 백엔드
+- [x] `GradeSystemConfig` 엔티티 + `grade_system_config` 테이블 생성 (스키마 상단 참조)
+  - 싱글 레코드로 관리 (id=1 고정)
+  - `isEnabled` (등급 시스템 사용 여부)
+- [x] `DataInitializer.java`: `grade_system_config` 초기 데이터 삽입 (`isEnabled = true`)
+- [x] `AdminGradeSettingsController.java` 확장
+  - `GET /admin/grade-settings/config` — 등급 시스템 전역 설정 조회
+  - `PUT /admin/grade-settings/config` — 등급 시스템 사용 여부 토글
+  - `POST /admin/grade-settings` — **새 등급 추가**
+  - `DELETE /admin/grade-settings/{grade}` — **등급 삭제**
+  - `PUT /admin/grade-settings/{grade}` 확장 — **등급 이름(displayName)** 수정 가능하도록 확장
+  - `PUT /admin/grade-settings/reorder` — **등급 순서 변경**
+- [x] `UserGradeService.java` 수정
+  - 등급 시스템 비활성화 시(`isEnabled == false`) 승급/강등 로직 스킵
+  - `getUserGradeInfo()` 응답에 `gradeSystemEnabled` 플래그 추가
+  - 등급 삭제 시 해당 등급 보유 회원 자동 강등 처리 로직
+- [x] 포인트 적립 로직 수정
+  - 등급 시스템 비활성화 시 기본 적립률(1%) 적용
+
+#### 프론트엔드
+- [x] 관리자 회원관리 페이지(`/admin/users`)에 **"등급 관리"** 탭/섹션 통합
+- [x] **등급 시스템 토글 스위치**
+- [x] **등급 카드 목록** (정렬 가능)
+- [x] **등급 추가** 버튼 구현
+- [x] **등급 순서 변경** (드래그 기법 또는 ↑↓ 버튼)
+- [x] 등급 시스템 비활성화 상태에서의 UI 처리 (마이페이지 등급 영역 안내 추가)
 
 ### 추천 3: 회원 활동 로그 (Admin)
 - 관리자 페이지에서 회원별 활동 이력 조회 (로그인, 주문, 설정 변경 등)

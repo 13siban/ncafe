@@ -15,4 +15,6 @@ public class MeResponse {
     private String nickname;
     private String role;
     private String phoneNumber;
+    private String grade;
+    private Integer pointBalance;
 }

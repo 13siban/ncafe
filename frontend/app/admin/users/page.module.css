@@ -4,9 +4,33 @@
   margin: 40px auto;
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
 .title {
   font-size: 1.5rem;
   font-weight: 700;
-  margin-bottom: 2rem;
   color: var(--color-gray-900);
+}
+
+.settingsBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.settingsBtn:hover {
+  background: var(--bg-secondary);
 }

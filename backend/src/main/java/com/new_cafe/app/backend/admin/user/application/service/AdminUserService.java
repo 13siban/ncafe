@@ -11,11 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import com.new_cafe.app.backend.admin.user.application.port.in.UpdateAdminUserRoleUseCase;
+import com.new_cafe.app.backend.admin.user.application.port.in.UpdateAdminUserGradeUseCase;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class AdminUserService implements GetAdminUserListUseCase, DeleteAdminUserUseCase, UpdateAdminUserRoleUseCase {
+public class AdminUserService implements GetAdminUserListUseCase, DeleteAdminUserUseCase, UpdateAdminUserRoleUseCase, UpdateAdminUserGradeUseCase {
 
     private final UserJpaRepository userJpaRepository;
 
@@ -37,5 +38,11 @@ public class AdminUserService implements GetAdminUserListUseCase, DeleteAdminUse
             throw new RuntimeException("자기 자신의 권한은 변경할 수 없습니다.");
         }
         user.updateRole(role);
+    }
+
+    @Override
+    public void updateUserGrade(String id, String grade) {
+        User user = userJpaRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        user.updateGrade(grade);
     }
 }

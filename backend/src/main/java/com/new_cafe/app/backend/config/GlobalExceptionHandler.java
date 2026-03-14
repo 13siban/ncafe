@@ -21,6 +21,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception e) {
+        log.error("Unhandled exception: ", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("message", "서버 내부 오류가 발생했습니다."));
     }

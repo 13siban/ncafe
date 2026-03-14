@@ -9,6 +9,9 @@ interface User {
     id: string;
     username: string;
     role: string;
+    grade?: string;
+    enabled?: boolean;
+    deletedAt?: string;
 }
 
 export const UserList = () => {
@@ -79,6 +82,42 @@ export const UserList = () => {
         }
     };
 
+    const handleGradeChange = async (userId: string, newGrade: string) => {
+        try {
+            const res = await apiFetch(`/api/admin/users/${userId}/grade`, {
+                method: 'PUT',
+                body: JSON.stringify({ grade: newGrade })
+            });
+
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.message || '등급 변경에 실패했습니다.');
+            }
+
+            alert('등급이 성공적으로 변경되었습니다.');
+            fetchUsers();
+        } catch (err: any) {
+            alert(err.message || '등급 변경 중 오류가 발생했습니다.');
+        }
+    };
+
+    const handleToggleLock = async (userId: string) => {
+        try {
+            const res = await apiFetch(`/api/admin/users/${userId}/lock`, {
+                method: 'PUT',
+            });
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.message || '잠금 상태 변경에 실패했습니다.');
+            }
+            const data = await res.json();
+            alert(data.message);
+            fetchUsers();
+        } catch (err: any) {
+            alert(err.message || '잠금 상태 변경 중 오류가 발생했습니다.');
+        }
+    };
+
     const getRoleBadgeClass = (role: string) => {
         if (role === 'ROLE_ADMIN') return styles.roleAdmin;
         if (role === 'ROLE_SUB_ADMIN') return styles.roleSubAdmin;
@@ -102,13 +141,15 @@ export const UserList = () => {
                         <th>ID</th>
                         <th>닉네임 (Username)</th>
                         <th>역할 (Role)</th>
+                        <th>등급 (Grade)</th>
+                        <th>상태</th>
                         <th>관리</th>
                     </tr>
                 </thead>
                 <tbody>
                     {users.length === 0 ? (
                         <tr>
-                            <td colSpan={4} className={styles.empty}>
+                            <td colSpan={6} className={styles.empty}>
                                 가입된 회원이 없습니다.
                             </td>
                         </tr>
@@ -136,6 +177,47 @@ export const UserList = () => {
                                     )}
                                 </td>
                                 <td>
+                                    {isAdmin ? (
+                                        <select
+                                            className={styles.roleSelect}
+                                            value={user.grade || 'GREEN_BEAN'}
+                                            onChange={(e) => handleGradeChange(user.id, e.target.value)}
+                                        >
+                                            <option value="GREEN_BEAN">Green Bean 🌱</option>
+                                            <option value="GOLDEN_BROWN">Golden Brown ✨</option>
+                                            <option value="DEEP_BROWN">Deep Brown 🫘</option>
+                                            <option value="BLACK_ROAST">Black Roast 🖤</option>
+                                        </select>
+                                    ) : (
+                                        <span>{user.grade || 'GREEN_BEAN'}</span>
+                                    )}
+                                </td>
+                                <td>
+                                    {user.deletedAt ? (
+                                        <span style={{ color: '#e67e22', fontSize: '0.8rem', fontWeight: 600 }}>
+                                            🗑️ 탈퇴 요청
+                                        </span>
+                                    ) : user.enabled === false ? (
+                                        <span style={{ color: '#e74c3c', fontSize: '0.8rem', fontWeight: 600 }}>
+                                            🔒 잠금
+                                        </span>
+                                    ) : (
+                                        <span style={{ color: '#27ae60', fontSize: '0.8rem', fontWeight: 600 }}>
+                                            ✅ 활성
+                                        </span>
+                                    )}
+                                </td>
+                                <td style={{ display: 'flex', gap: '4px' }}>
+                                    {isAdmin && (
+                                        <button
+                                            className={user.enabled === false ? styles.unlockBtn : styles.lockBtn}
+                                            onClick={() => handleToggleLock(user.id)}
+                                            disabled={user.username === currentUser?.username}
+                                            title={user.enabled === false ? '잠금 해제' : '계정 잠금'}
+                                        >
+                                            {user.enabled === false ? '🔓' : '🔒'}
+                                        </button>
+                                    )}
                                     <button
                                         className={styles.deleteBtn}
                                         onClick={() => handleDelete(user.id)}
