@@ -1,0 +1,432 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { userAPI, userFavoriteAPI } from '@/app/lib/api';
+import { useCartStore } from '@/store/useCartStore';
+import Header from '@/components/common/Header/Header';
+import { Footer } from '@/components/common/Footer/Footer';
+import styles from './mypage.module.css';
+
+export default function MyPage() {
+    const router = useRouter();
+    const [isLoading, setIsLoading] = useState(true);
+    
+    // 프로필 정보 상태
+    const [nickname, setNickname] = useState('');
+    const [email, setEmail] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    
+    // 비밀번호 변경 상태
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    const [profileMessage, setProfileMessage] = useState('');
+    const [passwordMessage, setPasswordMessage] = useState('');
+    
+    const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'favorites' | 'topMenus'>('profile');
+    
+    const [favorites, setFavorites] = useState<any[]>([]);
+    const [orders, setOrders] = useState<any[]>([]);
+    const [topMenus, setTopMenus] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchProfileAndFavorites = async () => {
+            try {
+                const profileData = await userAPI.getProfile();
+                setNickname(profileData.nickname || '');
+                setEmail(profileData.email || '');
+                setPhoneNumber(profileData.phoneNumber || '');
+                
+                const favData = await userFavoriteAPI.getFavorites();
+                setFavorites(favData);
+
+                try {
+                    const ordersData = await userAPI.getOrders();
+                    setOrders(ordersData);
+                } catch {
+                    setOrders([]);
+                }
+
+                try {
+                    const topMenusData = await userAPI.getTopMenus();
+                    setTopMenus(topMenusData);
+                } catch {
+                    setTopMenus([]);
+                }
+            } catch (error: any) {
+                alert(error.message || '정보를 불러오는 데 실패했습니다.');
+                router.push('/login');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchProfileAndFavorites();
+    }, [router]);
+
+    const handleProfileUpdate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const res = await userAPI.updateProfile({ nickname, email, phoneNumber });
+            setProfileMessage(res.message || '프로필이 성공적으로 수정되었습니다.');
+            setTimeout(() => setProfileMessage(''), 3000);
+            
+            // 전역 세션 업데이트 요청 이벤트를 발생시켜 Header 등을 갱신
+            window.dispatchEvent(new Event('login'));
+        } catch (error: any) {
+            alert(error.message || '프로필 수정 중 오류가 발생했습니다.');
+        }
+    };
+
+    const handlePasswordUpdate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (newPassword !== confirmPassword) {
+            alert('새 비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+            return;
+        }
+
+        try {
+            const res = await userAPI.updatePassword({ currentPassword, newPassword });
+            setPasswordMessage(res.message || '비밀번호가 성공적으로 변경되었습니다.');
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirmPassword('');
+            setTimeout(() => setPasswordMessage(''), 3000);
+        } catch (error: any) {
+            alert(error.message || '비밀번호 변경 중 오류가 발생했습니다.');
+        }
+    };
+
+    const handleRemoveFavorite = async (id: number) => {
+        if (!window.confirm('이 즐겨찾기를 삭제하시겠습니까?')) return;
+        try {
+            await userFavoriteAPI.removeFavorite(id);
+            setFavorites(prev => prev.filter(f => f.id !== id));
+        } catch (error: any) {
+            alert(error.message || '삭제 중 오류가 발생했습니다.');
+        }
+    };
+
+    const handleCleanupUnavailable = async () => {
+        const unavailable = favorites.filter(f => !f.orderable);
+        if (unavailable.length === 0) return;
+        if (!window.confirm(`주문 불가 항목 ${unavailable.length}개를 모두 삭제하시겠습니까?`)) return;
+        try {
+            await Promise.all(unavailable.map(f => userFavoriteAPI.removeFavorite(f.id)));
+            setFavorites(prev => prev.filter(f => f.orderable));
+        } catch (error: any) {
+            alert(error.message || '삭제 중 오류가 발생했습니다.');
+        }
+    };
+
+    const getReasonLabel = (reason: string) => {
+        switch (reason) {
+            case 'MENU_DELETED': return { icon: '🚫', text: '메뉴가 삭제되었습니다' };
+            case 'MENU_HIDDEN': return { icon: '🔒', text: '숨김 처리된 메뉴입니다' };
+            case 'MENU_SOLD_OUT': return { icon: '📦', text: '품절' };
+            case 'OPTION_GROUP_DELETED': return { icon: '⚙️', text: '선택한 옵션이 변경되었습니다' };
+            case 'OPTION_ITEM_DELETED': return { icon: '⚙️', text: '선택한 옵션이 변경되었습니다' };
+            default: return { icon: '⚠️', text: '주문 불가' };
+        }
+    };
+
+    const handleAddToCart = (fav: any) => {
+        if (!fav.orderable) {
+            alert(`주문 불가: ${fav.unavailableReason}`);
+            return;
+        }
+
+        const optionTotalPrice = fav.options.reduce((sum: number, opt: any) => sum + (opt.additionalPrice || 0), 0);
+        
+        const cartItem = {
+            cartId: `fav-${fav.id}-${Date.now()}`,
+            menuId: fav.menuId,
+            menuName: fav.menuName,
+            menuEngName: fav.menuName,
+            imageSrc: fav.imageUrl || 'placeholder.jpg',
+            basePrice: fav.basePrice,
+            quantity: 1,
+            selectedOptions: fav.options.map((opt: any) => ({
+                optionGroupId: opt.optionGroupId,
+                optionGroupName: opt.optionGroupName,
+                optionItemId: opt.optionItemId,
+                optionItemName: opt.optionItemName,
+                priceDelta: opt.additionalPrice || 0
+            })),
+            optionTotalPrice,
+            subtotal: fav.basePrice + optionTotalPrice
+        };
+
+        useCartStore.getState().addItem(cartItem);
+        alert('장바구니에 즐겨찾기 메뉴가 담겼습니다.');
+    };
+
+    if (isLoading) {
+        return (
+            <div className={styles.pageWrapper}>
+                <Header />
+                <div className={styles.loading}>정보를 불러오는 중입니다...</div>
+                <Footer />
+            </div>
+        );
+    }
+
+    return (
+        <div className={styles.pageWrapper}>
+            <Header />
+            <div className={styles.container}>
+            <div className={styles.content}>
+                <h1 className={styles.title}>마이페이지</h1>
+                
+                <div className={styles.tabs}>
+                    <button 
+                        className={`${styles.tabBtn} ${activeTab === 'profile' ? styles.activeTab : ''}`}
+                        onClick={() => setActiveTab('profile')}
+                    >프로필</button>
+                    <button 
+                        className={`${styles.tabBtn} ${activeTab === 'orders' ? styles.activeTab : ''}`}
+                        onClick={() => setActiveTab('orders')}
+                    >주문 내역</button>
+                    <button 
+                        className={`${styles.tabBtn} ${activeTab === 'favorites' ? styles.activeTab : ''}`}
+                        onClick={() => setActiveTab('favorites')}
+                    >즐겨찾기</button>
+                    <button 
+                        className={`${styles.tabBtn} ${activeTab === 'topMenus' ? styles.activeTab : ''}`}
+                        onClick={() => setActiveTab('topMenus')}
+                    >자주 주문한 메뉴</button>
+                </div>
+
+                <div className={styles.tabContent}>
+                    {activeTab === 'profile' && (
+                        <>
+                            <section className={styles.section}>
+                                <h2 className={styles.sectionTitle}>개인정보 수정</h2>
+                                <form onSubmit={handleProfileUpdate} className={styles.form}>
+                                    <div className={styles.formGroup}>
+                                        <label htmlFor="nickname">닉네임</label>
+                                        <input 
+                                            id="nickname" 
+                                            type="text" 
+                                            value={nickname} 
+                                            onChange={(e) => setNickname(e.target.value)} 
+                                            required 
+                                        />
+                                    </div>
+                                    <div className={styles.formGroup}>
+                                        <label htmlFor="email">이메일</label>
+                                        <input 
+                                            id="email" 
+                                            type="email" 
+                                            value={email} 
+                                            onChange={(e) => setEmail(e.target.value)} 
+                                        />
+                                    </div>
+                                    <div className={styles.formGroup}>
+                                        <label htmlFor="phoneNumber">전화번호</label>
+                                        <input 
+                                            id="phoneNumber" 
+                                            type="tel" 
+                                            value={phoneNumber} 
+                                            onChange={(e) => setPhoneNumber(e.target.value)} 
+                                        />
+                                    </div>
+                                    {profileMessage && <div className={styles.successMessage}>{profileMessage}</div>}
+                                    <button type="submit" className={styles.submitBtn}>저장하기</button>
+                                </form>
+                            </section>
+
+                            <hr className={styles.divider} />
+
+                            <section className={styles.section}>
+                                <h2 className={styles.sectionTitle}>비밀번호 변경</h2>
+                                <form onSubmit={handlePasswordUpdate} className={styles.form}>
+                                    <div className={styles.formGroup}>
+                                        <label htmlFor="currentPassword">현재 비밀번호</label>
+                                        <input 
+                                            id="currentPassword" 
+                                            type="password" 
+                                            value={currentPassword} 
+                                            onChange={(e) => setCurrentPassword(e.target.value)} 
+                                            required 
+                                        />
+                                    </div>
+                                    <div className={styles.formGroup}>
+                                        <label htmlFor="newPassword">새 비밀번호</label>
+                                        <input 
+                                            id="newPassword" 
+                                            type="password" 
+                                            value={newPassword} 
+                                            onChange={(e) => setNewPassword(e.target.value)} 
+                                            required 
+                                        />
+                                    </div>
+                                    <div className={styles.formGroup}>
+                                        <label htmlFor="confirmPassword">비밀번호 확인</label>
+                                        <input 
+                                            id="confirmPassword" 
+                                            type="password" 
+                                            value={confirmPassword} 
+                                            onChange={(e) => setConfirmPassword(e.target.value)} 
+                                            required 
+                                        />
+                                    </div>
+                                    {passwordMessage && <div className={styles.successMessage}>{passwordMessage}</div>}
+                                    <button type="submit" className={styles.submitBtn}>비밀번호 변경</button>
+                                </form>
+                            </section>
+                        </>
+                    )}
+
+                    {activeTab === 'orders' && (
+                        <section className={styles.section}>
+                            <h2 className={styles.sectionTitle}>주문 내역</h2>
+                            <div className={styles.orderList}>
+                                {orders.length === 0 ? (
+                                    <p style={{ color: 'var(--color-gray-500)', textAlign: 'center', padding: '2rem 0' }}>
+                                        주문 내역이 없습니다.
+                                    </p>
+                                ) : (
+                                    orders.map(order => (
+                                        <div 
+                                            key={order.id} 
+                                            className={styles.orderCard}
+                                            onClick={() => router.push(`/order/${order.orderDate}/${order.orderNumber}`)}
+                                            style={{ cursor: 'pointer' }}
+                                        >
+                                            <div className={styles.cardHeader}>
+                                                <div className={styles.dateInfo}>
+                                                    <div className={styles.date}>{new Date(order.createdAt).toLocaleDateString()} {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                                    <div className={styles.displayNumber}>{order.displayNumber}</div>
+                                                </div>
+                                                <div className={styles.statusBadge}>
+                                                    {order.status}
+                                                </div>
+                                            </div>
+                                            <div className={styles.cardBody}>
+                                                <div className={styles.summary}>{order.summary}</div>
+                                                <div className={styles.totalPrice}>{new Intl.NumberFormat('ko-KR').format(order.totalPrice)}원</div>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </section>
+                    )}
+
+                    {activeTab === 'favorites' && (
+                        <section className={styles.section}>
+                            <h2 className={styles.sectionTitle}>즐겨찾기 메뉴</h2>
+                            
+                            {/* 주문 불가 항목 배너 */}
+                            {favorites.filter(f => !f.orderable).length > 0 && (
+                                <div className={styles.unavailableBanner}>
+                                    <span>⚠️ {favorites.filter(f => !f.orderable).length}개의 주문 불가 항목이 있습니다</span>
+                                    <button className={styles.cleanupBtn} onClick={handleCleanupUnavailable}>
+                                        일괄 삭제
+                                    </button>
+                                </div>
+                            )}
+
+                            <div className={styles.favoriteList}>
+                                {favorites.length === 0 ? (
+                                    <p style={{ color: 'var(--color-gray-500)', textAlign: 'center', padding: '2rem 0' }}>
+                                        즐겨찾기한 메뉴가 없습니다.
+                                    </p>
+                                ) : (
+                                    favorites.map(fav => {
+                                        const reason = !fav.orderable ? getReasonLabel(fav.unavailableReason) : null;
+                                        return (
+                                            <div 
+                                                key={fav.id} 
+                                                className={`${styles.favoriteCard} ${!fav.orderable ? styles.favoriteCardUnavailable : ''}`}
+                                            >
+                                                <img 
+                                                    src={`/images/${fav.imageUrl || 'placeholder.jpg'}`} 
+                                                    alt={fav.menuName} 
+                                                    className={styles.favoriteImg}
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
+                                                    }}
+                                                />
+                                                <div className={styles.favoriteInfo}>
+                                                    <div className={styles.favoriteMenuName}>
+                                                        {fav.alias ? `${fav.alias} (${fav.menuName})` : fav.menuName}
+                                                    </div>
+                                                    <div className={styles.favoriteOptionTags}>
+                                                        {fav.options.map((opt: any, idx: number) => (
+                                                            <span key={idx} className={styles.tag}>
+                                                                {opt.optionGroupName}: {opt.optionItemName}
+                                                                {opt.additionalPrice > 0 ? ` (+${opt.additionalPrice}원)` : ''}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                    {reason ? (
+                                                        <div className={styles.reasonBadge}>
+                                                            {reason.icon} {reason.text}
+                                                        </div>
+                                                    ) : (
+                                                        <div className={styles.favoritePrice}>
+                                                            {new Intl.NumberFormat('ko-KR').format(fav.totalPrice)}원
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className={styles.favoriteActions}>
+                                                    <button 
+                                                        className={styles.cartBtn} 
+                                                        onClick={() => handleAddToCart(fav)}
+                                                        disabled={!fav.orderable}
+                                                        title={reason ? reason.text : ''}
+                                                    >
+                                                        장바구니 담기
+                                                    </button>
+                                                    <button 
+                                                        className={styles.deleteBtn} 
+                                                        onClick={() => handleRemoveFavorite(fav.id)}
+                                                    >
+                                                        삭제
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })
+                                )}
+                            </div>
+                        </section>
+                    )}
+
+                    {activeTab === 'topMenus' && (
+                        <section className={styles.section}>
+                            <h2 className={styles.sectionTitle}>자주 주문한 메뉴 Top 5</h2>
+                            <div className={styles.topMenuList}>
+                                {topMenus.length === 0 ? (
+                                    <p style={{ color: 'var(--color-gray-500)', textAlign: 'center', padding: '2rem 0' }}>
+                                        주문 기록이 없습니다.
+                                    </p>
+                                ) : (
+                                    topMenus.map((topMenu, idx) => (
+                                        <div 
+                                            key={topMenu.menuId} 
+                                            className={styles.topMenuCard}
+                                            onClick={() => router.push(`/menus/${topMenu.engName ? topMenu.engName.toLowerCase().replace(/\s+/g, '-') : topMenu.menuId}`)}
+                                        >
+                                            <div className={styles.topMenuRank}>{idx + 1}</div>
+                                            <div className={styles.topMenuInfo}>
+                                                <div className={styles.topMenuName}>{topMenu.menuName}</div>
+                                                <div className={styles.topMenuCount}>주문 횟수: {topMenu.totalQuantity}회</div>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </section>
+                    )}
+                </div>
+            </div>
+            </div>
+            <Footer />
+        </div>
+    );
+}

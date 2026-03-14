@@ -22,12 +22,46 @@ public class User implements UserDetails {
     @Id
     private String id;
 
-    @Column(name = "nickname")
+    @Column(name = "username")
     private String username;
+
+    @Column(name = "nickname")
+    private String nickname;
+
+    private String email;
+    private String phoneNumber;
 
     @com.fasterxml.jackson.annotation.JsonIgnore
     private String password;
     private String role;
+
+    public void updateRole(String role) {
+        this.role = role;
+    }
+
+    public void updateProfile(String nickname, String email, String phoneNumber) {
+        this.nickname = nickname;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    private java.time.LocalDateTime createdAt;
+    private java.time.LocalDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = java.time.LocalDateTime.now();
+        this.updatedAt = java.time.LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = java.time.LocalDateTime.now();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -5,10 +5,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 
 public interface OrderJpaRepository extends JpaRepository<OrderJpaEntity, Long> {
+    interface TopMenuProjection {
+        Long getMenuId();
+        String getMenuName();
+        Long getTotalQuantity();
+    }
     List<OrderJpaEntity> findByOrderDateOrderByCreatedAtDesc(LocalDate orderDate);
     
     long countByOrderDate(LocalDate orderDate);
@@ -25,4 +31,11 @@ public interface OrderJpaRepository extends JpaRepository<OrderJpaEntity, Long> 
     long countGuestOrdersByOrderDate(@Param("date") LocalDate date);
 
     List<OrderJpaEntity> findByOrderDateBetween(LocalDate start, LocalDate end);
+
+    @Query("SELECT oi.menuId AS menuId, oi.menuName AS menuName, SUM(oi.quantity) AS totalQuantity " +
+           "FROM OrderJpaEntity o JOIN OrderItemJpaEntity oi ON o.id = oi.orderId " +
+           "WHERE o.userId = :userId " +
+           "GROUP BY oi.menuId, oi.menuName " +
+           "ORDER BY SUM(oi.quantity) DESC")
+    List<TopMenuProjection> findTopMenusByUserId(@Param("userId") String userId, Pageable pageable);
 }

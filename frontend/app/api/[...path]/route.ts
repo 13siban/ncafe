@@ -63,6 +63,7 @@ async function unifiedHandler(req: NextRequest) {
                 email: user.email || user.nickname,
                 nickname: user.nickname,
                 role: user.role,
+                phoneNumber: user.phoneNumber,
             } : {
                 id: tokenData.username,
                 email: tokenData.username,
@@ -86,6 +87,27 @@ async function unifiedHandler(req: NextRequest) {
     // 3. [특수 경로] 현재 세션 상태 확인
     if (pathname === '/api/auth/session' && req.method === 'GET') {
         if (!session.token) return NextResponse.json({ user: null });
+        
+        // 기존 세션을 최신 정보로 갱신 (마이페이지/주문 시 phoneNumber 등 최신화)
+        try {
+            const meRes = await fetch(`${API_BASE}/auth/me`, {
+                headers: { Authorization: `Bearer ${session.token}` },
+            });
+            if (meRes.ok) {
+                const user = await meRes.json();
+                session.user = {
+                    id: user.id || user.nickname,
+                    email: user.email || user.nickname,
+                    nickname: user.nickname,
+                    role: user.role,
+                    phoneNumber: user.phoneNumber,
+                };
+                await session.save();
+            }
+        } catch (e) {
+            console.error('Session refresh error:', e);
+        }
+
         return NextResponse.json({ user: session.user });
     }
 

@@ -13,6 +13,7 @@ interface SessionUser {
     nickname: string;
     username: string;
     role: string;
+    phoneNumber?: string;
 }
 
 interface AuthState {

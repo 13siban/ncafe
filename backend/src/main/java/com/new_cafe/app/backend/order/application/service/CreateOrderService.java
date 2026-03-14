@@ -2,6 +2,7 @@ package com.new_cafe.app.backend.order.application.service;
 
 import com.new_cafe.app.backend.admin.menu.adapter.out.persistence.AdminMenuJpaEntity;
 import com.new_cafe.app.backend.admin.menu.adapter.out.persistence.AdminMenuJpaRepository;
+import com.new_cafe.app.backend.auth.application.port.out.LoadUserPort;
 import com.new_cafe.app.backend.menuoption.adapter.out.persistence.OptionGroupJpaEntity;
 import com.new_cafe.app.backend.menuoption.adapter.out.persistence.OptionGroupJpaRepository;
 import com.new_cafe.app.backend.menuoption.adapter.out.persistence.OptionItemJpaEntity;
@@ -32,6 +33,7 @@ public class CreateOrderService implements CreateOrderUseCase {
     private final GetStoreSettingsUseCase getStoreSettingsUseCase;
     private final OrderRepositoryPort orderRepository;
     private final OrderOptionRepositoryPort orderOptionRepository;
+    private final LoadUserPort loadUserPort;
     
     private final AdminMenuJpaRepository menuRepository;
     private final OptionGroupJpaRepository optionGroupRepository;
@@ -49,9 +51,14 @@ public class CreateOrderService implements CreateOrderUseCase {
         LocalDate today = LocalDate.now();
         Integer nextOrderNumber = orderRepository.getNextOrderNumber(today);
 
-        String actualCustomerName = userId != null ? command.getCustomerName() : "비회원";
-        if (userId != null && (actualCustomerName == null || actualCustomerName.isBlank())) {
-            actualCustomerName = "회원"; // Fallback
+        String actualCustomerName = "비회원";
+
+        if (userId != null) {
+            actualCustomerName = loadUserPort.loadUser(userId)
+                    .map(u -> u.getNickname() != null ? u.getNickname() : u.getUsername())
+                    .orElseGet(() -> command.getCustomerName() != null && !command.getCustomerName().isBlank() ? command.getCustomerName() : "회원");
+        } else {
+            actualCustomerName = command.getCustomerName() != null && !command.getCustomerName().isBlank() ? command.getCustomerName() : "비회원";
         }
 
         List<OrderItem> savedItems = new ArrayList<>();

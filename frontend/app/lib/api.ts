@@ -90,10 +90,10 @@ export const authAPI = {
     getSession: () => fetchAPI('/auth/session'),
 
     /** 회원가입: 새로운 사용자 등록 */
-    signup: (username: string, password: string) =>
+    signup: (username: string, password: string, nickname?: string, email?: string, phoneNumber?: string) =>
         fetchAPI('/auth/signup', {
             method: 'POST',
-            body: JSON.stringify({ username, password }),
+            body: JSON.stringify({ username, password, nickname, email, phoneNumber }),
         }),
 };
 
@@ -160,5 +160,53 @@ export const adminSalesAPI = {
     /** 매출 차트 데이터 조회 */
     getChart: (period: string = 'daily', date?: string) =>
         fetchAPI(`/admin/sales/chart?period=${period}${date ? `&date=${date}` : ''}`),
+};
+
+// 사용자 마이페이지 API 모음
+export const userAPI = {
+    /** 내 프로필 조회 */
+    getProfile: () => fetchAPI('/users/me'),
+
+    /** 프로필 업데이트 */
+    updateProfile: (params: { nickname: string; email?: string; phoneNumber?: string }) =>
+        fetchAPI('/users/me', {
+            method: 'PUT',
+            body: JSON.stringify(params),
+        }),
+
+    /** 비밀번호 변경 */
+    updatePassword: (params: { currentPassword: string; newPassword: string }) =>
+        fetchAPI('/users/me/password', {
+            method: 'PUT',
+            body: JSON.stringify(params),
+        }),
+
+    /** 주문 내역 조회 */
+    getOrders: () => fetchAPI('/users/me/orders', { skipRedirect: true }),
+
+    /** 자주 주문한 메뉴 Top 5 조회 */
+    getTopMenus: () => fetchAPI('/users/me/top-menus', { skipRedirect: true }),
+};
+
+// 사용자 즐겨찾기 API 모음
+export const userFavoriteAPI = {
+    /** 즐겨찾기 추가 */
+    addFavorite: (params: { menuId: number; alias?: string; selectedOptions?: { optionGroupId: number; optionItemId: number }[] }) =>
+        fetchAPI('/users/me/favorites', {
+            method: 'POST',
+            body: JSON.stringify(params),
+        }),
+
+    /** 즐겨찾기 삭제 */
+    removeFavorite: (favoriteId: number) =>
+        fetchAPI(`/users/me/favorites/${favoriteId}`, {
+            method: 'DELETE',
+        }),
+
+    /** 즐겨찾기 목록 조회 */
+    getFavorites: () => fetchAPI('/users/me/favorites'),
+
+    /** 등급 및 특정 메뉴 즐겨찾기 여부 확인 */
+    checkFavorite: (menuId: number) => fetchAPI(`/users/me/favorites/check?menuId=${menuId}`),
 };
 

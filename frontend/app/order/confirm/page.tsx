@@ -31,8 +31,9 @@ export default function OrderConfirmPage() {
             try {
                 const session = await authAPI.getSession();
                 if (session && session.user) {
-                    setUsername(session.user.nickname || session.user.username);
+                    setUsername(session.user.nickname || session.user.username || session.user.id);
                     setEmail(session.user.email || "");
+                    setPhone(session.user.phoneNumber || "");
                     setIsLoggedIn(true);
                 }
             } catch (e) {
@@ -94,19 +95,19 @@ export default function OrderConfirmPage() {
             const result = await response.json();
             setIsSuccess(true);
             clearCart();
-            
+
             // 비회원일 경우 로컬 스토리지에 주문 내역 저장
             if (!isLoggedIn) {
                 const guestOrders = JSON.parse(localStorage.getItem("guest-orders") || "[]");
                 const newOrder = { date: result.orderDate, number: result.orderNumber };
-                
+
                 // 중복 체크 후 추가
                 const isDuplicate = guestOrders.some((o: any) => o.date === newOrder.date && o.number === newOrder.number);
                 if (!isDuplicate) {
                     localStorage.setItem("guest-orders", JSON.stringify([newOrder, ...guestOrders].slice(0, 20))); // 최근 20개까지만 저장
                 }
             }
-            
+
             router.push(`/order/${result.orderDate}/${result.orderNumber}`);
         } else {
             const error = await response.json();
@@ -207,34 +208,32 @@ export default function OrderConfirmPage() {
                             disabled={isLoggedIn}
                         />
                     </div>
-                    {!isLoggedIn && (
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>
-                                이메일 (결제 알림용)
-                            </label>
-                            <input
-                                type="email"
-                                className={styles.input}
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="example@email.com"
-                            />
-                        </div>
-                    )}
-                    {!isLoggedIn && (
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>
-                                휴대폰 번호 (결제 알림용)
-                            </label>
-                            <input
-                                type="tel"
-                                className={styles.input}
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
-                                placeholder="010-0000-0000"
-                            />
-                        </div>
-                    )}
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>
+                            {isLoggedIn ? '이메일' : '[선택] 이메일 (결제 알림용)'}
+                        </label>
+                        <input
+                            type="email"
+                            className={styles.input}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder={isLoggedIn ? '' : '입력하지 않아도 주문 가능합니다'}
+                            disabled={isLoggedIn}
+                        />
+                    </div>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>
+                            {isLoggedIn ? '휴대폰 번호' : '[선택] 휴대폰 번호 (결제 알림용)'}
+                        </label>
+                        <input
+                            type="tel"
+                            className={styles.input}
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            placeholder={isLoggedIn ? '' : '입력하지 않아도 주문 가능합니다'}
+                            disabled={isLoggedIn}
+                        />
+                    </div>
                     {isLoggedIn && <p style={{ fontSize: '0.75rem', color: 'var(--primary)', marginTop: 4 }}>회원 정보로 자동 입력되었습니다.</p>}
                     <div className={styles.formGroup}>
                         <label className={styles.label}>

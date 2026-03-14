@@ -43,7 +43,9 @@ export async function middleware(req: NextRequest) {
         const res = NextResponse.next();
         const session = await getIronSession<{ user?: { role: string } }>(req, res, sessionOptions);
 
-        if (!session.user || session.user.role !== 'ROLE_ADMIN') {
+        const isAuthorized = session.user && (session.user.role === 'ROLE_ADMIN' || session.user.role === 'ROLE_SUB_ADMIN');
+
+        if (!isAuthorized) {
             const referer = req.headers.get('referer');
             let targetUrl = new URL('/', req.url);
 

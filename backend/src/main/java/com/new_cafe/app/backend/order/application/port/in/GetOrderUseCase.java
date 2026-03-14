@@ -17,6 +17,7 @@ public interface GetOrderUseCase {
     List<OrderListDto> getAllOrders(String status, LocalDate date);
     List<OrderListDto> getOrdersByRange(String status, LocalDate start, LocalDate end);
     List<OrderListDto> getOrdersByKeys(List<OrderKey> keys);
+    List<TopMenuDto> getTopMenus(String userId, int limit);
 
     @Getter
     @Builder
@@ -59,5 +60,16 @@ public interface GetOrderUseCase {
         private String summary;
         private Integer totalPrice;
         private String createdAt;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    class TopMenuDto {
+        private Long menuId;
+        private String menuName;
+        private String engName;
+        private Long totalQuantity;
     }
 }

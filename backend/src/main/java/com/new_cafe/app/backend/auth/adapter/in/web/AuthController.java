@@ -5,6 +5,7 @@ import com.new_cafe.app.backend.auth.adapter.in.web.dto.LoginResponse;
 import com.new_cafe.app.backend.auth.adapter.in.web.dto.MeResponse;
 import com.new_cafe.app.backend.auth.application.port.in.LoginUseCase;
 import com.new_cafe.app.backend.auth.application.port.in.SignupUseCase;
+import com.new_cafe.app.backend.auth.application.port.out.LoadUserPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,6 +28,7 @@ public class AuthController {
 
     private final LoginUseCase loginUseCase;
     private final SignupUseCase signupUseCase;
+    private final LoadUserPort loadUserPort;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody com.new_cafe.app.backend.auth.adapter.in.web.dto.SignupRequest request) {
@@ -34,6 +36,9 @@ public class AuthController {
                 SignupUseCase.SignupCommand.builder()
                         .username(request.getUsername())
                         .password(request.getPassword())
+                        .nickname(request.getNickname())
+                        .email(request.getEmail())
+                        .phoneNumber(request.getPhoneNumber())
                         .build()
         );
         return ResponseEntity.ok(Map.of("message", "회원가입이 완료되었습니다."));
@@ -73,11 +78,14 @@ public class AuthController {
                 .findFirst()
                 .orElse("ROLE_USER");
 
-        return ResponseEntity.ok(MeResponse.builder()
-                .id(username)        // id 필드에 username 사용 (users 테이블에 별도 email 없으므로)
-                .email(username)     // email 필드도 username으로 매핑
-                .nickname(username)
+        return loadUserPort.loadUser(username).map(user -> ResponseEntity.ok(MeResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail() != null ? user.getEmail() : username)
+                .nickname(user.getNickname() != null ? user.getNickname() : username)
+                .phoneNumber(user.getPhoneNumber())
                 .role(role)
-                .build());
+                .build()))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body((MeResponse) null));
     }
 }

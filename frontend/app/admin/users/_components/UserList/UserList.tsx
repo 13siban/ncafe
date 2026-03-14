@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useAuthStore } from '@/store/useAuthStore';
 import { apiFetch } from '@/lib/api';
 import styles from './UserList.module.css';
 
@@ -11,6 +12,9 @@ interface User {
 }
 
 export const UserList = () => {
+    const { user: currentUser } = useAuthStore();
+    const isAdmin = currentUser?.role === 'ROLE_ADMIN';
+
     const [users, setUsers] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -56,6 +60,37 @@ export const UserList = () => {
         }
     };
 
+    const handleRoleChange = async (userId: string, newRole: string) => {
+        try {
+            const res = await apiFetch(`/api/admin/users/${userId}/role`, {
+                method: 'PUT',
+                body: JSON.stringify({ role: newRole })
+            });
+
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.message || '권한 변경에 실패했습니다.');
+            }
+
+            alert('권한이 성공적으로 변경되었습니다.');
+            fetchUsers();
+        } catch (err: any) {
+            alert(err.message || '권한 변경 중 오류가 발생했습니다.');
+        }
+    };
+
+    const getRoleBadgeClass = (role: string) => {
+        if (role === 'ROLE_ADMIN') return styles.roleAdmin;
+        if (role === 'ROLE_SUB_ADMIN') return styles.roleSubAdmin;
+        return styles.roleUser;
+    };
+
+    const getRoleLabel = (role: string) => {
+        if (role === 'ROLE_ADMIN') return '관리자';
+        if (role === 'ROLE_SUB_ADMIN') return '부관리자';
+        return '일반회원';
+    };
+
     if (isLoading) return <div className={styles.loading}>데이터를 불러오는 중입니다...</div>;
     if (error) return <div className={styles.error}>{error}</div>;
 
@@ -83,12 +118,22 @@ export const UserList = () => {
                                 <td>{user.id}</td>
                                 <td>{user.username}</td>
                                 <td>
-                                    <span
-                                        className={`${styles.roleBadge} ${user.role === 'ROLE_ADMIN' ? styles.roleAdmin : styles.roleUser
-                                            }`}
-                                    >
-                                        {user.role === 'ROLE_ADMIN' ? '관리자' : '일반회원'}
-                                    </span>
+                                    {isAdmin ? (
+                                        <select
+                                            className={styles.roleSelect}
+                                            value={user.role}
+                                            onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                                            disabled={user.username === currentUser?.username}
+                                        >
+                                            <option value="ROLE_ADMIN">관리자</option>
+                                            <option value="ROLE_SUB_ADMIN">부관리자</option>
+                                            <option value="ROLE_USER">일반회원</option>
+                                        </select>
+                                    ) : (
+                                        <span className={`${styles.roleBadge} ${getRoleBadgeClass(user.role)}`}>
+                                            {getRoleLabel(user.role)}
+                                        </span>
+                                    )}
                                 </td>
                                 <td>
                                     <button

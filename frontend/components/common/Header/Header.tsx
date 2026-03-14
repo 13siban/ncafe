@@ -88,7 +88,10 @@ const Header = () => {
                     <Link href="/menus" className={isActive('/menus') ? styles.active : ''}>Menu</Link>
                     <Link href="/order/my" className={isActive('/order/my') ? styles.active : ''}>My Order</Link>
                     <Link href="/about" className={isActive('/about') ? styles.active : ''}>About</Link>
-                    {isMounted && (user?.role === 'ADMIN' || user?.role === 'ROLE_ADMIN') && (
+                    {isMounted && user && (
+                        <Link href="/mypage" className={isActive('/mypage') ? styles.active : ''}>My Page</Link>
+                    )}
+                    {isMounted && (user?.role === 'ADMIN' || user?.role === 'ROLE_ADMIN' || user?.role === 'ROLE_SUB_ADMIN') && (
                         <Link href="/admin" className={isActive('/admin') ? styles.active : ''}>Admin</Link>
                     )}
                 </div>

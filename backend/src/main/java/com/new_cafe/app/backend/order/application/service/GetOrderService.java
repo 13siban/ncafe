@@ -1,5 +1,6 @@
 package com.new_cafe.app.backend.order.application.service;
 
+import com.new_cafe.app.backend.menu.adapter.out.persistence.MenuJpaRepository;
 import com.new_cafe.app.backend.order.adapter.out.persistence.OrderItemJpaEntity;
 import com.new_cafe.app.backend.order.adapter.out.persistence.OrderItemJpaRepository;
 import com.new_cafe.app.backend.order.adapter.out.persistence.OrderJpaEntity;
@@ -10,6 +11,7 @@ import com.new_cafe.app.backend.order.application.port.in.CreateOrderUseCase;
 import com.new_cafe.app.backend.order.application.port.in.GetOrderUseCase;
 import com.new_cafe.app.backend.order.domain.model.OrderStatus;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,7 @@ public class GetOrderService implements GetOrderUseCase {
     private final OrderJpaRepository orderRepository;
     private final OrderItemJpaRepository orderItemRepository;
     private final OrderOptionSelectionJpaRepository orderOptionRepository;
+    private final MenuJpaRepository menuRepository;
 
     @Override
     public OrderDto getOrder(LocalDate date, Integer number) {
@@ -89,6 +92,27 @@ public class GetOrderService implements GetOrderUseCase {
                     k.getNumber().equals(o.getOrderNumber())
                 ))
                 .map(this::mapToListDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TopMenuDto> getTopMenus(String userId, int limit) {
+        if (userId == null) {
+            return List.of();
+        }
+        return orderRepository.findTopMenusByUserId(userId, PageRequest.of(0, limit))
+                .stream()
+                .map(proj -> {
+                    String engName = menuRepository.findById(proj.getMenuId())
+                            .map(m -> m.getEngName())
+                            .orElse(null);
+                    return TopMenuDto.builder()
+                            .menuId(proj.getMenuId())
+                            .menuName(proj.getMenuName())
+                            .engName(engName)
+                            .totalQuantity(proj.getTotalQuantity())
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 

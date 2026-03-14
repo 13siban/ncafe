@@ -193,7 +193,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 {isMounted && !isLoading ? (user ? (user.username || user.nickname) : '로그인 필요') : '로딩 중...'}
               </div>
               <div className={styles.userRole}>
-                {isMounted && !isLoading && user ? (user.role === 'ROLE_ADMIN' ? '관리자' : '사용자') : ''}
+                {isMounted && !isLoading && user ? (user.role === 'ROLE_ADMIN' ? '관리자' : user.role === 'ROLE_SUB_ADMIN' ? '부관리자' : '사용자') : ''}
               </div>
             </div>
             {isMounted && !isLoading && user && (

@@ -10,6 +10,7 @@ export interface SessionUser {
     email: string;
     nickname: string;
     role: string;
+    phoneNumber?: string;
 }
 
 export interface SessionData {

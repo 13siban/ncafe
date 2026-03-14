@@ -35,7 +35,7 @@ public class UpdateMenuService implements UpdateMenuUseCase {
                 throw new IllegalArgumentException("영문 이름에는 숫자나 특수문자를 포함할 수 없습니다 (공백, 하이픈 제외).");
             }
             // 2. 중복 체크 (자신 제외)
-            if (loadAdminMenuPort.existsByEngNameAndIdNotIgnoreCase(newEngName, command.getId())) {
+            if (loadAdminMenuPort.existsByEngNameIgnoreCaseAndIdNot(newEngName, command.getId())) {
                 throw new IllegalArgumentException("이미 다른 메뉴에서 사용 중인 영문 이름입니다: " + newEngName);
             }
         }

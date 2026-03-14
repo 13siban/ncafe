@@ -30,6 +30,9 @@ public class SignupService implements SignupUseCase {
                 .id(UUID.randomUUID().toString())
                 .username(command.getUsername())
                 .password(passwordEncoder.encode(command.getPassword()))
+                .nickname(command.getNickname())
+                .email(command.getEmail())
+                .phoneNumber(command.getPhoneNumber())
                 .role("ROLE_USER")
                 .build();
 

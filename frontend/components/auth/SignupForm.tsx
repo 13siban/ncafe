@@ -11,6 +11,9 @@ const SignupForm = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [passwordConfirm, setPasswordConfirm] = useState('');
+    const [nickname, setNickname] = useState('');
+    const [email, setEmail] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -26,7 +29,7 @@ const SignupForm = () => {
         setIsLoading(true);
 
         try {
-            await authAPI.signup(username, password);
+            await authAPI.signup(username, password, nickname, email, phoneNumber);
             alert('회원가입이 완료되었습니다. 로그인해주세요.');
             router.push('/login');
         } catch (err: any) {
@@ -77,6 +80,45 @@ const SignupForm = () => {
                         value={passwordConfirm}
                         onChange={(e) => setPasswordConfirm(e.target.value)}
                         placeholder="비밀번호를 다시 한번 입력하세요"
+                        required
+                    />
+                </div>
+
+                <div className={styles.formGroup}>
+                    <label htmlFor="nickname" className={styles.label}>닉네임 (표시명)</label>
+                    <input
+                        id="nickname"
+                        type="text"
+                        className={styles.input}
+                        value={nickname}
+                        onChange={(e) => setNickname(e.target.value)}
+                        placeholder="사용할 닉네임을 입력하세요"
+                        required
+                    />
+                </div>
+
+                <div className={styles.formGroup}>
+                    <label htmlFor="email" className={styles.label}>이메일</label>
+                    <input
+                        id="email"
+                        type="email"
+                        className={styles.input}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="이메일을 입력하세요"
+                        required
+                    />
+                </div>
+
+                <div className={styles.formGroup}>
+                    <label htmlFor="phoneNumber" className={styles.label}>전화번호</label>
+                    <input
+                        id="phoneNumber"
+                        type="tel"
+                        className={styles.input}
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="010-0000-0000"
                         required
                     />
                 </div>

@@ -228,18 +228,21 @@ public class DataInitializer implements CommandLineRunner {
     private void createInitialUsers() {
         log.info("Creating initial users...");
         
-        createUser("hong", "1234", "ROLE_ADMIN");
-        createUser("admin", "1234", "ROLE_ADMIN");
-        createUser("subadmin", "1234", "ROLE_ADMIN");
-        createUser("user", "1234", "ROLE_USER");
+        createUser("hong_id", "hong", "1234", "ROLE_ADMIN", "hong@example.com", "010-1111-2222");
+        createUser("admin", "admin", "1234", "ROLE_ADMIN", "admin@example.com", "010-2222-3333");
+        createUser("subadmin", "subadmin", "1234", "ROLE_SUB_ADMIN", "subadmin@example.com", "010-3333-4444");
+        createUser("user", "user", "1234", "ROLE_USER", "user@example.com", "010-5555-6666");
         
         log.info("Initial users created.");
     }
 
-    private void createUser(String nickname, String password, String role) {
+    private void createUser(String username, String nickname, String password, String role, String email, String phoneNumber) {
         User user = User.builder()
                 .id(UUID.randomUUID().toString())
-                .username(nickname)
+                .username(username)
+                .nickname(nickname)
+                .email(email)
+                .phoneNumber(phoneNumber)
                 .password(passwordEncoder.encode(password))
                 .role(role)
                 .build();

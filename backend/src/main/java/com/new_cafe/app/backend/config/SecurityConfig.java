@@ -3,8 +3,10 @@ package com.new_cafe.app.backend.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.new_cafe.app.backend.config.security.JwtAuthenticationFilter;
@@ -16,6 +18,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -42,7 +45,9 @@ public class SecurityConfig {
                     .requestMatchers("/orders/**", "/api/orders/**").permitAll()
 
                     // 관리자 API: ADMIN 권한이 있는 사용자만 접근 가능
-                    .requestMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.PUT, "/admin/users/**", "/api/admin/users/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.DELETE, "/admin/users/**", "/api/admin/users/**").hasRole("ADMIN")
+                    .requestMatchers("/admin/**", "/api/admin/**").hasAnyRole("ADMIN", "SUB_ADMIN")
                     
                     // 에러 페이지 접근 허용 (상세 에러메시지 전달을 위함)
                     .requestMatchers("/error").permitAll()

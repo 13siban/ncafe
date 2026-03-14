@@ -64,8 +64,8 @@ public class AdminMenuPersistenceAdapter implements
     }
 
     @Override
-    public boolean existsByEngNameAndIdNotIgnoreCase(String engName, Long id) {
-        return adminMenuJpaRepository.existsByEngNameAndIdNotIgnoreCase(engName, id);
+    public boolean existsByEngNameIgnoreCaseAndIdNot(String engName, Long id) {
+        return adminMenuJpaRepository.existsByEngNameIgnoreCaseAndIdNot(engName, id);
     }
 
     @Override

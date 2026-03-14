@@ -40,10 +40,12 @@ public class GetMenuDetailService implements GetMenuDetailUseCase {
                 menu = menuRepositoryPort.findByEngName(slug.replace("-", " "));
             }
         } else {
-            return null;
+            throw new IllegalArgumentException("메뉴 식별자(ID 또는 영문 이름)가 제공되지 않았습니다.");
         }
 
-        if (menu == null) return null;
+        if (menu == null) {
+            throw new IllegalArgumentException("요청하신 메뉴를 찾을 수 없습니다.");
+        }
         final Menu resolvedMenu = menu;
 
         Category category = categoryRepositoryPort.findById(resolvedMenu.getCategoryId());

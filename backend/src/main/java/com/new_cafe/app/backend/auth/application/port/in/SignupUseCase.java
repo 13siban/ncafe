@@ -11,5 +11,8 @@ public interface SignupUseCase {
     class SignupCommand {
         String username;
         String password;
+        String nickname;
+        String email;
+        String phoneNumber;
     }
 }

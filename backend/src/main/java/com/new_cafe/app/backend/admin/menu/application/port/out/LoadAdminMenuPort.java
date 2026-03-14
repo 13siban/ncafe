@@ -7,5 +7,5 @@ public interface LoadAdminMenuPort {
     Menu findById(Long id);
     List<Menu> findAll(Long categoryId, String searchQuery);
     boolean existsByEngNameIgnoreCase(String engName);
-    boolean existsByEngNameAndIdNotIgnoreCase(String engName, Long id);
+    boolean existsByEngNameIgnoreCaseAndIdNot(String engName, Long id);
 }

@@ -11,10 +11,19 @@ import { useMenuDetail } from './_components/useMenuDetail';
 import { MenuInfo } from './_components/MenuInfo/MenuInfo';
 import { MenuOptions } from './_components/MenuOptions/MenuOptions';
 import { Header, Footer } from '@/components/common';
+import { userFavoriteAPI, authAPI } from '@/app/lib/api';
+import { Star } from 'lucide-react';
 
 export default function PublicMenuDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const router = useRouter();
+    const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+
+    React.useEffect(() => {
+        authAPI.getSession().then(data => {
+            setIsLoggedIn(!!data?.user);
+        }).catch(() => setIsLoggedIn(false));
+    }, []);
 
     const {
         menu,
@@ -37,6 +46,34 @@ export default function PublicMenuDetailPage({ params }: { params: Promise<{ id:
         const success = handleAddToCart();
         if (success) {
             setShowModal(true);
+        }
+    };
+
+    const handleAddFavorite = async () => {
+        if (!menu) return;
+
+        const alias = window.prompt("즐겨찾기 별칭(예: 연하게 아아)을 입력해주세요. (선택사항)") || undefined;
+        
+        const mappedOptions: { optionGroupId: number; optionItemId: number }[] = [];
+        Object.entries(selectedOptions).forEach(([groupId, itemIds]) => {
+            (itemIds as number[]).forEach(itemId => {
+                mappedOptions.push({
+                    optionGroupId: Number(groupId),
+                    optionItemId: Number(itemId),
+                });
+            });
+        });
+
+        try {
+            await userFavoriteAPI.addFavorite({
+                menuId: menu.id,
+                alias,
+                selectedOptions: mappedOptions
+            });
+            alert('즐겨찾기에 성공적으로 추가되었습니다!');
+        } catch (err: any) {
+            alert(err.message || '로그인 후 이용 가능합니다.');
+            router.push('/login');
         }
     };
 
@@ -125,6 +162,16 @@ export default function PublicMenuDetailPage({ params }: { params: Promise<{ id:
                                         />
                                     </div>
                                 </div>
+
+                                {isLoggedIn && (
+                                    <button 
+                                        className={styles.favoriteBtn} 
+                                        onClick={handleAddFavorite}
+                                        title="즐겨찾기 추가"
+                                    >
+                                        <Star size={24} color="white" fill="white" />
+                                    </button>
+                                )}
 
                                 <button
                                     className={styles.addToCartBtn}
