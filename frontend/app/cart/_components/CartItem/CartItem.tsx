@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Trash2, Plus, Minus, ShoppingBag, ChevronDown, ChevronUp } from 'lucide-react';
 import styles from '../../page.module.css';
 import { CartItem as CartItemType, useCartStore, CartOption } from '@/store/useCartStore';
@@ -110,7 +111,7 @@ export function CartItem({ item, onRemove, onUpdateQuantity, onValidityChange }:
 
     return (
         <div className={styles.cartItem}>
-            <div className={styles.itemImage}>
+            <Link href={`/menus/${item.menuEngName ? item.menuEngName.toLowerCase().replace(/\s+/g, '-') : item.menuId}`} className={styles.itemImage}>
                 {item.imageSrc ? (
                     <Image
                         src={`/images/${item.imageSrc}`}
@@ -123,7 +124,7 @@ export function CartItem({ item, onRemove, onUpdateQuantity, onValidityChange }:
                         <ShoppingBag size={24} color="#ccc" />
                     </div>
                 )}
-            </div>
+            </Link>
             <div className={styles.itemInfo}>
                 <div className={styles.itemHeader}>
                     <h3 className={styles.itemName}>{item.menuName}</h3>

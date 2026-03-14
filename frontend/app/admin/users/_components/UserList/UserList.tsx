@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { apiFetch } from '@/lib/api';
+import { UserPointModal } from '../UserPointModal/UserPointModal';
 import styles from './UserList.module.css';
 
 interface User {
@@ -21,6 +22,7 @@ export const UserList = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedUserForPoints, setSelectedUserForPoints] = useState<User | null>(null);
 
     const fetchUsers = async () => {
         setIsLoading(true);
@@ -210,6 +212,16 @@ export const UserList = () => {
                                 <td style={{ display: 'flex', gap: '4px' }}>
                                     {isAdmin && (
                                         <button
+                                            className={styles.lockBtn}
+                                            style={{ backgroundColor: '#f39c12' }}
+                                            onClick={() => setSelectedUserForPoints(user)}
+                                            title="포인트 관리"
+                                        >
+                                            포인트
+                                        </button>
+                                    )}
+                                    {isAdmin && (
+                                        <button
                                             className={user.enabled === false ? styles.unlockBtn : styles.lockBtn}
                                             onClick={() => handleToggleLock(user.id)}
                                             disabled={user.username === currentUser?.username}
@@ -230,6 +242,13 @@ export const UserList = () => {
                     )}
                 </tbody>
             </table>
+
+            {selectedUserForPoints && (
+                <UserPointModal
+                    user={{ id: selectedUserForPoints.id, username: selectedUserForPoints.username }}
+                    onClose={() => setSelectedUserForPoints(null)}
+                />
+            )}
         </div>
     );
 };

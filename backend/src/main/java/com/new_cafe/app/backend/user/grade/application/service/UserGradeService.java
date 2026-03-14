@@ -89,11 +89,14 @@ public class UserGradeService {
         }
 
         boolean enabled = isGradeSystemEnabled();
+        int defaultEarnRate = gradeSystemConfigRepository.findById(1L)
+                .map(com.new_cafe.app.backend.user.grade.adapter.out.persistence.GradeSystemConfigJpaEntity::getDefaultEarnRate)
+                .orElse(1);
 
         return UserGradeResponse.builder()
                 .currentGrade(enabled ? currentSetting.getGrade() : "NONE")
                 .currentGradeName(enabled ? currentSetting.getDisplayName() : "일반 회원")
-                .earnRate(enabled ? currentSetting.getEarnRate() : 1)
+                .earnRate(enabled ? currentSetting.getEarnRate() : defaultEarnRate)
                 .gradeSystemEnabled(enabled)
                 .currentOrderCount(user.getTotalOrderCount() != null ? user.getTotalOrderCount() : 0)
                 .currentOrderAmount(user.getTotalOrderAmount() != null ? user.getTotalOrderAmount() : 0)

@@ -565,6 +565,14 @@ export default function MyPage() {
                                                 onClick={() => router.push(`/menus/${topMenu.engName ? topMenu.engName.toLowerCase().replace(/\s+/g, '-') : topMenu.menuId}`)}
                                             >
                                                 <div className={styles.topMenuRank}>{idx + 1}</div>
+                                                <img 
+                                                    src={`/images/${topMenu.imageUrl || 'placeholder.jpg'}`}
+                                                    alt={topMenu.menuName}
+                                                    className={styles.topMenuImg}
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
+                                                    }}
+                                                />
                                                 <div className={styles.topMenuInfo}>
                                                     <div className={styles.topMenuName}>{topMenu.menuName}</div>
                                                     <div className={styles.topMenuCount}>주문 횟수: {topMenu.totalQuantity}회</div>

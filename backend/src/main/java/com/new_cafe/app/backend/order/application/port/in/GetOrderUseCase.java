@@ -74,6 +74,7 @@ public interface GetOrderUseCase {
         private Long menuId;
         private String menuName;
         private String engName;
+        private String imageUrl;
         private Long totalQuantity;
     }
 }

@@ -7,4 +7,6 @@ import lombok.Data;
 public class GradeSystemConfigRequest {
     @JsonProperty("isEnabled")
     private boolean isEnabled;
+
+    private Integer defaultEarnRate;
 }

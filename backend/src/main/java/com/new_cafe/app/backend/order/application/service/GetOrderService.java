@@ -1,6 +1,8 @@
 package com.new_cafe.app.backend.order.application.service;
 
 import com.new_cafe.app.backend.menu.adapter.out.persistence.MenuJpaRepository;
+import com.new_cafe.app.backend.menu.application.port.out.MenuImageRepositoryPort;
+import com.new_cafe.app.backend.menu.domain.model.MenuImage;
 import com.new_cafe.app.backend.order.adapter.out.persistence.OrderItemJpaEntity;
 import com.new_cafe.app.backend.order.adapter.out.persistence.OrderItemJpaRepository;
 import com.new_cafe.app.backend.order.adapter.out.persistence.OrderJpaEntity;
@@ -31,6 +33,7 @@ public class GetOrderService implements GetOrderUseCase {
     private final OrderItemJpaRepository orderItemRepository;
     private final OrderOptionSelectionJpaRepository orderOptionRepository;
     private final MenuJpaRepository menuRepository;
+    private final MenuImageRepositoryPort menuImageRepositoryPort;
 
     @Override
     public OrderDto getOrder(LocalDate date, Integer number) {
@@ -103,13 +106,27 @@ public class GetOrderService implements GetOrderUseCase {
         return orderRepository.findTopMenusByUserId(userId, PageRequest.of(0, limit))
                 .stream()
                 .map(proj -> {
-                    String engName = menuRepository.findById(proj.getMenuId())
-                            .map(m -> m.getEngName())
-                            .orElse(null);
+                    String engName = null;
+                    String imageUrl = "placeholder.jpg";
+                    var optMenu = menuRepository.findById(proj.getMenuId());
+                    if (optMenu.isPresent()) {
+                        engName = optMenu.get().getEngName();
+                        // menu_images 테이블 우선 조회 (GetMenuListService와 동일 로직)
+                        List<MenuImage> images = menuImageRepositoryPort.findAllByMenuId(proj.getMenuId());
+                        if (!images.isEmpty()) {
+                            imageUrl = images.get(0).getSrcUrl();
+                        } else if (engName != null && !engName.trim().isEmpty()) {
+                            imageUrl = engName.toLowerCase().replaceAll("\\s+", "") + ".png";
+                        } else {
+                            imageUrl = "blank.png";
+                        }
+                    }
+                    
                     return TopMenuDto.builder()
                             .menuId(proj.getMenuId())
                             .menuName(proj.getMenuName())
                             .engName(engName)
+                            .imageUrl(imageUrl)
                             .totalQuantity(proj.getTotalQuantity())
                             .build();
                 })

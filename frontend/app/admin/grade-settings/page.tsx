@@ -17,9 +17,11 @@ type GradeSetting = {
 export default function AdminGradeSettingsPage() {
     const [settings, setSettings] = useState<GradeSetting[]>([]);
     const [systemEnabled, setSystemEnabled] = useState(true);
+    const [defaultEarnRate, setDefaultEarnRate] = useState(1);
     const [isLoading, setIsLoading] = useState(true);
     const [savingGrade, setSavingGrade] = useState<string | null>(null);
     const [isAdding, setIsAdding] = useState(false);
+    const [isSavingConfig, setIsSavingConfig] = useState(false);
 
     const [newGrade, setNewGrade] = useState({
         grade: "",
@@ -41,6 +43,7 @@ export default function AdminGradeSettingsPage() {
             ]);
             setSettings(data);
             setSystemEnabled(configData.isEnabled);
+            setDefaultEarnRate(configData.defaultEarnRate ?? 1);
         } catch (e) {
             console.error("Failed to fetch settings", e);
             alert("설정을 불러오지 못했습니다.");
@@ -56,12 +59,27 @@ export default function AdminGradeSettingsPage() {
         try {
             await fetchAPI('/admin/grade-settings/config', {
                 method: 'PUT',
-                body: JSON.stringify({ isEnabled: nextState })
+                body: JSON.stringify({ isEnabled: nextState, defaultEarnRate })
             });
             setSystemEnabled(nextState);
             alert(`등급 시스템이 ${nextState ? '활성화' : '비활성화'}되었습니다.`);
         } catch (e) {
             alert('설정 변경에 실패했습니다.');
+        }
+    };
+
+    const handleSaveDefaultEarnRate = async () => {
+        setIsSavingConfig(true);
+        try {
+            await fetchAPI('/admin/grade-settings/config', {
+                method: 'PUT',
+                body: JSON.stringify({ isEnabled: systemEnabled, defaultEarnRate })
+            });
+            alert(`기본 적립률이 ${defaultEarnRate}%로 저장되었습니다.`);
+        } catch (e) {
+            alert('기본 적립률 저장에 실패했습니다.');
+        } finally {
+            setIsSavingConfig(false);
         }
     };
 
@@ -175,7 +193,41 @@ export default function AdminGradeSettingsPage() {
             </div>
             
             <div className={`${styles.systemContainer} ${!systemEnabled ? styles.disabledSystem : ''}`}>
-                {!systemEnabled && <div className={styles.disabledOverlay}>등급 시스템이 비활성화되었습니다. 기본 적립률이 적용됩니다.</div>}
+                {!systemEnabled && (
+                    <div className={styles.disabledOverlay}>
+                        등급 시스템이 비활성화되었습니다. 기본 적립률({defaultEarnRate}%)이 모든 회원에게 적용됩니다.
+                    </div>
+                )}
+
+                <div className={styles.defaultEarnRateSection}>
+                    <div className={styles.defaultEarnRateRow}>
+                        <div className={styles.defaultEarnRateInfo}>
+                            <label className={styles.defaultEarnRateLabel}>기본 적립률 (등급 시스템 비활성화 시 적용)</label>
+                            <span className={styles.defaultEarnRateDesc}>등급 시스템이 꺼져있을 때 모든 주문에 일괄 적용될 적립률입니다.</span>
+                        </div>
+                        <div className={styles.defaultEarnRateInput}>
+                            <input
+                                type="number"
+                                min={0}
+                                max={100}
+                                value={defaultEarnRate}
+                                onChange={(e) => setDefaultEarnRate(parseInt(e.target.value) || 0)}
+                            />
+                            <span className={styles.percentText}>%</span>
+                            <button
+                                onClick={handleSaveDefaultEarnRate}
+                                disabled={isSavingConfig}
+                                className={styles.saveDefaultBtn}
+                            >
+                                {isSavingConfig ? <Loader2 size={16} className="animate-spin" /> : (
+                                    <>
+                                        <Save size={16} /> 저장
+                                    </>
+                                )} 
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 
                 <div className={styles.addBtnWrap}>
                     <button onClick={() => setIsAdding(!isAdding)} className={styles.addBtn}>

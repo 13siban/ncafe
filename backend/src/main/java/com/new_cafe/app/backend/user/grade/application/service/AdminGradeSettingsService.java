@@ -73,6 +73,23 @@ public class AdminGradeSettingsService implements ManageGradeSettingsUseCase {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public int getDefaultEarnRate() {
+        return configRepository.findById(1L)
+                .map(GradeSystemConfigJpaEntity::getDefaultEarnRate)
+                .orElse(1);
+    }
+
+    @Override
+    @Transactional
+    public void updateDefaultEarnRate(int defaultEarnRate) {
+        GradeSystemConfigJpaEntity config = configRepository.findById(1L)
+                .orElseGet(() -> GradeSystemConfigJpaEntity.builder().id(1L).build());
+        config.setDefaultEarnRate(defaultEarnRate);
+        configRepository.save(config);
+    }
+
+    @Override
     @Transactional
     public void createGrade(String grade, String displayName, Integer earnRate, Integer count, Integer amount) {
         if (repository.findByGrade(grade) != null) {

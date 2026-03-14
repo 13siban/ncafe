@@ -486,11 +486,19 @@
 }
 
 .topMenuRank {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 800;
     color: var(--color-primary-600);
-    min-width: 48px;
+    min-width: 32px;
     text-align: center;
+}
+
+.topMenuImg {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    background-color: var(--color-gray-100);
 }
 
 .topMenuInfo {

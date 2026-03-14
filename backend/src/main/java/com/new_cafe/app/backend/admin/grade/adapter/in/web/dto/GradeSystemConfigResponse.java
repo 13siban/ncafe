@@ -12,4 +12,6 @@ public class GradeSystemConfigResponse {
     
     @JsonProperty("isEnabled")
     private boolean isEnabled;
+
+    private int defaultEarnRate;
 }

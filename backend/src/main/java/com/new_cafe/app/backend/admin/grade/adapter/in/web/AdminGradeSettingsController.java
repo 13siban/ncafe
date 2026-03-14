@@ -51,13 +51,19 @@ public class AdminGradeSettingsController {
     @GetMapping("/config")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUB_ADMIN')")
     public ResponseEntity<GradeSystemConfigResponse> getConfig() {
-        return ResponseEntity.ok(new GradeSystemConfigResponse(manageGradeSettingsUseCase.isGradeSystemEnabled()));
+        return ResponseEntity.ok(new GradeSystemConfigResponse(
+                manageGradeSettingsUseCase.isGradeSystemEnabled(),
+                manageGradeSettingsUseCase.getDefaultEarnRate()
+        ));
     }
 
     @PutMapping("/config")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> updateConfig(@RequestBody GradeSystemConfigRequest request) {
         manageGradeSettingsUseCase.updateGradeSystemConfig(request.isEnabled());
+        if (request.getDefaultEarnRate() != null) {
+            manageGradeSettingsUseCase.updateDefaultEarnRate(request.getDefaultEarnRate());
+        }
         return ResponseEntity.ok().build();
     }
 

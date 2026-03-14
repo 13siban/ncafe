@@ -10,7 +10,13 @@ import com.new_cafe.app.backend.admin.user.application.port.in.UpdateAdminUserRo
 import com.new_cafe.app.backend.admin.user.application.port.in.UpdateAdminUserGradeUseCase;
 import com.new_cafe.app.backend.admin.user.adapter.in.web.dto.UpdateUserRoleRequest;
 import com.new_cafe.app.backend.admin.user.adapter.in.web.dto.UpdateUserGradeRequest;
+import com.new_cafe.app.backend.admin.user.adapter.in.web.dto.AdminPointRequest;
 import com.new_cafe.app.backend.auth.adapter.out.persistence.UserJpaRepository;
+import com.new_cafe.app.backend.auth.application.port.in.ManageUserPointUseCase;
+import com.new_cafe.app.backend.auth.domain.model.UserPoint;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,6 +33,7 @@ public class AdminUserController {
     private final DeleteAdminUserUseCase deleteAdminUserUseCase;
     private final UpdateAdminUserRoleUseCase updateAdminUserRoleUseCase;
     private final UpdateAdminUserGradeUseCase updateAdminUserGradeUseCase;
+    private final ManageUserPointUseCase userPointUseCase;
     private final UserJpaRepository userJpaRepository;
 
     @GetMapping
@@ -73,5 +80,40 @@ public class AdminUserController {
             "message", user.isEnabled() ? "계정이 잠금 해제되었습니다." : "계정이 잠금되었습니다.",
             "isEnabled", user.isEnabled()
         );
+    }
+
+    @GetMapping("/{id}/points")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Map<String, Object> getUserPointBalance(@PathVariable String id) {
+        int balance = userPointUseCase.getPointBalance(id);
+        return Map.of("pointBalance", balance);
+    }
+
+    @GetMapping("/{id}/points/history")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Page<UserPoint> getUserPointHistory(
+            @PathVariable String id,
+            @PageableDefault(size = 20, sort = "createdAt", direction = org.springframework.data.domain.Sort.Direction.DESC) Pageable pageable
+    ) {
+        return userPointUseCase.getPointHistory(id, pageable);
+    }
+
+    @PostMapping("/{id}/points")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Map<String, String> adjustUserPoints(@PathVariable String id, @RequestBody AdminPointRequest request) {
+        if (request.getAmount() == null || request.getAmount() == 0) {
+            throw new IllegalArgumentException("변경할 포인트 금액을 입력해주세요.");
+        }
+        
+        String desc = request.getDescription() != null ? request.getDescription() : "관리자 수동 지급/차감";
+        
+        if (request.getAmount() > 0) {
+            userPointUseCase.earnPoints(id, null, request.getAmount(), desc);
+        } else {
+            // Amount is negative, we need to pass positive value to usePoints
+            userPointUseCase.usePoints(id, null, Math.abs(request.getAmount()), desc);
+        }
+        
+        return Map.of("message", "포인트가 성공적으로 조정되었습니다.");
     }
 }

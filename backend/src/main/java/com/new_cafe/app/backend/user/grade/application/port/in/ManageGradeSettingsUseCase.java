@@ -10,6 +10,8 @@ public interface ManageGradeSettingsUseCase {
     
     boolean isGradeSystemEnabled();
     void updateGradeSystemConfig(boolean isEnabled);
+    int getDefaultEarnRate();
+    void updateDefaultEarnRate(int defaultEarnRate);
     
     void createGrade(String grade, String displayName, Integer earnRate, Integer count, Integer amount);
     void deleteGrade(String grade);
