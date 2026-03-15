@@ -33,7 +33,14 @@ export function FeatureSections() {
     return (
         <section className={styles.sectionContainer}>
             {/* Coffee Section */}
-            <div className={styles.featureRow}>
+            <div className={`${styles.featureRow} ${styles.desktopTextFirst}`}>
+                <div className={styles.featureImageWrapper}>
+                    <img
+                        src="https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&q=80"
+                        alt="Pouring Coffee"
+                        className={styles.featureImage}
+                    />
+                </div>
                 <motion.div
                     className={styles.featureTextContent}
                     initial="hidden"
@@ -63,17 +70,10 @@ export function FeatureSections() {
                         </Link>
                     </motion.div>
                 </motion.div>
-                <div className={styles.featureImageWrapper}>
-                    <img
-                        src="https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&q=80"
-                        alt="Pouring Coffee"
-                        className={styles.featureImage}
-                    />
-                </div>
             </div>
 
             {/* Dessert Section */}
-            <div className={`${styles.featureRow} ${styles.reverseRow}`}>
+            <div className={styles.featureRow}>
                 <div className={styles.featureImageWrapper}>
                     <img
                         src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&q=80"

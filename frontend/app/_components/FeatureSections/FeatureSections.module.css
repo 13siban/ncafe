@@ -116,7 +116,7 @@
 
 /* Reverse layout for desktop */
 @media (min-width: 1024px) {
-    .reverseRow .featureImageWrapper {
+    .desktopTextFirst .featureTextContent {
         order: -1;
     }
 }

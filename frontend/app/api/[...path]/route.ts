@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/app/lib/session';
+import sharp from 'sharp';
 
 const API_BASE = process.env.API_BASE_URL || 'http://localhost:8080';
 const CHAT_SERVER_BASE = process.env.CHAT_SERVER_URL || 'http://localhost:8000';
@@ -138,13 +139,45 @@ async function unifiedHandler(req: NextRequest) {
     }
 
     const hasBody = !['GET', 'HEAD'].includes(req.method);
-    let requestBody = null;
+    let requestBody: BodyInit | null = null;
 
     if (hasBody) {
         try {
-            const buffer = await req.arrayBuffer();
-            if (buffer.byteLength > 0) {
-                requestBody = buffer;
+            if (contentType && contentType.includes('multipart/form-data')) {
+                const formData = await req.formData();
+                const newFormData = new FormData();
+                
+                for (const [key, value] of formData.entries()) {
+                    if (value instanceof Blob && value.type.startsWith('image/')) {
+                        try {
+                            const buffer = Buffer.from(await value.arrayBuffer());
+                            // Sharp로 이미지 리사이징 및 WebP 변환 (용량 최적화)
+                            const compressedBuffer = await sharp(buffer)
+                                .resize({ width: 1200, withoutEnlargement: true }) // 최대 너비 1200px
+                                .webp({ quality: 80 }) // 80% 화질의 WebP로 변환
+                                .toBuffer();
+                            
+                            const originalName = (value as File).name || 'image.jpg';
+                            const newFileName = originalName.replace(/\.[^/.]+$/, "") + ".webp";
+                            const newFile = new Blob([new Uint8Array(compressedBuffer)], { type: 'image/webp' });
+                            newFormData.append(key, newFile, newFileName);
+                        } catch (e) {
+                            console.error("Image compression failed", e);
+                            newFormData.append(key, value); // 실패 시 원본 그대로 전송
+                        }
+                    } else {
+                        newFormData.append(key, value);
+                    }
+                }
+                
+                requestBody = newFormData;
+                // fetch가 FormData를 보낼 때 알맞은 boundary를 설정하도록 기존 Content-Type 헤더 제거
+                delete headers['Content-Type'];
+            } else {
+                const buffer = await req.arrayBuffer();
+                if (buffer.byteLength > 0) {
+                    requestBody = buffer;
+                }
             }
         } catch (e) {
             console.error('Failed to read request body:', e);

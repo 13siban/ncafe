@@ -48,7 +48,7 @@ export default function GradeSection() {
 
     return (
         <section className={styles.gradeSection}>
-            <motion.h2 
+            <motion.h2
                 className={styles.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -56,14 +56,14 @@ export default function GradeSection() {
             >
                 Membership Tiers
             </motion.h2>
-            <motion.p 
+            <motion.p
                 className={styles.description}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
             >
-                NCAFE를 사랑해주시는 분들을 위해 특별한 혜택을 준비했습니다.<br />
+                mymyy를 사랑해주시는 분들을 위해 특별한 혜택을 준비했습니다.<br />
                 함께할수록 더 커지는 즐거움을 경험해 보세요.
             </motion.p>
 
@@ -73,8 +73,8 @@ export default function GradeSection() {
                         key={grade.grade}
                         className={styles.gradeCard}
                         style={{
-                            background: grade.mainColor 
-                                ? `linear-gradient(135deg, ${grade.mainColor}, ${grade.mainColor}cc)` 
+                            background: grade.mainColor
+                                ? `linear-gradient(135deg, ${grade.mainColor}, ${grade.mainColor}cc)`
                                 : '#333',
                             color: grade.textColor || '#fff',
                         }}
@@ -84,14 +84,14 @@ export default function GradeSection() {
                         transition={{ delay: index * 0.1 + 0.2 }}
                     >
                         <div className={styles.gradeHeader} style={{ borderColor: `${grade.textColor}40` }}>
-                            <span 
+                            <span
                                 className={styles.gradeBadge}
                                 style={{
                                     backgroundColor: grade.textColor,
                                     color: grade.mainColor
                                 }}
                             >
-                                {grade.grade} 등급
+                                {grade.grade}
                             </span>
                             <h3 className={styles.gradeName}>{grade.displayName}</h3>
                         </div>
@@ -112,7 +112,7 @@ export default function GradeSection() {
                             <div className={styles.benefitItem} style={{ borderTop: `1px dashed ${grade.textColor}40`, paddingTop: '16px', marginTop: 'auto' }}>
                                 <span className={styles.benefitLabel}>결제 적립 혜택</span>
                                 <span className={styles.benefitValue} style={{ fontSize: '1.2rem' }}>
-                                    {grade.earnRate}% 
+                                    {grade.earnRate}%
                                 </span>
                             </div>
                         </div>

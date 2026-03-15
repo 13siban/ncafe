@@ -127,7 +127,8 @@ const Header = () => {
                                             background: badge.bg, color: badge.color, 
                                             padding: '2px 8px', borderRadius: '12px', 
                                             fontSize: '0.75rem', fontWeight: 600,
-                                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                            border: '1px solid white'
                                         }}>
                                             {badge.text}
                                         </span>
