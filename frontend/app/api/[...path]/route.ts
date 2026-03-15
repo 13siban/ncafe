@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/app/lib/session';
-import sharp from 'sharp';
+
+// Sharp는 동적 import (모듈 누락 시에도 라우트가 동작하도록)
+let sharpModule: typeof import('sharp') | null = null;
+try {
+    sharpModule = require('sharp');
+} catch {
+    console.warn('[BFF] Sharp not available, image compression disabled');
+}
 
 const API_BASE = process.env.API_BASE_URL || 'http://localhost:8080';
 const CHAT_SERVER_BASE = process.env.CHAT_SERVER_URL || 'http://localhost:8000';
@@ -150,17 +157,21 @@ async function unifiedHandler(req: NextRequest) {
                 for (const [key, value] of formData.entries()) {
                     if (value instanceof Blob && value.type.startsWith('image/')) {
                         try {
-                            const buffer = Buffer.from(await value.arrayBuffer());
-                            // Sharp로 이미지 리사이징 및 WebP 변환 (용량 최적화)
-                            const compressedBuffer = await sharp(buffer)
-                                .resize({ width: 1200, withoutEnlargement: true }) // 최대 너비 1200px
-                                .webp({ quality: 80 }) // 80% 화질의 WebP로 변환
-                                .toBuffer();
-                            
-                            const originalName = (value as File).name || 'image.jpg';
-                            const newFileName = originalName.replace(/\.[^/.]+$/, "") + ".webp";
-                            const newFile = new Blob([new Uint8Array(compressedBuffer)], { type: 'image/webp' });
-                            newFormData.append(key, newFile, newFileName);
+                            if (sharpModule) {
+                                const buffer = Buffer.from(await value.arrayBuffer());
+                                // Sharp로 이미지 리사이징 및 WebP 변환 (용량 최적화)
+                                const compressedBuffer = await sharpModule(buffer)
+                                    .resize({ width: 1200, withoutEnlargement: true })
+                                    .webp({ quality: 80 })
+                                    .toBuffer();
+                                
+                                const originalName = (value as File).name || 'image.jpg';
+                                const newFileName = originalName.replace(/\.[^/.]+$/, "") + ".webp";
+                                const newFile = new Blob([new Uint8Array(compressedBuffer)], { type: 'image/webp' });
+                                newFormData.append(key, newFile, newFileName);
+                            } else {
+                                newFormData.append(key, value); // Sharp 없으면 원본 전송
+                            }
                         } catch (e) {
                             console.error("Image compression failed", e);
                             newFormData.append(key, value); // 실패 시 원본 그대로 전송

@@ -7,7 +7,8 @@ import NoticePopupModal from "@/components/common/NoticePopupModal";
 import GlobalOrderTracker from "@/components/common/GlobalOrderTracker/GlobalOrderTracker";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+  // 서버 사이드에서 실행되므로 Docker 내부 네트워크 주소를 사용
+  const apiUrl = process.env.API_BASE_URL || 'http://localhost:8080';
   
   try {
     const res = await fetch(`${apiUrl}/store/status`, { cache: 'no-store' });

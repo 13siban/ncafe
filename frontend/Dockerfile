@@ -34,8 +34,8 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-# [수정] 헬스체크 및 디버깅용 curl 설치
-RUN apk add --no-cache curl
+# [수정] 헬스체크 및 디버깅용 curl, Sharp 네이티브 의존성 설치
+RUN apk add --no-cache curl vips-dev
 
 ENV NODE_ENV production
 # Disable telemetry during runtime
@@ -55,6 +55,9 @@ RUN chown nextjs:nodejs .next
 # The standalone folder contains the server and necessary node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Sharp: standalone 빌드에 네이티브 모듈이 누락될 수 있으므로 별도 설치 (Alpine = musl)
+RUN npm install --no-save sharp@0.34.5
 
 USER nextjs
 
