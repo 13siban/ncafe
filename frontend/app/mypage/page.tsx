@@ -236,7 +236,6 @@ export default function MyPage() {
                                                     </div>
                                                 </div>
                                                 {gradeInfo.nextGrade ? (
-                                                    <>
                                                         <div className={styles.gradeProgressContainer}>
                                                             <div className={styles.progressLabel}>
                                                                 <span>다음 등급: {gradeInfo.nextGradeName}</span>
@@ -252,18 +251,17 @@ export default function MyPage() {
                                                                     }}
                                                                 />
                                                             </div>
-                                                        </div>
-                                                        <div className={styles.nextGradeInfo}>
-                                                            <span>주문 금액: {new Intl.NumberFormat('ko-KR').format(gradeInfo.currentOrderAmount)}원</span>
-                                                            <span>목표: {gradeInfo.nextGradeRequireAmount ? `${new Intl.NumberFormat('ko-KR').format(gradeInfo.nextGradeRequireAmount)}원` : '달성'}</span>
-                                                        </div>
-                                                        {gradeInfo.nextGradeRequireCount !== null && (
-                                                            <div className={styles.nextGradeInfo} style={{ marginTop: '4px' }}>
-                                                                <span>주문 횟수: {gradeInfo.currentOrderCount}회</span>
-                                                                <span>목표: {gradeInfo.nextGradeRequireCount}회</span>
+                                                            <div className={styles.nextGradeInfo}>
+                                                                <span>주문 금액: {new Intl.NumberFormat('ko-KR').format(gradeInfo.currentOrderAmount)}원</span>
+                                                                <span>목표: {gradeInfo.nextGradeRequireAmount ? `${new Intl.NumberFormat('ko-KR').format(gradeInfo.nextGradeRequireAmount)}원` : '달성'}</span>
                                                             </div>
-                                                        )}
-                                                    </>
+                                                            {gradeInfo.nextGradeRequireCount !== null && (
+                                                                <div className={styles.nextGradeInfo} style={{ marginTop: '4px' }}>
+                                                                    <span>주문 횟수: {gradeInfo.currentOrderCount}회</span>
+                                                                    <span>목표: {gradeInfo.nextGradeRequireCount}회</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                 ) : (
                                                     <div className={styles.gradeProgressContainer}>
                                                         <div className={styles.progressLabel}>최고 등급입니다!</div>
@@ -350,64 +348,6 @@ export default function MyPage() {
                                     </form>
                                 </section>
 
-                                <section className={`${styles.section} ${styles.dangerSection}`}>
-                                    <h2 className={styles.sectionTitle} style={{ color: '#e74c3c' }}>⚠️ 계정 탈퇴</h2>
-                                    <p style={{ fontSize: '0.875rem', color: '#999', marginBottom: '16px', lineHeight: 1.6 }}>
-                                        탈퇴 후 30일 이내에 로그인하면 계정을 복구할 수 있습니다.<br />
-                                        30일이 지나면 계정과 모든 데이터가 영구적으로 삭제됩니다.
-                                    </p>
-                                    {!showDeleteConfirm ? (
-                                        <button
-                                            className={styles.dangerBtn}
-                                            onClick={() => setShowDeleteConfirm(true)}
-                                        >
-                                            계정 탈퇴 요청
-                                        </button>
-                                    ) : (
-                                        <div className={styles.deleteConfirmBox}>
-                                            <p style={{ fontWeight: 600, marginBottom: '12px', color: '#e74c3c' }}>
-                                                정말 탈퇴하시겠습니까? 비밀번호를 입력해주세요.
-                                            </p>
-                                            <input
-                                                type="password"
-                                                placeholder="현재 비밀번호 입력"
-                                                value={deletePassword}
-                                                onChange={(e) => setDeletePassword(e.target.value)}
-                                                className={styles.deleteInput}
-                                            />
-                                            <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                                                <button
-                                                    className={styles.dangerBtn}
-                                                    onClick={async () => {
-                                                        if (!deletePassword) {
-                                                            alert('비밀번호를 입력해주세요.');
-                                                            return;
-                                                        }
-                                                        try {
-                                                            const res = await userAPI.deleteAccount(deletePassword);
-                                                            alert(res.message || '탈퇴 요청이 처리되었습니다.');
-                                                            // 로그아웃 처리
-                                                            window.location.href = '/login';
-                                                        } catch (error: any) {
-                                                            alert(error.message || '탈퇴 요청 중 오류가 발생했습니다.');
-                                                        }
-                                                    }}
-                                                >
-                                                    탈퇴 확인
-                                                </button>
-                                                <button
-                                                    className={styles.cancelBtn}
-                                                    onClick={() => {
-                                                        setShowDeleteConfirm(false);
-                                                        setDeletePassword('');
-                                                    }}
-                                                >
-                                                    취소
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </section>
 
 <section className={styles.section}>
                                 <h2 className={styles.sectionTitle}>주문 내역</h2>
@@ -600,6 +540,65 @@ export default function MyPage() {
                                         ))
                                     )}
                                 </div>
+                            </section>
+
+                            <section className={`${styles.section} ${styles.dangerSection}`}>
+                                <h2 className={styles.sectionTitle} style={{ color: '#e74c3c' }}>⚠️ 계정 탈퇴</h2>
+                                <p style={{ fontSize: '0.875rem', color: '#999', marginBottom: '16px', lineHeight: 1.6 }}>
+                                    탈퇴 후 30일 이내에 로그인하면 계정을 복구할 수 있습니다.<br />
+                                    30일이 지나면 계정과 모든 데이터가 영구적으로 삭제됩니다.
+                                </p>
+                                {!showDeleteConfirm ? (
+                                    <button
+                                        className={styles.dangerBtn}
+                                        onClick={() => setShowDeleteConfirm(true)}
+                                    >
+                                        계정 탈퇴 요청
+                                    </button>
+                                ) : (
+                                    <div className={styles.deleteConfirmBox}>
+                                        <p style={{ fontWeight: 600, marginBottom: '12px', color: '#e74c3c' }}>
+                                            정말 탈퇴하시겠습니까? 비밀번호를 입력해주세요.
+                                        </p>
+                                        <input
+                                            type="password"
+                                            placeholder="현재 비밀번호 입력"
+                                            value={deletePassword}
+                                            onChange={(e) => setDeletePassword(e.target.value)}
+                                            className={styles.deleteInput}
+                                        />
+                                        <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                                            <button
+                                                className={styles.dangerBtn}
+                                                onClick={async () => {
+                                                    if (!deletePassword) {
+                                                        alert('비밀번호를 입력해주세요.');
+                                                        return;
+                                                    }
+                                                    try {
+                                                        const res = await userAPI.deleteAccount(deletePassword);
+                                                        alert(res.message || '탈퇴 요청이 처리되었습니다.');
+                                                        // 로그아웃 처리
+                                                        window.location.href = '/login';
+                                                    } catch (error: any) {
+                                                        alert(error.message || '탈퇴 요청 중 오류가 발생했습니다.');
+                                                    }
+                                                }}
+                                            >
+                                                탈퇴 확인
+                                            </button>
+                                            <button
+                                                className={styles.cancelBtn}
+                                                onClick={() => {
+                                                    setShowDeleteConfirm(false);
+                                                    setDeletePassword('');
+                                                }}
+                                            >
+                                                취소
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
                             </section>
                     </div>
                 </div>
