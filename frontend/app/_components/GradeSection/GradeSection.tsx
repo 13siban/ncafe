@@ -24,15 +24,13 @@ export default function GradeSection() {
         const loadGrades = async () => {
             try {
                 const data = await fetchAPI('/grades/public', { skipRedirect: true });
+                console.log('[GradeSection] API response:', data);
                 if (Array.isArray(data) && data.length > 0) {
                     setGrades(data);
                 }
                 // 빈 배열 = 등급 시스템 비활성 → 섹션 미노출
             } catch (err: any) {
-                // 404 또는 네트워크 에러 시 조용히 무시 (섹션 미노출)
-                if (err?.status !== 404) {
-                    console.error("Failed to load public grades:", err);
-                }
+                console.error("[GradeSection] Failed to load public grades:", err?.status, err?.message || err);
             } finally {
                 setLoading(false);
             }
@@ -100,13 +98,13 @@ export default function GradeSection() {
                             <div className={styles.benefitItem}>
                                 <span className={styles.benefitLabel}>승급 조건 (주문)</span>
                                 <span className={styles.benefitValue}>
-                                    {grade.upgradeOrderCount > 0 ? `${grade.upgradeOrderCount}회 이상` : '기본 등급'}
+                                    {(grade.upgradeOrderCount ?? 0) > 0 ? `${grade.upgradeOrderCount}회 이상` : '기본 등급'}
                                 </span>
                             </div>
                             <div className={styles.benefitItem}>
                                 <span className={styles.benefitLabel}>승급 조건 (금액)</span>
                                 <span className={styles.benefitValue}>
-                                    {grade.upgradeOrderAmount > 0 ? `${grade.upgradeOrderAmount.toLocaleString()}원 이상` : '기본 등급'}
+                                    {(grade.upgradeOrderAmount ?? 0) > 0 ? `${grade.upgradeOrderAmount!.toLocaleString()}원 이상` : '기본 등급'}
                                 </span>
                             </div>
                             <div className={styles.benefitItem} style={{ borderTop: `1px dashed ${grade.textColor}40`, paddingTop: '16px', marginTop: 'auto' }}>
