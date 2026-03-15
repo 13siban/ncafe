@@ -56,8 +56,9 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Sharp: standalone 빌드에 네이티브 모듈이 누락될 수 있으므로 별도 설치 (Alpine = musl)
-RUN npm install --no-save sharp@0.34.5
+# Sharp: standalone 빌드에 네이티브 모듈이 누락될 수 있으므로 builder에서 복사
+COPY --from=builder /app/node_modules/sharp ./node_modules/sharp
+COPY --from=builder /app/node_modules/@img ./node_modules/@img
 
 USER nextjs
 
