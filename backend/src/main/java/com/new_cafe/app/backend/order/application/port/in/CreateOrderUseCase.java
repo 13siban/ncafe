@@ -1,6 +1,7 @@
 package com.new_cafe.app.backend.order.application.port.in;
 
 import com.new_cafe.app.backend.order.domain.model.OrderStatus;
+import com.new_cafe.app.backend.order.domain.model.OrderType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +20,7 @@ public interface CreateOrderUseCase {
     @AllArgsConstructor
     class CreateOrderCommand {
         private String customerName;
+        private OrderType orderType;
         private String memo;
         private List<OrderItemCommand> items;
         private String paymentId;
@@ -51,6 +53,7 @@ public interface CreateOrderUseCase {
         private String orderDate;
         private Integer orderNumber;
         private String displayNumber;
+        private OrderType orderType;
         private OrderStatus status;
         private String customerName;
         private Integer totalPrice;

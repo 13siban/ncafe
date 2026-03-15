@@ -9,6 +9,8 @@ class Message(BaseModel):
 class ChatRequest(BaseModel):
     messages: List[Message]
     stream: bool = True
+    userId: Optional[str] = None
+    cartSummary: Optional[str] = None
 
 class IngestRequest(BaseModel):
     filename: str

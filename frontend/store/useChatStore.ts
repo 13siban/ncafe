@@ -15,9 +15,14 @@ interface ChatState {
     toggleChat: () => void;
     openChat: () => void;
     closeChat: () => void;
-    sendMessage: (content: string) => Promise<void>;
+    sendMessage: (content: string, userId?: string | null, cartSummary?: string | null) => Promise<void>;
     clearMessages: () => void;
-    pendingAction: { type: 'navigate'; path: string } | { type: 'add_to_cart'; slug: string; quantity: number } | null;
+    pendingAction:
+        | { type: 'navigate'; path: string }
+        | { type: 'add_to_cart'; slug: string; quantity: number }
+        | { type: 'show_menu_cards'; menus: { slug: string; name: string; price: number }[] }
+        | { type: 'reorder'; items: { menuId: number; menuName: string; quantity: number }[] }
+        | null;
     clearPendingAction: () => void;
 }
 
@@ -46,7 +51,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     openChat: () => set({ isOpen: true }),
     closeChat: () => set({ isOpen: false }),
 
-    sendMessage: async (content: string) => {
+    sendMessage: async (content: string, userId?: string | null, cartSummary?: string | null) => {
         const state = get();
         let sessionId = state.sessionId;
 
@@ -76,7 +81,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
             const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: content, sessionId, stream: true }),
+                body: JSON.stringify({ message: content, sessionId, stream: true, userId: userId || null, cartSummary: cartSummary || null }),
             });
 
             if (!res.ok) {
@@ -91,7 +96,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
             const decoder = new TextDecoder('utf-8', { fatal: false });
             let sseBuffer = '';
             let fullContent = '';
-            let action: { type: 'navigate'; path: string } | { type: 'add_to_cart'; slug: string; quantity: number } | null = null;
+            let action: ChatState['pendingAction'] = null;
 
             while (true) {
                 const { done, value } = await reader.read();
@@ -120,6 +125,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
                                         type: 'add_to_cart',
                                         slug: parsed.slug,
                                         quantity: parsed.quantity || 1,
+                                    };
+                                } else if (parsed.action === 'show_menu_cards' && parsed.menus) {
+                                    action = {
+                                        type: 'show_menu_cards',
+                                        menus: parsed.menus,
+                                    };
+                                } else if (parsed.action === 'reorder' && parsed.items) {
+                                    action = {
+                                        type: 'reorder',
+                                        items: parsed.items,
                                     };
                                 }
                             }
@@ -155,15 +170,36 @@ export const useChatStore = create<ChatState>((set, get) => ({
             }
 
             // 스트리밍 완료 — 최종 상태 업데이트
-            set((state) => ({
-                messages: state.messages.map((msg) =>
-                    msg.id === aiMessageId
-                        ? { ...msg, content: fullContent }
-                        : msg
-                ),
-                isLoading: false,
-                pendingAction: action,
-            }));
+            let defaultContent = fullContent;
+            if (isFirstChunk && action) {
+                // 텍스트 없이 액션만 온 경우 (프롬프트에서 '바로 호출하세요' 지시 때문)
+                if (action.type === 'add_to_cart') defaultContent = "옵션을 선택해주세요.";
+                else if (action.type === 'show_menu_cards') defaultContent = "추천 메뉴입니다.";
+                else if (action.type === 'reorder') defaultContent = "이전 주문 상품의 옵션을 확인해주세요.";
+                else if (action.type === 'navigate') defaultContent = "해당 페이지로 이동합니다.";
+                else defaultContent = "요청을 처리했습니다.";
+
+                set((state) => ({
+                    messages: [...state.messages, {
+                        id: aiMessageId,
+                        role: 'assistant',
+                        content: defaultContent,
+                        timestamp: Date.now(),
+                    }],
+                    isLoading: false,
+                    pendingAction: action,
+                }));
+            } else {
+                set((state) => ({
+                    messages: state.messages.map((msg) =>
+                        msg.id === aiMessageId
+                            ? { ...msg, content: fullContent }
+                            : msg
+                    ),
+                    isLoading: false,
+                    pendingAction: action,
+                }));
+            }
         } catch (error) {
             console.error('Chat Error:', error);
             const errorMessage: ChatMessage = {
@@ -181,5 +217,19 @@ export const useChatStore = create<ChatState>((set, get) => ({
     },
 
     clearPendingAction: () => set({ pendingAction: null }),
-    clearMessages: () => set({ messages: [] }),
+    clearMessages: () => {
+        const oldSessionId = get().sessionId;
+        // 서버측 세션 히스토리 삭제
+        if (oldSessionId) {
+            fetch('/api/chat', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId: oldSessionId }),
+            }).catch(() => {});
+        }
+        if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('chat-session-id');
+        }
+        set({ messages: [], sessionId: '' });
+    },
 }));

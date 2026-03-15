@@ -77,6 +77,16 @@ export function OrderDetailModal({
                                 <span>{order.customerName} {order.isGuest && '(비회원)'}</span>
                             </div>
                             <div className={modalStyles.infoRow}>
+                                <span className={modalStyles.infoLabel}>주문 방식</span>
+                                <span>
+                                    {order.orderType === 'PICKUP' ? (
+                                        <span style={{ color: 'var(--color-primary-500)', fontWeight: 'bold' }}>포장 (일회용기)</span>
+                                    ) : (
+                                        <span style={{ color: 'var(--color-gray-600)', fontWeight: 'bold' }}>매장 (다회용기)</span>
+                                    )}
+                                </span>
+                            </div>
+                            <div className={modalStyles.infoRow}>
                                 <span className={modalStyles.infoLabel}>요청사항</span>
                                 <span className={order.memo ? modalStyles.memoText : modalStyles.emptyMemo}>
                                     {order.memo || '없음'}

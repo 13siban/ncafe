@@ -15,6 +15,7 @@ public class Order {
     private Integer orderNumber;
     private String userId;
     private String customerName;
+    private OrderType orderType;
     private OrderStatus status;
     private Integer totalPrice;
     private Integer usedPoints;

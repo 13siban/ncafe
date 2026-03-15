@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+export type OrderType = 'PICKUP' | 'STORE';
+
+
 export interface CartOption {
     optionGroupId: number;
     optionGroupName: string;
@@ -24,7 +27,9 @@ export interface CartItem {
 }
 
 interface CartState {
+    orderType: OrderType;
     items: CartItem[];
+    setOrderType: (type: OrderType) => void;
     addItem: (item: CartItem) => void;
     removeItem: (cartId: string) => void;
     updateQuantity: (cartId: string, quantity: number) => void;
@@ -37,7 +42,9 @@ interface CartState {
 export const useCartStore = create<CartState>()(
     persist(
         (set, get) => ({
+            orderType: 'STORE',
             items: [],
+            setOrderType: (type) => set({ orderType: type }),
             addItem: (newItem) => {
                 set((state) => {
                     // Check if an item with the same menuId and options already exists

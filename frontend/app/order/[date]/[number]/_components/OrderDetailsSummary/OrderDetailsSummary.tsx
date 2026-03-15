@@ -35,7 +35,21 @@ export function OrderDetailsSummary({ order }: OrderDetailsSummaryProps) {
         <div className={styles.section}>
             <div className={styles.orderBrief}>
                 <div className={styles.orderNumber}>주문번호 <span className={styles.displayNumber}>{order.displayNumber}</span></div>
-                <div style={{ fontSize: '0.875rem', color: '#666' }}>{order.customerName} 고객님</div>
+                <div style={{ fontSize: '0.875rem', color: '#666', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span>{order.customerName} 고객님</span>
+                    {order.orderType && (
+                        <span style={{ 
+                            padding: '2px 6px', 
+                            backgroundColor: 'var(--color-primary-50)', 
+                            color: 'var(--color-primary-600)', 
+                            borderRadius: '4px',
+                            fontWeight: 600,
+                            fontSize: '0.75rem'
+                        }}>
+                            {order.orderType === 'PICKUP' ? '포장 (일회용기)' : '매장 (다회용기)'}
+                        </span>
+                    )}
+                </div>
             </div>
 
             <h3 className={styles.sectionTitle}>

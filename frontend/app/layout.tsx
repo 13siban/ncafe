@@ -1,16 +1,9 @@
 import type { Metadata } from "next";
-import { Fraunces } from "next/font/google";
 import "./globals.css";
 import { AuthErrorHandler } from "@/components/auth/AuthErrorHandler";
 import ChatWidget from "@/components/chat/ChatWidget";
 import { Toaster } from 'react-hot-toast';
 import NoticePopupModal from "@/components/common/NoticePopupModal";
-
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-fraunces",
-  display: "swap",
-});
 
 export async function generateMetadata(): Promise<Metadata> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
@@ -55,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={fraunces.variable}>
+    <html lang="ko">
       <body>
         <AuthErrorHandler />
         {children}

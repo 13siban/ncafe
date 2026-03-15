@@ -1,17 +1,37 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, Send, X } from 'lucide-react';
+import { MessageCircle, Send, X, ShoppingCart, Eye, Check } from 'lucide-react';
 import styles from './ChatWidget.module.css';
 import { useChatStore } from '@/store/useChatStore';
-import { useCartStore } from '@/store/useCartStore';
+import { useCartStore, CartOption } from '@/store/useCartStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation';
+import { OptionGroup } from '@/types/menuOption';
 
 const FAQ_QUESTIONS = [
-    '영업시간',
     '오늘의 추천 메뉴',
-    '주문 방법',
+    '인기 메뉴',
+    '내 주문 상태',
+    '주문 대기 현황',
 ];
+
+interface MenuCardData {
+    slug: string;
+    name: string;
+    price: number;
+}
+
+// 옵션 선택 패널 데이터
+interface OptionPanelData {
+    menuId: number;
+    menuName: string;
+    menuEngName: string;
+    imageSrc: string;
+    basePrice: number;
+    quantity: number;
+    optionGroups: OptionGroup[];
+}
 
 const ChatWidget = () => {
     const {
@@ -23,29 +43,146 @@ const ChatWidget = () => {
         sendMessage,
         pendingAction,
         clearPendingAction,
+        clearMessages,
     } = useChatStore();
 
     const router = useRouter();
+    const user = useAuthStore((state) => state.user);
+    const checkAuth = useAuthStore((state) => state.checkAuth);
+    const items = useCartStore((state) => state.items);
 
     const [input, setInput] = useState('');
+    const [menuCards, setMenuCards] = useState<MenuCardData[]>([]);
+    const [optionPanel, setOptionPanel] = useState<OptionPanelData | null>(null);
+    const [selectedOptions, setSelectedOptions] = useState<Record<number, number[]>>({});
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     // 새 메시지가 추가되면 스크롤을 맨 아래로
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages, isLoading]);
+    }, [messages, isLoading, menuCards, optionPanel]);
 
-    // 채팅창이 열리면 입력창에 포커스
+    // 채팅창이 열리면 세션 확인 + 입력창에 포커스
     useEffect(() => {
         if (isOpen) {
+            checkAuth();
             setTimeout(() => inputRef.current?.focus(), 300);
         }
-    }, [isOpen]);
+    }, [isOpen, checkAuth]);
 
     const addItem = useCartStore((state) => state.addItem);
 
-    // 에이전트 요청에 따른 페이지 이동 및 장바구니 담기 처리
+    // 옵션 패널 열기: slug로 메뉴+옵션 정보를 fetch해서 패널 표시
+    const openOptionPanel = async (slug: string, quantity: number = 1) => {
+        try {
+            const res = await fetch(`/api/menus/slug/${slug}`);
+            if (!res.ok) return;
+            const text = await res.text();
+            if (!text) return;
+            const menu = JSON.parse(text);
+
+            const optRes = await fetch(`/api/menus/${menu.id}/options`);
+            let optionGroups: OptionGroup[] = [];
+            if (optRes.ok) {
+                const optData = await optRes.json();
+                optionGroups = optData.optionGroups || [];
+            }
+
+            // 필수 옵션은 첫 번째 항목 자동 선택
+            const defaults: Record<number, number[]> = {};
+            optionGroups.forEach((g) => {
+                if (g.isRequired && g.items?.length > 0) {
+                    defaults[g.id] = [g.items[0].id];
+                }
+            });
+            setSelectedOptions(defaults);
+
+            setOptionPanel({
+                menuId: menu.id,
+                menuName: menu.korName,
+                menuEngName: menu.engName,
+                imageSrc: menu.images && menu.images.length > 0 ? menu.images[0].srcUrl : '',
+                basePrice: menu.price,
+                quantity,
+                optionGroups,
+            });
+        } catch (e) {
+            console.error('Failed to load menu options', e);
+        }
+    };
+
+    // 옵션 변경 핸들러
+    const handleOptionChange = (group: OptionGroup, itemId: number, checked: boolean) => {
+        setSelectedOptions((prev) => {
+            const copy = { ...prev };
+            if (group.type === 'radio') {
+                copy[group.id] = [itemId];
+            } else {
+                const current = copy[group.id] || [];
+                copy[group.id] = checked
+                    ? [...current, itemId]
+                    : current.filter((id) => id !== itemId);
+            }
+            return copy;
+        });
+    };
+
+    // 옵션 패널에서 "담기" 클릭
+    const handleAddFromPanel = () => {
+        if (!optionPanel) return;
+
+        const cartOptions: CartOption[] = [];
+        let optionTotalPrice = 0;
+
+        optionPanel.optionGroups.forEach((group) => {
+            const selectedIds = selectedOptions[group.id] || [];
+            group.items?.forEach((item) => {
+                if (selectedIds.includes(item.id)) {
+                    cartOptions.push({
+                        optionGroupId: group.id,
+                        optionGroupName: group.name,
+                        optionItemId: item.id,
+                        optionItemName: item.name,
+                        priceDelta: item.priceDelta || 0,
+                    });
+                    optionTotalPrice += item.priceDelta || 0;
+                }
+            });
+        });
+
+        const cartId = `${optionPanel.menuId}-${cartOptions.map(o => `${o.optionGroupId}:${o.optionItemId}`).sort().join('-')}`;
+        addItem({
+            cartId,
+            menuId: optionPanel.menuId,
+            menuName: optionPanel.menuName,
+            menuEngName: optionPanel.menuEngName,
+            imageSrc: optionPanel.imageSrc,
+            basePrice: optionPanel.basePrice,
+            quantity: optionPanel.quantity,
+            selectedOptions: cartOptions,
+            optionTotalPrice,
+            subtotal: (optionPanel.basePrice + optionTotalPrice) * optionPanel.quantity,
+        });
+
+        setOptionPanel(null);
+        setSelectedOptions({});
+    };
+
+    // 옵션총가격 계산
+    const getOptionTotalPrice = () => {
+        if (!optionPanel) return 0;
+        let total = 0;
+        optionPanel.optionGroups.forEach((group) => {
+            const ids = selectedOptions[group.id] || [];
+            group.items?.forEach((item) => {
+                if (ids.includes(item.id)) total += item.priceDelta || 0;
+            });
+        });
+        return total;
+    };
+
+    // 에이전트 요청에 따른 액션 처리
     useEffect(() => {
         if (!pendingAction) return;
 
@@ -53,62 +190,36 @@ const ChatWidget = () => {
             router.push(pendingAction.path);
             clearPendingAction();
         } else if (pendingAction.type === 'add_to_cart') {
-            const addCartAndClear = async () => {
-                try {
-                    const res = await fetch(`/api/menus/slug/${pendingAction.slug}`);
-                    if (res.ok) {
-                        const text = await res.text();
-                        if (!text) {
-                            console.warn(`메뉴 데이터를 찾을 수 없습니다: ${pendingAction.slug}`);
-                            return;
+            // 바로 담기 대신 옵션 패널 열기
+            openOptionPanel(pendingAction.slug, pendingAction.quantity).finally(clearPendingAction);
+        } else if (pendingAction.type === 'show_menu_cards') {
+            setMenuCards(pendingAction.menus);
+            clearPendingAction();
+        } else if (pendingAction.type === 'reorder') {
+            const reorder = async () => {
+                for (const item of pendingAction.items) {
+                    try {
+                        const res = await fetch(`/api/menus/${item.menuId}`);
+                        if (res.ok) {
+                            const menu = await res.json();
+                            const slug = (menu.engName || '').toLowerCase().replace(/\s+/g, '-');
+                            if (slug) await openOptionPanel(slug, item.quantity);
                         }
-                        const menu = JSON.parse(text);
-                        
-                        // 기본 옵션 조회를 위해 옵션 API 호출
-                        const optRes = await fetch(`/api/menus/${menu.id}/options`);
-                        let cartOptions: any[] = [];
-                        let optionTotalPrice = 0;
-                        if (optRes.ok) {
-                            const optData = await optRes.json();
-                            optData.optionGroups?.forEach((group: any) => {
-                                if (group.isRequired && group.items?.length > 0) {
-                                    // 기본적으로 첫번째 항목 선택
-                                    const item = group.items[0];
-                                    cartOptions.push({
-                                        optionGroupId: group.id,
-                                        optionGroupName: group.name,
-                                        optionItemId: item.id,
-                                        optionItemName: item.name,
-                                        priceDelta: item.priceDelta || 0,
-                                    });
-                                    optionTotalPrice += item.priceDelta || 0;
-                                }
-                            });
-                        }
-
-                        const cartId = `${menu.id}-${cartOptions.map(o => `${o.optionGroupId}:${o.optionItemId}`).sort().join('-')}`;
-                        addItem({
-                            cartId,
-                            menuId: menu.id,
-                            menuName: menu.korName,
-                            menuEngName: menu.engName,
-                            imageSrc: menu.images && menu.images.length > 0 ? menu.images[0].srcUrl : '',
-                            basePrice: menu.price,
-                            quantity: pendingAction.quantity,
-                            selectedOptions: cartOptions,
-                            optionTotalPrice,
-                            subtotal: (menu.price + optionTotalPrice) * pendingAction.quantity
-                        });
+                    } catch (e) {
+                        console.error('Reorder item failed', e);
                     }
-                } catch (e) {
-                    console.error('Failed to add to cart automatically', e);
-                } finally {
-                    clearPendingAction();
                 }
             };
-            addCartAndClear();
+            reorder().finally(clearPendingAction);
         }
     }, [pendingAction, router, clearPendingAction, addItem]);
+
+    // userId와 cartSummary를 포함하여 메시지 전송
+    const getUserId = () => user?.id || null;
+    const getCartSummary = () => {
+        if (items.length === 0) return null;
+        return items.map(i => `${i.menuName} ×${i.quantity}`).join(', ');
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -116,12 +227,22 @@ const ChatWidget = () => {
         if (!trimmed || isLoading) return;
 
         setInput('');
-        await sendMessage(trimmed);
+        setMenuCards([]);
+        await sendMessage(trimmed, getUserId(), getCartSummary());
     };
 
     const handleFAQClick = async (question: string) => {
         if (isLoading) return;
-        await sendMessage(question);
+        setMenuCards([]);
+        await sendMessage(question, getUserId(), getCartSummary());
+    };
+
+    const handleMenuCardClick = (slug: string) => {
+        router.push(`/menus/${slug}`);
+    };
+
+    const handleMenuCardAddToCart = async (slug: string) => {
+        await openOptionPanel(slug);
     };
 
     return (
@@ -149,14 +270,23 @@ const ChatWidget = () => {
                                 <p>무엇이든 물어보세요!</p>
                             </div>
                         </div>
-                        <button
-                            className={styles.closeButton}
-                            onClick={closeChat}
-                            aria-label="채팅 닫기"
-                            id="chat-close-button"
-                        >
-                            <X size={16} />
-                        </button>
+                        <div className={styles.chatHeaderActions}>
+                            <button
+                                className={styles.newChatButton}
+                                onClick={() => { clearMessages(); setMenuCards([]); setOptionPanel(null); }}
+                                title="새 대화"
+                            >
+                                새 대화
+                            </button>
+                            <button
+                                className={styles.closeButton}
+                                onClick={closeChat}
+                                aria-label="채팅 닫기"
+                                id="chat-close-button"
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
                     </div>
 
                     {/* 메시지 영역 */}
@@ -189,7 +319,96 @@ const ChatWidget = () => {
                                 </div>
                             ))}
 
-                            {/* 로딩 인디케이터 (메시지 목록의 마지막이 어시스턴트가 아닐 때만 표시) */}
+                            {/* 메뉴 카드 UI */}
+                            {menuCards.length > 0 && (
+                                <div className={styles.menuCardsContainer}>
+                                    {menuCards.map((menu, idx) => (
+                                        <div key={idx} className={styles.menuCard}>
+                                            <div className={styles.menuCardInfo}>
+                                                <span className={styles.menuCardName}>{menu.name}</span>
+                                                <span className={styles.menuCardPrice}>
+                                                    {new Intl.NumberFormat('ko-KR').format(menu.price)}원
+                                                </span>
+                                            </div>
+                                            <div className={styles.menuCardActions}>
+                                                <button
+                                                    className={styles.menuCardBtn}
+                                                    onClick={() => handleMenuCardClick(menu.slug)}
+                                                    title="바로보기"
+                                                >
+                                                    <Eye size={13} />
+                                                </button>
+                                                <button
+                                                    className={`${styles.menuCardBtn} ${styles.menuCardBtnPrimary}`}
+                                                    onClick={() => handleMenuCardAddToCart(menu.slug)}
+                                                    title="담기"
+                                                >
+                                                    <ShoppingCart size={13} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* 옵션 선택 패널 */}
+                            {optionPanel && (
+                                <div className={styles.optionPanel}>
+                                    <div className={styles.optionPanelHeader}>
+                                        <span className={styles.optionPanelTitle}>{optionPanel.menuName}</span>
+                                        <button
+                                            className={styles.optionPanelClose}
+                                            onClick={() => { setOptionPanel(null); setSelectedOptions({}); }}
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </div>
+
+                                    {optionPanel.optionGroups.length > 0 ? (
+                                        <div className={styles.optionGroups}>
+                                            {optionPanel.optionGroups.map((group) => (
+                                                <div key={group.id} className={styles.optionGroup}>
+                                                    <div className={styles.optionGroupLabel}>
+                                                        {group.name}
+                                                        {group.isRequired && <span className={styles.optionRequired}>필수</span>}
+                                                    </div>
+                                                    <div className={styles.optionItems}>
+                                                        {group.items?.map((item) => {
+                                                            const isSelected = (selectedOptions[group.id] || []).includes(item.id);
+                                                            return (
+                                                                <button
+                                                                    key={item.id}
+                                                                    className={`${styles.optionItem} ${isSelected ? styles.optionItemSelected : ''}`}
+                                                                    onClick={() => handleOptionChange(group, item.id, !isSelected)}
+                                                                >
+                                                                    <span>{item.name}</span>
+                                                                    {item.priceDelta > 0 && (
+                                                                        <span className={styles.optionDelta}>
+                                                                            +{new Intl.NumberFormat('ko-KR').format(item.priceDelta)}
+                                                                        </span>
+                                                                    )}
+                                                                    {isSelected && <Check size={12} className={styles.optionCheck} />}
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className={styles.optionNoOption}>선택 가능한 옵션이 없습니다.</p>
+                                    )}
+
+                                    <button className={styles.optionAddBtn} onClick={handleAddFromPanel}>
+                                        <ShoppingCart size={14} />
+                                        {new Intl.NumberFormat('ko-KR').format(
+                                            (optionPanel.basePrice + getOptionTotalPrice()) * optionPanel.quantity
+                                        )}원 담기
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* 로딩 인디케이터 */}
                             {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
                                 <div className={styles.typingIndicator}>
                                     <div className={styles.typingDot} />

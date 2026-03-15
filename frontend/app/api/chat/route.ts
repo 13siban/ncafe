@@ -19,7 +19,7 @@ const chatServerUrl = process.env.CHAT_SERVER_URL || 'http://localhost:8000';
 
 export async function POST(request: NextRequest) {
     try {
-        const { message, sessionId, stream } = await request.json();
+        const { message, sessionId, stream, userId, cartSummary } = await request.json();
 
         if (!message || !sessionId) {
             return NextResponse.json(
@@ -44,6 +44,8 @@ export async function POST(request: NextRequest) {
                 content: m.content,
             })),
             stream: !!stream,
+            userId: userId || null,
+            cartSummary: cartSummary || null,
         });
 
         // === SSE 스트리밍 모드 ===
@@ -218,4 +220,12 @@ async function collectStreamedReply(
 
         chatHistories.set(sessionId, history);
     }
+}
+
+export async function DELETE(request: NextRequest) {
+    const { sessionId } = await request.json();
+    if (sessionId) {
+        chatHistories.delete(sessionId);
+    }
+    return NextResponse.json({ success: true });
 }

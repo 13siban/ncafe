@@ -14,6 +14,7 @@ export interface OrderListItem {
     customerName: string;
     isGuest: boolean;
     status: OrderStatus;
+    orderType?: 'PICKUP' | 'STORE';
     summary: string;
     totalPrice: number;
     createdAt: string;

@@ -1,5 +1,6 @@
 /* NCafe Design System - globals.css */
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap');
 
 @font-face {
   font-family: 'Sweet';
@@ -107,7 +108,7 @@
 
   /* Typography */
   --font-sans: 'Sweet', 'Pretendard', -apple-system, sans-serif;
-  --font-serif: var(--font-fraunces), serif;
+  --font-serif: 'Fraunces', serif;
 
   --text-xs: 0.75rem;
   /* 12px */

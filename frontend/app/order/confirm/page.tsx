@@ -11,7 +11,7 @@ import { requestPayment, PaymentMethod } from "@/lib/portone";
 
 export default function OrderConfirmPage() {
     const router = useRouter();
-    const { items, getTotalPrice, clearCart } = useCartStore();
+    const { orderType, items, getTotalPrice, clearCart } = useCartStore();
 
     const [isMounted, setIsMounted] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -54,7 +54,7 @@ export default function OrderConfirmPage() {
                             setEarnRate(gradeInfo.earnRate || 0);
                         }
                     } catch (e) {
-                        console.error("Failed to fetch grade info", e);
+                        console.warn("Failed to fetch grade info - token might be expired");
                     }
 
                     try {
@@ -63,11 +63,11 @@ export default function OrderConfirmPage() {
                             setPointBalance(pointInfo.pointBalance);
                         }
                     } catch (e) {
-                        console.error("Failed to fetch point balance", e);
+                        console.warn("Failed to fetch point balance - token might be expired");
                     }
                 }
             } catch (e) {
-                console.error("Failed to fetch session:", e);
+                console.warn("Session check failed - treating as guest");
             } finally {
                 setIsLoading(false);
             }
@@ -114,6 +114,7 @@ export default function OrderConfirmPage() {
             },
             body: JSON.stringify({
                 customerName: username,
+                orderType: orderType,
                 memo: memo,
                 items: orderItems,
                 usePoints: validUsePoints,
@@ -192,7 +193,19 @@ export default function OrderConfirmPage() {
                 {/* 1. Item Summary Section */}
                 <div className={styles.section}>
                     <h2 className={styles.sectionTitle}>
-                        <ShoppingBag size={20} /> 주문 내역
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                            <span><ShoppingBag size={20} style={{ verticalAlign: 'middle', marginRight: '6px' }} /> 주문 내역</span>
+                            <span style={{ 
+                                fontSize: '0.85rem', 
+                                padding: '4px 10px', 
+                                borderRadius: '12px', 
+                                backgroundColor: orderType === 'PICKUP' ? 'var(--color-primary-100)' : 'var(--color-gray-100)',
+                                color: orderType === 'PICKUP' ? 'var(--color-primary-600)' : 'var(--color-gray-700)',
+                                fontWeight: '600'
+                            }}>
+                                {orderType === 'PICKUP' ? '포장 (일회용기)' : '매장 (다회용기)'}
+                            </span>
+                        </div>
                     </h2>
                     <div className={styles.itemList}>
                         {items.map((item) => (

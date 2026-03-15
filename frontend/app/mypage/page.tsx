@@ -25,8 +25,6 @@ export default function MyPage() {
     const [profileMessage, setProfileMessage] = useState('');
     const [passwordMessage, setPasswordMessage] = useState('');
 
-    const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'favorites' | 'topMenus' | 'points'>('profile');
-
     const [favorites, setFavorites] = useState<any[]>([]);
     const [orders, setOrders] = useState<any[]>([]);
     const [topMenus, setTopMenus] = useState<any[]>([]);
@@ -205,34 +203,9 @@ export default function MyPage() {
             <div className={styles.container}>
                 <div className={styles.content}>
                     <h1 className={styles.title}>마이페이지</h1>
-
-                    <div className={styles.tabs}>
-                        <button
-                            className={`${styles.tabBtn} ${activeTab === 'profile' ? styles.activeTab : ''}`}
-                            onClick={() => setActiveTab('profile')}
-                        >프로필</button>
-                        <button
-                            className={`${styles.tabBtn} ${activeTab === 'orders' ? styles.activeTab : ''}`}
-                            onClick={() => setActiveTab('orders')}
-                        >주문 내역</button>
-                        <button
-                            className={`${styles.tabBtn} ${activeTab === 'favorites' ? styles.activeTab : ''}`}
-                            onClick={() => setActiveTab('favorites')}
-                        >즐겨찾기</button>
-                        <button
-                            className={`${styles.tabBtn} ${activeTab === 'topMenus' ? styles.activeTab : ''}`}
-                            onClick={() => setActiveTab('topMenus')}
-                        >자주 주문한 메뉴</button>
-                        <button
-                            className={`${styles.tabBtn} ${activeTab === 'points' ? styles.activeTab : ''}`}
-                            onClick={() => setActiveTab('points')}
-                        >포인트</button>
-                    </div>
-
                     <div className={styles.tabContent}>
-                        {activeTab === 'profile' && (
-                            <>
-                                <section className={styles.section}>
+
+                        <section className={styles.section}>
                                     <h2 className={styles.sectionTitle}>회원 등급</h2>
                                     {gradeInfo ? (
                                         gradeInfo.gradeSystemEnabled === false ? (
@@ -339,8 +312,6 @@ export default function MyPage() {
                                     </form>
                                 </section>
 
-                                <hr className={styles.divider} />
-
                                 <section className={styles.section}>
                                     <h2 className={styles.sectionTitle}>비밀번호 변경</h2>
                                     <form onSubmit={handlePasswordUpdate} className={styles.form}>
@@ -378,8 +349,6 @@ export default function MyPage() {
                                         <button type="submit" className={styles.submitBtn}>비밀번호 변경</button>
                                     </form>
                                 </section>
-
-                                <hr className={styles.divider} />
 
                                 <section className={`${styles.section} ${styles.dangerSection}`}>
                                     <h2 className={styles.sectionTitle} style={{ color: '#e74c3c' }}>⚠️ 계정 탈퇴</h2>
@@ -439,11 +408,8 @@ export default function MyPage() {
                                         </div>
                                     )}
                                 </section>
-                            </>
-                        )}
 
-                        {activeTab === 'orders' && (
-                            <section className={styles.section}>
+<section className={styles.section}>
                                 <h2 className={styles.sectionTitle}>주문 내역</h2>
                                 <div className={styles.orderList}>
                                     {orders.length === 0 ? (
@@ -476,10 +442,8 @@ export default function MyPage() {
                                     )}
                                 </div>
                             </section>
-                        )}
 
-                        {activeTab === 'favorites' && (
-                            <section className={styles.section}>
+<section className={styles.section}>
                                 <h2 className={styles.sectionTitle}>즐겨찾기 메뉴</h2>
 
                                 {/* 주문 불가 항목 배너 */}
@@ -557,10 +521,8 @@ export default function MyPage() {
                                     )}
                                 </div>
                             </section>
-                        )}
 
-                        {activeTab === 'topMenus' && (
-                            <section className={styles.section}>
+<section className={styles.section}>
                                 <h2 className={styles.sectionTitle}>자주 주문한 메뉴 Top 5</h2>
                                 <div className={styles.topMenuList}>
                                     {topMenus.length === 0 ? (
@@ -592,10 +554,8 @@ export default function MyPage() {
                                     )}
                                 </div>
                             </section>
-                        )}
 
-                        {activeTab === 'points' && (
-                            <section className={styles.section}>
+<section className={styles.section}>
                                 <h2 className={styles.sectionTitle}>내 포인트</h2>
 
                                 <div className={styles.gradeCard} style={{ background: gradeInfo?.mainColor ? `linear-gradient(135deg, ${gradeInfo.mainColor}, ${gradeInfo.mainColor}dd)` : 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))', color: gradeInfo?.textColor || 'white', marginBottom: '24px' }}>
@@ -641,7 +601,6 @@ export default function MyPage() {
                                     )}
                                 </div>
                             </section>
-                        )}
                     </div>
                 </div>
             </div>

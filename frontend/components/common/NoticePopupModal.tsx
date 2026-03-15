@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 import { fetchAPI } from '@/app/lib/api';
 import styles from './NoticePopupModal.module.css';
 
@@ -26,10 +27,25 @@ interface NoticePopup {
 export default function NoticePopupModal() {
   const [popups, setPopups] = useState<NoticePopup[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const pathname = usePathname();
+  const [hasFetched, setHasFetched] = useState(false);
 
   useEffect(() => {
-    fetchPopups();
-  }, []);
+    if (hasFetched) return;
+
+    // 404 페이지 요소가 렌더링될 시간을 벌기 위해 setTimeout을 사용
+    const timer = setTimeout(() => {
+      // 404 페이지 식별 ID가 화면에 존재한다면 API 요청을 취소합니다.
+      if (document.getElementById('not-found-page')) {
+        return;
+      }
+      
+      fetchPopups();
+      setHasFetched(true);
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, [pathname, hasFetched]);
 
   const isHiddenForToday = useCallback((popupId: number): boolean => {
     const key = `hidePopup_${popupId}`;
@@ -84,7 +100,7 @@ export default function NoticePopupModal() {
   };
 
   return (
-    <div className={styles.overlay}>
+    <div id="notice-popup-root" className={styles.overlay}>
       <div className={styles.modal}>
         {currentPopup.imageUrl && (
           <img 

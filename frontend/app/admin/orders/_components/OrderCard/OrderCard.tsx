@@ -46,6 +46,19 @@ export function OrderCard({
                 <div className={styles.customerInfo}>
                     <User size={14} />
                     {order.customerName} {order.isGuest && <span style={{ fontSize: '10px', color: '#999', fontWeight: 400 }}>(비회원)</span>}
+                    {order.orderType && (
+                        <span style={{
+                            marginLeft: '6px',
+                            fontSize: '0.7rem',
+                            padding: '2px 6px',
+                            borderRadius: '8px',
+                            backgroundColor: order.orderType === 'PICKUP' ? 'var(--color-primary-100)' : 'var(--color-gray-100)',
+                            color: order.orderType === 'PICKUP' ? 'var(--color-primary-600)' : 'var(--color-gray-700)',
+                            fontWeight: '600'
+                        }}>
+                            {order.orderType === 'PICKUP' ? '포장' : '매장'}
+                        </span>
+                    )}
                 </div>
                 <div style={{ marginTop: '0.75rem', fontWeight: 600 }}>
                     {order.summary}

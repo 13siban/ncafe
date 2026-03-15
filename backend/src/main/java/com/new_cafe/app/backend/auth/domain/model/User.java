@@ -47,6 +47,10 @@ public class User implements UserDetails {
     @Column(name = "point_balance")
     private Integer pointBalance;
 
+    public Integer getPointBalance() {
+        return pointBalance == null ? 0 : pointBalance;
+    }
+
     @Column(name = "is_enabled")
     private Boolean isEnabled;
 

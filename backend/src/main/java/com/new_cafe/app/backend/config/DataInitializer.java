@@ -123,10 +123,11 @@ public class DataInitializer implements CommandLineRunner {
             createOptionItem(warmGroup.getId(), "그대로", 0, 1);
             createOptionItem(warmGroup.getId(), "데워주세요", 0, 2);
 
-            // 6. 포장 옵션
-            OptionGroupJpaEntity packGroup = createOptionGroup("포장 옵션", "radio", true, 6);
-            createOptionItem(packGroup.getId(), "매장", 0, 1);
-            createOptionItem(packGroup.getId(), "포장", 0, 2);
+            // 6. 포장 옵션 (Removed: Now using native cart-level OrderType)
+            // OptionGroupJpaEntity packGroup = createOptionGroup("포장 옵션", "radio", true, 6);
+            // createOptionItem(packGroup.getId(), "매장", 0, 1);
+            // createOptionItem(packGroup.getId(), "포장", 0, 2);
+
 
             // 7. 쿠키 세트
             OptionGroupJpaEntity cookieGroup = createOptionGroup("쿠키 세트", "radio", true, 7);
@@ -152,14 +153,12 @@ public class DataInitializer implements CommandLineRunner {
             createCategoryOptionMap(nonCoffee.getId(), sizeGroup.getId(), 2);
             createCategoryOptionMap(nonCoffee.getId(), syrupGroup.getId(), 3);
 
-            // Dessert: 포장(1), 쿠키세트(2)
-            createCategoryOptionMap(dessert.getId(), packGroup.getId(), 1);
-            createCategoryOptionMap(dessert.getId(), cookieGroup.getId(), 2);
+            // Dessert: 쿠키세트(1)
+            createCategoryOptionMap(dessert.getId(), cookieGroup.getId(), 1);
 
-            // Bakery: 데움(1), 포장(2), 빵종류변경(3)
+            // Bakery: 데움(1), 빵종류변경(2)
             createCategoryOptionMap(bakery.getId(), warmGroup.getId(), 1);
-            createCategoryOptionMap(bakery.getId(), packGroup.getId(), 2);
-            createCategoryOptionMap(bakery.getId(), breadGroup.getId(), 3);
+            createCategoryOptionMap(bakery.getId(), breadGroup.getId(), 2);
 
             log.info("Creating menu option exclusions...");
             // 에스프레소: 온도, 사이즈, 시럽 제외

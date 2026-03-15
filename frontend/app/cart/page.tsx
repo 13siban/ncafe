@@ -12,7 +12,7 @@ import { CartEmpty } from './_components/CartEmpty/CartEmpty';
 
 export default function CartPage() {
     const router = useRouter();
-    const { items, removeItem, updateQuantity, clearCart, getTotalPrice } = useCartStore();
+    const { orderType, setOrderType, items, removeItem, updateQuantity, clearCart, getTotalPrice } = useCartStore();
     const [isMounted, setIsMounted] = useState(false);
     const [isOrdering, setIsOrdering] = useState(false);
     const [invalidItems, setInvalidItems] = useState<Set<string>>(new Set());
@@ -73,6 +73,21 @@ export default function CartPage() {
                     <CartEmpty />
                 ) : (
                     <>
+                        <div className={styles.orderTypeGroup}>
+                            <button 
+                                className={`${styles.orderTypeButton} ${orderType === 'PICKUP' ? styles.active : ''}`}
+                                onClick={() => setOrderType('PICKUP')}
+                            >
+                                포장 (일회용기)
+                            </button>
+                            <button 
+                                className={`${styles.orderTypeButton} ${orderType === 'STORE' ? styles.active : ''}`}
+                                onClick={() => setOrderType('STORE')}
+                            >
+                                매장 (다회용기)
+                            </button>
+                        </div>
+
                         <div className={styles.cartHeader}>
                             <span>주문 메뉴 {items.reduce((sum, item) => sum + item.quantity, 0)}개</span>
                             <button className={styles.clearButton} onClick={clearCart}>

@@ -1,6 +1,7 @@
 package com.new_cafe.app.backend.order.adapter.out.persistence;
 
 import com.new_cafe.app.backend.order.domain.model.OrderStatus;
+import com.new_cafe.app.backend.order.domain.model.OrderType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,6 +33,10 @@ public class OrderJpaEntity {
 
     @Column(name = "customer_name", nullable = false, length = 50)
     private String customerName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_type", length = 20)
+    private OrderType orderType;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

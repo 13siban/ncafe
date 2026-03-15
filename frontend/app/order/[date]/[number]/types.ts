@@ -7,6 +7,7 @@ export interface OrderDetail {
     orderDate: string;
     orderNumber: number;
     displayNumber: string;
+    orderType?: 'PICKUP' | 'STORE';
     customerName: string;
     status: OrderStatus;
     totalPrice: number;

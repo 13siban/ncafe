@@ -120,6 +120,12 @@
     opacity: 0.8;
 }
 
+.chatHeaderActions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
 .closeButton {
     background: rgba(255, 255, 255, 0.15);
     border: none;
@@ -136,6 +142,23 @@
 }
 
 .closeButton:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.newChatButton {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: white;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.newChatButton:hover {
     background: rgba(255, 255, 255, 0.3);
 }
 
@@ -390,4 +413,227 @@
 
 .faqItem:active {
     transform: translateY(0);
+}
+
+/* 메뉴 추천 카드 */
+.menuCardsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-left: 36px;
+    animation: fadeIn 0.3s ease;
+}
+
+.menuCard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--bg-primary);
+    border: 1px solid var(--color-primary-200);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.menuCard:hover {
+    border-color: var(--color-primary-400);
+    box-shadow: 0 2px 8px rgba(139, 90, 60, 0.1);
+}
+
+.menuCardInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.menuCardName {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-gray-800);
+}
+
+.menuCardPrice {
+    font-size: var(--text-xs);
+    color: var(--color-primary-600);
+    font-weight: 500;
+}
+
+.menuCardActions {
+    display: flex;
+    gap: 4px;
+}
+
+.menuCardBtn {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-gray-200);
+    background: var(--bg-primary);
+    color: var(--color-gray-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.menuCardBtn:hover {
+    border-color: var(--color-primary-300);
+    color: var(--color-primary-600);
+    background: var(--color-primary-50);
+}
+
+.menuCardBtnPrimary {
+    background: var(--color-primary-600);
+    color: white;
+    border-color: var(--color-primary-600);
+}
+
+.menuCardBtnPrimary:hover {
+    background: var(--color-primary-700);
+    color: white;
+    border-color: var(--color-primary-700);
+}
+
+/* 옵션 선택 패널 */
+.optionPanel {
+    margin-left: 36px;
+    background: var(--bg-primary);
+    border: 1px solid var(--color-primary-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    flex-shrink: 0;
+    animation: fadeIn 0.3s ease;
+}
+
+.optionPanelHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: var(--color-primary-50);
+    border-bottom: 1px solid var(--color-primary-100);
+}
+
+.optionPanelTitle {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-gray-800);
+}
+
+.optionPanelClose {
+    background: none;
+    border: none;
+    color: var(--color-gray-400);
+    cursor: pointer;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+}
+
+.optionPanelClose:hover {
+    background: var(--color-gray-100);
+    color: var(--color-gray-600);
+}
+
+.optionGroups {
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.optionGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.optionGroupLabel {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-gray-500);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.optionRequired {
+    font-size: 10px;
+    color: var(--color-primary-600);
+    font-weight: 500;
+}
+
+.optionItems {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.optionItem {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-gray-200);
+    background: var(--bg-primary);
+    font-size: 12px;
+    color: var(--color-gray-700);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.optionItem:hover {
+    border-color: var(--color-primary-300);
+    background: var(--color-primary-50);
+}
+
+.optionItemSelected {
+    border-color: var(--color-primary-500);
+    background: var(--color-primary-50);
+    color: var(--color-primary-700);
+    font-weight: 500;
+}
+
+.optionDelta {
+    font-size: 10px;
+    color: var(--color-gray-400);
+}
+
+.optionItemSelected .optionDelta {
+    color: var(--color-primary-500);
+}
+
+.optionCheck {
+    color: var(--color-primary-600);
+}
+
+.optionNoOption {
+    padding: 12px;
+    font-size: 12px;
+    color: var(--color-gray-400);
+    text-align: center;
+}
+
+.optionAddBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 10px;
+    background: var(--color-primary-600);
+    color: white;
+    border: none;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.optionAddBtn:hover {
+    background: var(--color-primary-700);
 }

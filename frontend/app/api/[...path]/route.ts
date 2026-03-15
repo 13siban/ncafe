@@ -159,7 +159,7 @@ async function unifiedHandler(req: NextRequest) {
             // duplex 옵션은 더 이상 스트림을 직접 전달하지 않으므로 제거됩니다.
         });
 
-        if (proxyRes.status === 401 && session.token) {
+        if ((proxyRes.status === 401 || proxyRes.status === 403) && session.token) {
             session.destroy();
         }
 
