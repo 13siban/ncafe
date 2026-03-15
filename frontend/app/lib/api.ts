@@ -135,6 +135,44 @@ export const adminStoreAPI = {
     }
 };
 
+export const galleryAPI = {
+    /** 갤러리 퍼블릭 목록 조회 */
+    getPublicImages: () => fetchAPI('/gallery/public'),
+
+    /** 어드민 모든 갤러리 목록 조회 */
+    getAdminImages: () => fetchAPI('/admin/gallery'),
+
+    /** 갤러리 이미지 업로드 */
+    uploadImage: (file: File) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return fetchAPI('/admin/gallery/upload', {
+            method: 'POST',
+            body: formData,
+        });
+    },
+
+    /** 갤러리 이미지 업데이트 (정렬순서, 표시여부) */
+    updateImage: (id: number, params: { sortOrder?: number; isVisible?: boolean }) =>
+        fetchAPI(`/admin/gallery/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(params),
+        }),
+
+    /** 갤러리 이미지 삭제 */
+    deleteImage: (id: number) =>
+        fetchAPI(`/admin/gallery/${id}`, {
+            method: 'DELETE',
+        }),
+
+    /** 갤러리 이미지 순서 변경 (전체 변경) */
+    reorderImages: (orderedIds: number[]) =>
+        fetchAPI('/admin/gallery/reorder', {
+            method: 'PUT',
+            body: JSON.stringify({ orderedIds }),
+        }),
+};
+
 // 대시보드 및 통계 API 모음
 export const adminDashboardAPI = {
     /** 기간별 대시보드 통계 조회 (period: daily, weekly, monthly) */

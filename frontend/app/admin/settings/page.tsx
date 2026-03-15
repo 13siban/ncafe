@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import styles from './page.module.css';
 import { useSettings } from './_components/useSettings';
+import { GallerySetting } from './_components/GallerySetting';
 
 export default function AdminSettingsPage() {
     const {
@@ -241,18 +242,8 @@ export default function AdminSettingsPage() {
                     </div>
                 </section>
 
-                {/* 4. Development & Advanced Section (Optional Additions) */}
-                <section className={styles.card}>
-                    <div className={styles.cardHeader}>
-                        <Settings className={styles.cardIcon} size={20} />
-                        <h2 className={styles.cardTitle}>고급 설정</h2>
-                    </div>
-                    <div className={styles.cardContent}>
-                        <div className={styles.infoBox}>
-                            <p>주문 알림 및 기타 고급 설정 기능이 곧 추가될 예정입니다.</p>
-                        </div>
-                    </div>
-                </section>
+                {/* 4. Gallery Settings */}
+                <GallerySetting />
             </div>
         </div>
     );

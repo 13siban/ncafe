@@ -42,6 +42,7 @@ public class SecurityConfig {
                     .requestMatchers("/categories/**", "/api/categories/**").permitAll()
                     .requestMatchers("/notice-popups/**", "/api/notice-popups/**").permitAll()
                     .requestMatchers("/grades/public", "/api/grades/public").permitAll()
+                    .requestMatchers("/gallery/public", "/api/gallery/public").permitAll()
                     .requestMatchers("/**/*.png", "/**/*.jpg", "/**/*.jpeg", "/**/*.gif", "/**/*.svg", "/**/*.webp").permitAll()
                     .requestMatchers("/upload/**").permitAll()
                     .requestMatchers("/store/status", "/api/store/status").permitAll()

@@ -20,10 +20,12 @@ export type ImageItem =
   | { type: 'existing'; url: string; id: string }
   | { type: 'new'; url: string; id: string; file: PreviewFile };
 
+const EMPTY_ARRAY: string[] = [];
+
 export const ImageUploader = ({
   onFilesChange,
   onInitialImagesChange,
-  initialImages = [],
+  initialImages = EMPTY_ARRAY,
   maxFiles = 5
 }: ImageUploaderProps) => {
   const [files, setFiles] = useState<PreviewFile[]>([]);

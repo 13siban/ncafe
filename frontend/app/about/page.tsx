@@ -5,6 +5,7 @@ import Header from '@/components/common/Header/Header';
 import { Footer } from '@/components/common';
 import styles from './page.module.css';
 import { motion } from 'framer-motion';
+import GallerySection from './_components/GallerySection/GallerySection';
 
 export default function AboutPage() {
     return (
@@ -65,6 +66,9 @@ export default function AboutPage() {
                         </motion.div>
                     </div>
                 </section>
+
+                {/* Infinite Scrolling Gallery Section */}
+                <GallerySection />
             </div>
             <Footer />
         </main>
