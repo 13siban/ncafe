@@ -1,0 +1,138 @@
+.trackerWrapper {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.trackerBody {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  border-radius: 9999px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  background-color: white;
+  min-width: 60px;
+  max-width: 600px;
+}
+
+.iconContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.detailsContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-right: 20px;
+  white-space: nowrap;
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.expanded .detailsContainer {
+  opacity: 1;
+  width: auto;
+  padding-left: 12px;
+}
+
+.statusTitle {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+
+.statusSummary {
+  font-size: 0.85rem;
+  color: var(--color-gray-600);
+}
+
+.closeButton {
+  background: transparent;
+  border: none;
+  color: var(--color-gray-400);
+  cursor: pointer;
+  padding: 8px;
+  margin-right: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+  opacity: 0;
+  width: 0;
+  visibility: hidden;
+}
+
+.expanded .closeButton {
+  opacity: 1;
+  width: 32px;
+  visibility: visible;
+}
+
+.closeButton:hover {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-800);
+}
+
+/* Status Colors */
+.statusPreparing .iconContainer,
+.statusPreparing .statusTitle {
+  background-color: #f59e0b;
+}
+
+.statusPreparing .statusTitle {
+  background-color: transparent;
+  color: #d97706;
+}
+
+.statusCompleted .iconContainer,
+.statusCompleted .statusTitle {
+  background-color: #10b981;
+}
+
+.statusCompleted .statusTitle {
+  background-color: transparent;
+  color: #059669;
+}
+
+.statusRejected .iconContainer,
+.statusRejected .statusTitle {
+  background-color: #ef4444;
+}
+
+.statusRejected .statusTitle {
+  background-color: transparent;
+  color: #b91c1c;
+}
+
+/* Base vibrate animation */
+@keyframes vibrate {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}
+
+.statusCompleted .iconContainer {
+  animation: vibrate 0.5s ease-in-out infinite;
+}

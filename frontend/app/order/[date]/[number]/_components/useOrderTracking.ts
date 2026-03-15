@@ -33,7 +33,7 @@ export function useOrderTracking(date: string, number: string) {
             if (order && (order.status === 'PREPARING' || order.status === 'COMPLETED')) {
                 fetchOrder(true);
             }
-        }, 10000);
+        }, 2000);
 
         return () => clearInterval(interval);
     }, [fetchOrder, order?.status]);
@@ -43,6 +43,7 @@ export function useOrderTracking(date: string, number: string) {
             setLoading(true);
             await fetchAPI(`/orders/${date}/${number}/pickup`, { method: 'PUT' });
             await fetchOrder();
+            window.dispatchEvent(new Event('globalTrackerRefresh'));
         } catch (error) {
             console.error("Failed to mark order as picked up:", error);
             alert("픽업 완료 처리 중 오류가 발생했습니다.");

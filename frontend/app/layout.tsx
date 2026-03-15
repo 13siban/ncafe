@@ -4,6 +4,7 @@ import { AuthErrorHandler } from "@/components/auth/AuthErrorHandler";
 import ChatWidget from "@/components/chat/ChatWidget";
 import { Toaster } from 'react-hot-toast';
 import NoticePopupModal from "@/components/common/NoticePopupModal";
+import GlobalOrderTracker from "@/components/common/GlobalOrderTracker/GlobalOrderTracker";
 
 export async function generateMetadata(): Promise<Metadata> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
@@ -55,6 +56,7 @@ export default function RootLayout({
         <Toaster position="bottom-center" toastOptions={{ duration: 2000 }} />
         <ChatWidget />
         <NoticePopupModal />
+        <GlobalOrderTracker />
       </body>
     </html>
   );
