@@ -1,6 +1,7 @@
 'use client';
 
 import React, { use } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import NextImage from 'next/image';
@@ -41,6 +42,8 @@ export default function PublicMenuDetailPage({ params }: { params: Promise<{ id:
     } = useMenuDetail(id);
 
     const [showModal, setShowModal] = React.useState(false);
+    const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
+    const [isImageModalOpen, setIsImageModalOpen] = React.useState(false);
 
     const handleAddToCartSuccess = () => {
         const success = handleAddToCart();
@@ -113,19 +116,46 @@ export default function PublicMenuDetailPage({ params }: { params: Promise<{ id:
 
                 <div className={styles.mainContent}>
                     {/* Left Column: Image */}
-                    <div className={styles.imageSection}>
-                        {imageSrc ? (
-                            <NextImage
-                                src={`/images/${imageSrc}`}
-                                alt={menu.korName}
-                                fill
-                                style={{ objectFit: 'cover' }}
-                                sizes="(max-width: 900px) 100vw, 500px"
-                                priority
-                            />
-                        ) : (
-                            <div className={styles.placeholder}>
-                                <UtensilsCrossed size={64} strokeWidth={1} />
+                    <div className={styles.imageGalleryContainer}>
+                        <div 
+                            className={styles.imageSection}
+                            onClick={() => {
+                                if (menu?.images?.length) setIsImageModalOpen(true);
+                            }}
+                            style={{ cursor: menu?.images?.length ? 'pointer' : 'default' }}
+                        >
+                            {menu?.images && menu.images.length > 0 ? (
+                                <NextImage
+                                    src={`/images/${menu.images[selectedImageIndex]?.srcUrl || menu.images[0].srcUrl}`}
+                                    alt={menu.korName}
+                                    fill
+                                    style={{ objectFit: 'cover' }}
+                                    sizes="(max-width: 900px) 100vw, 500px"
+                                    priority
+                                />
+                            ) : (
+                                <div className={styles.placeholder}>
+                                    <UtensilsCrossed size={64} strokeWidth={1} />
+                                </div>
+                            )}
+                        </div>
+                        
+                        {menu?.images && menu.images.length > 1 && (
+                            <div className={styles.thumbnailList}>
+                                {menu.images.map((img: any, idx: number) => (
+                                    <button 
+                                        key={idx}
+                                        className={`${styles.thumbnailBtn} ${idx === selectedImageIndex ? styles.activeThumbnail : ''}`}
+                                        onClick={() => setSelectedImageIndex(idx)}
+                                    >
+                                        <NextImage
+                                            src={`/images/${img.srcUrl}`}
+                                            alt={`${menu.korName} 썸네일 ${idx + 1}`}
+                                            fill
+                                            style={{ objectFit: 'cover' }}
+                                        />
+                                    </button>
+                                ))}
                             </div>
                         )}
                     </div>
@@ -216,6 +246,29 @@ export default function PublicMenuDetailPage({ params }: { params: Promise<{ id:
                         </div>
                     </div>
                 </div>
+            )}
+
+            {isImageModalOpen && menu?.images && menu.images.length > 0 && typeof document !== 'undefined' && createPortal(
+                <div 
+                    className={styles.imageModalOverlay}
+                    onClick={() => setIsImageModalOpen(false)}
+                >
+                    <div className={styles.imageModalContent} onClick={e => e.stopPropagation()}>
+                        <NextImage
+                            src={`/images/${menu.images[selectedImageIndex]?.srcUrl || menu.images[0].srcUrl}`}
+                            alt={`${menu.korName} 원본 이미지`}
+                            layout="fill"
+                            objectFit="contain"
+                        />
+                        <button 
+                            className={styles.closeImageModalBtn}
+                            onClick={() => setIsImageModalOpen(false)}
+                        >
+                            ×
+                        </button>
+                    </div>
+                </div>,
+                document.body
             )}
 
             <Footer />

@@ -1,0 +1,103 @@
+.gradeSection {
+    padding: 100px 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+    background-color: #fcfbf7;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-family: var(--font-fraunces);
+    margin-bottom: 20px;
+    color: #2c1810;
+}
+
+.description {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 60px;
+    line-height: 1.6;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    align-items: stretch;
+}
+
+.gradeCard {
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.gradeCard:hover {
+    transform: translateY(-5px);
+}
+
+.gradeHeader {
+    width: 100%;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.gradeBadge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.gradeName {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.benefits {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.benefitItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+}
+
+.benefitLabel {
+    color: inherit;
+    opacity: 0.8;
+}
+
+.benefitValue {
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .gradeSection {
+        padding: 60px 5%;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}

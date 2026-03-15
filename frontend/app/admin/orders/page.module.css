@@ -327,6 +327,19 @@
     gap: 0.75rem;
 }
 
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 @media (max-width: 640px) {
     .orderGrid {
         grid-template-columns: 1fr;

@@ -195,10 +195,10 @@ public class DataInitializer implements CommandLineRunner {
 
         if (gradeSettingsRepository.count() == 0) {
             log.info("Initializing grade settings...");
-            createGradeSetting("GREEN_BEAN", "Green Bean 🌱", 1, null, null, 1);
-            createGradeSetting("GOLDEN_BROWN", "Golden Brown ✨", 2, 10, 50000, 2);
-            createGradeSetting("DEEP_BROWN", "Deep Brown \uD83E\uDDB8", 3, 30, 150000, 3);
-            createGradeSetting("BLACK_ROAST", "Black Roast 🖤", 5, 100, 500000, 4);
+            createGradeSetting("GREEN_BEAN", "Green Bean 🌱", 1, null, null, 1, "#4caf50", "#ffffff");
+            createGradeSetting("GOLDEN_BROWN", "Golden Brown ✨", 2, 10, 50000, 2, "#ffb300", "#000000");
+            createGradeSetting("DEEP_BROWN", "Deep Brown \uD83E\uDDB8", 3, 30, 150000, 3, "#5d4037", "#ffffff");
+            createGradeSetting("BLACK_ROAST", "Black Roast 🖤", 5, 100, 500000, 4, "#212121", "#ffffff");
             
             GradeSystemConfigJpaEntity config = GradeSystemConfigJpaEntity.builder()
                     .id(1L)
@@ -306,7 +306,7 @@ public class DataInitializer implements CommandLineRunner {
         menuOptionExclusionRepository.save(exclusion);
     }
 
-    private void createGradeSetting(String grade, String displayName, int earnRate, Integer count, Integer amount, int sortOrder) {
+    private void createGradeSetting(String grade, String displayName, int earnRate, Integer count, Integer amount, int sortOrder, String mainColor, String textColor) {
         GradeSettingsJpaEntity entity = GradeSettingsJpaEntity.builder()
                 .grade(grade)
                 .displayName(displayName)
@@ -314,6 +314,8 @@ public class DataInitializer implements CommandLineRunner {
                 .upgradeOrderCount(count)
                 .upgradeOrderAmount(amount)
                 .sortOrder(sortOrder)
+                .mainColor(mainColor != null ? mainColor : "#333333")
+                .textColor(textColor != null ? textColor : "#FFFFFF")
                 .updatedAt(LocalDateTime.now())
                 .build();
         gradeSettingsRepository.save(entity);

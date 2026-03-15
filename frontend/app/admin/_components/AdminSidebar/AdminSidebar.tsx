@@ -17,6 +17,7 @@ import {
   BarChart3,
   Brain,
   Award,
+  MessageSquare
 } from 'lucide-react';
 import styles from './AdminSidebar.module.css';
 import { apiFetch } from '@/lib/api';
@@ -85,16 +86,12 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
   const navItems = [
     { label: '대시보드', href: '/admin', icon: <LayoutDashboard size={20} /> },
-    {
-      label: '메뉴 관리',
-      href: '/admin/menus',
-      icon: <UtensilsCrossed size={20} />,
-      badge: menuCount > 0 ? menuCount : undefined,
-    },
+    { label: '메뉴 관리', href: '/admin/menus', icon: <UtensilsCrossed size={20} />, badge: menuCount > 0 ? menuCount : undefined },
     { label: '옵션 관리', href: '/admin/options', icon: <Sliders size={20} /> },
     { label: '주문 관리', href: '/admin/orders', icon: <ShoppingBag size={20} /> },
     { label: '매출 분석', href: '/admin/sales', icon: <BarChart3 size={20} /> },
     { label: '회원 관리', href: '/admin/users', icon: <Users size={20} /> },
+    { label: '공지 팝업 관리', href: '/admin/notice-popups', icon: <MessageSquare size={20} /> },
     { label: 'AI RAG 관리', href: '/admin/rag', icon: <Brain size={20} /> },
   ];
 

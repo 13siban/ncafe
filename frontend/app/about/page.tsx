@@ -3,6 +3,7 @@
 import React from 'react';
 import Header from '@/components/common/Header/Header';
 import { Footer } from '@/components/common';
+import GradeSection from './_components/GradeSection/GradeSection';
 import styles from './page.module.css';
 import { motion } from 'framer-motion';
 
@@ -65,6 +66,8 @@ export default function AboutPage() {
                         </motion.div>
                     </div>
                 </section>
+
+                <GradeSection />
             </div>
             <Footer />
         </main>

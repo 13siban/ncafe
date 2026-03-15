@@ -14,6 +14,10 @@
   .grid {
     grid-template-columns: 400px 1fr;
   }
+  .leftColumn {
+    position: sticky;
+    top: 100px;
+  }
 }
 
 .loading {
@@ -25,9 +29,8 @@
 }
 
 .leftColumn {
-  position: sticky;
-  top: 2rem;
   height: fit-content;
+  position: relative;
 }
 
 .rightColumn {

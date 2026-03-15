@@ -7,6 +7,7 @@ import com.new_cafe.app.backend.menuoption.adapter.out.persistence.OptionGroupJp
 import com.new_cafe.app.backend.menuoption.adapter.out.persistence.OptionGroupJpaRepository;
 import com.new_cafe.app.backend.menuoption.adapter.out.persistence.OptionItemJpaEntity;
 import com.new_cafe.app.backend.menuoption.adapter.out.persistence.OptionItemJpaRepository;
+import com.new_cafe.app.backend.order.application.service.dto.OrderNotificationDto;
 import com.new_cafe.app.backend.order.application.port.in.CreateOrderUseCase;
 import com.new_cafe.app.backend.order.application.port.out.OrderOptionRepositoryPort;
 import com.new_cafe.app.backend.order.application.port.out.OrderRepositoryPort;
@@ -45,6 +46,7 @@ public class CreateOrderService implements CreateOrderUseCase {
     private final PaymentVerificationService paymentVerificationService;
     private final UserGradeService userGradeService;
     private final ManageUserPointUseCase userPointUseCase;
+    private final OrderNotificationService orderNotificationService;
 
     @Override
     @Transactional
@@ -204,6 +206,19 @@ public class CreateOrderService implements CreateOrderUseCase {
             
             userGradeService.addOrderStatsAndCheckGrade(userId, finalOrderPrice);
         }
+
+        
+        String summary = itemResponses.isEmpty() ? "" : itemResponses.get(0).getMenuName() + 
+                         (itemResponses.size() > 1 ? " 외 " + (itemResponses.size() - 1) + "건" : "");
+                         
+        orderNotificationService.notify(OrderNotificationDto.builder()
+                .orderId(savedOrder.getId())
+                .displayNumber("#" + savedOrder.getOrderNumber())
+                .customerName(savedOrder.getCustomerName())
+                .totalPrice(savedOrder.getTotalPrice())
+                .summary(summary)
+                .createdAt(savedOrder.getCreatedAt())
+                .build());
 
         return OrderResponse.builder()
                 .orderDate(savedOrder.getOrderDate().toString())

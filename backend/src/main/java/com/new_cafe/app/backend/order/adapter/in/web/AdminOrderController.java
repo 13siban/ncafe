@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.new_cafe.app.backend.order.application.service.OrderNotificationService;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +20,11 @@ public class AdminOrderController {
 
     private final GetOrderUseCase getOrderUseCase;
     private final ManageOrderStatusUseCase manageOrderStatusUseCase;
+    private final OrderNotificationService orderNotificationService;
+    @GetMapping("/subscribe")
+    public SseEmitter subscribe() {
+        return orderNotificationService.subscribe();
+    }
 
     @GetMapping
     public ResponseEntity<List<GetOrderUseCase.OrderListDto>> getAllOrders(

@@ -134,8 +134,7 @@
 .imageSection {
     position: relative;
     width: 100%;
-    aspect-ratio: 1 / 1;
-    border-radius: 4px;
+    aspect-ratio: 3 / 4;
     overflow: hidden;
     background-color: var(--color-primary-50);
 }
@@ -542,4 +541,88 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Image Gallery & Modal */
+
+.imageGalleryContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.thumbnailList {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.thumbnailBtn {
+    position: relative;
+    width: 60px;
+    height: 80px;
+    border: 2px solid transparent;
+    overflow: hidden;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    background: var(--color-gray-100);
+}
+
+.thumbnailBtn:hover {
+    opacity: 0.8;
+}
+
+.activeThumbnail {
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 2px rgba(61, 109, 100, 0.2);
+}
+
+.imageModalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.imageModalContent {
+    position: relative;
+    width: 80vw;
+    height: 80vh;
+    max-width: 800px;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.closeImageModalBtn {
+    position: absolute;
+    top: -40px;
+    right: -50px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 3rem;
+    font-weight: 300;
+    cursor: pointer;
+    padding: 0;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    transition: color 0.2s;
+}
+
+.closeImageModalBtn:hover {
+    color: #ffd700;
 }

@@ -12,11 +12,29 @@ export default function EditMenuPage() {
   const params = useParams();
   const id = params?.id as string;
   const [initialValues, setInitialValues] = useState<Partial<MenuFormValues> | null>(null);
+  const [originalImages, setOriginalImages] = useState<{ id: number, url: string }[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const menu = await fetchAPI(`/admin/menus/${id}`);
+        let existingImgData: { id: number, url: string }[] = [];
+        
+        try {
+          const imageRes = await fetchAPI(`/menus/${id}/menu-images`);
+          const getImageUrl = (srcUrl: string) => {
+            if (!srcUrl) return '';
+            if (srcUrl.startsWith('http')) return srcUrl;
+            return `/api/upload/${srcUrl}`;
+          };
+          existingImgData = (imageRes.images || []).map((img: any) => ({
+            id: img.id,
+            url: getImageUrl(img.srcUrl)
+          }));
+          setOriginalImages(existingImgData);
+        } catch (imgErr) {
+          console.error('Failed to load menu images', imgErr);
+        }
 
         setInitialValues({
           korName: menu.korName,
@@ -25,7 +43,7 @@ export default function EditMenuPage() {
           price: menu.price,
           categoryId: menu.categoryId, // ensure using the correct field mapping here
           status: menu.isSoldOut ? 'soldout' : (!menu.isAvailable ? 'hidden' : 'available'),
-          existingImages: [], // not implementing images yet over API
+          existingImages: existingImgData.map(img => img.url),
           images: [],
           options: [] // not implementing options yet over API
         });
@@ -54,6 +72,28 @@ export default function EditMenuPage() {
           isAvailable: data.status === 'available',
         }),
       });
+
+      // Handle deleted existing images
+      const keptUrls = new Set(data.existingImages || []);
+      const deletedImages = originalImages.filter(img => !keptUrls.has(img.url));
+      
+      for (const img of deletedImages) {
+        await fetchAPI(`/admin/menus/${id}/menu-images/${img.id}`, { method: 'DELETE' })
+          .catch(console.error);
+      }
+
+      // Handle new uploaded images
+      if (data.images && data.images.length > 0) {
+        const formData = new FormData();
+        data.images.forEach((img: File) => {
+          formData.append('files', img);
+        });
+
+        await fetchAPI(`/admin/menus/${id}/menu-images`, {
+          method: 'POST',
+          body: formData,
+        });
+      }
 
       alert(`메뉴 [${data.korName}] 수정이 완료되었습니다.`);
       router.push(`/admin/menus`);

@@ -35,6 +35,12 @@ public class GradeSettingsJpaEntity {
     @Column(name = "sort_order", nullable = false)
     private Integer sortOrder;
 
+    @Column(name = "main_color", nullable = false, length = 7)
+    private String mainColor = "#333333";
+
+    @Column(name = "text_color", nullable = false, length = 7)
+    private String textColor = "#FFFFFF";
+
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
@@ -44,11 +50,13 @@ public class GradeSettingsJpaEntity {
         this.updatedAt = LocalDateTime.now();
     }
     
-    public void updateSettings(String displayName, Integer earnRate, Integer count, Integer amount) {
+    public void updateSettings(String displayName, Integer earnRate, Integer count, Integer amount, String mainColor, String textColor) {
         if (displayName != null) this.displayName = displayName;
         if (earnRate != null) this.earnRate = earnRate;
         this.upgradeOrderCount = count;
         this.upgradeOrderAmount = amount;
+        if (mainColor != null) this.mainColor = mainColor;
+        if (textColor != null) this.textColor = textColor;
     }
 
     public void setSortOrder(Integer sortOrder) {

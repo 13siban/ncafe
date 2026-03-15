@@ -104,6 +104,8 @@ public class UserGradeService {
                 .nextGradeName(enabled && nextSetting != null ? nextSetting.getDisplayName() : null)
                 .nextGradeRequireCount(enabled && nextSetting != null ? nextSetting.getUpgradeOrderCount() : null)
                 .nextGradeRequireAmount(enabled && nextSetting != null ? nextSetting.getUpgradeOrderAmount() : null)
+                .mainColor(currentSetting.getMainColor())
+                .textColor(currentSetting.getTextColor())
                 .build();
     }
 }

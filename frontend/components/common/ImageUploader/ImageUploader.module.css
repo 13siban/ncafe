@@ -2,91 +2,149 @@
   width: 100%;
 }
 
-.dropzone {
-  border: 2px dashed var(--color-gray-200);
-  border-radius: var(--radius-lg);
-  padding: var(--space-8);
+.emptyContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background-color: var(--color-gray-50);
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  gap: var(--space-4);
-  background-color: var(--bg-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-height: 200px;
-}
-
-.dropzone:hover, .dropzoneActive {
-  border-color: var(--color-primary-500);
-  background-color: var(--color-primary-50);
-}
-
-.icon {
-  width: 48px;
-  height: 48px;
-  color: var(--color-gray-500);
-}
-
-.dropzone:hover .icon, .dropzoneActive .icon {
-  color: var(--color-primary-500);
-}
-
-.text {
-  text-align: center;
-  color: var(--color-gray-500);
-}
-
-.highlight {
-  color: var(--color-primary-600);
-  font-weight: 500;
-}
-
-.previewGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: var(--space-4);
-  margin-top: var(--space-4);
-}
-
-.previewItem {
-  position: relative;
-  aspect-ratio: 1;
-  border-radius: var(--radius-md);
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
   overflow: hidden;
-  border: 1px solid var(--color-gray-200);
 }
 
-.previewImage {
+.emptyText {
+  color: var(--color-gray-500);
+  font-size: var(--text-sm);
+}
+
+.uploadBtnWrapper {
+  cursor: pointer;
+}
+
+.uploadBtn {
+  background: white;
+  color: var(--color-primary-600);
+  border: 1px solid var(--color-primary-600);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-block;
+  text-align: center;
+}
+
+.uploadBtn:hover {
+  background: var(--color-primary-50);
+}
+
+.maxText {
+  color: var(--color-gray-400);
+  font-size: 0.8rem;
+  margin-top: -0.5rem;
+}
+
+.mainImageContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background-color: var(--color-gray-50);
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.mainImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.removeButton {
+.thumbnailList {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  align-items: center;
+  padding-bottom: 0.5rem;
+}
+
+.thumbnailBtn {
+  position: relative;
+  width: 60px;
+  height: 80px;
+  flex-shrink: 0;
+  border: 2px solid transparent;
+  cursor: pointer;
+  background-color: var(--color-gray-100);
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.thumbnailBtn:hover {
+  opacity: 0.8;
+}
+
+.activeThumbnail {
+  border-color: var(--color-primary-500);
+}
+
+.thumbnailImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnailRemove {
   position: absolute;
   top: 4px;
   right: 4px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0,0,0,0.5);
   color: white;
   border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s;
+  z-index: 10;
   padding: 0;
+  transition: background-color 0.2s;
 }
 
-.removeButton:hover {
-  background-color: var(--color-error);
+.thumbnailRemove:hover {
+  background: var(--color-error);
 }
 
-.error {
-  color: var(--color-error);
-  font-size: var(--text-sm);
-  margin-top: var(--space-2);
+.smallDropzone {
+  width: 60px;
+  height: 80px;
+  flex-shrink: 0;
+  border: 2px dashed var(--color-gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: var(--bg-secondary);
+  transition: all 0.2s;
+}
+
+.smallDropzone:hover {
+  background-color: var(--color-primary-50);
+  border-color: var(--color-primary-500);
+}
+
+.smallIcon {
+  width: 20px;
+  height: 20px;
+  color: var(--color-gray-400);
+}
+
+.smallDropzone:hover .smallIcon {
+  color: var(--color-primary-500);
 }

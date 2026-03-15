@@ -43,7 +43,9 @@ public class AdminGradeSettingsController {
                 request.getDisplayName(),
                 request.getEarnRate(),
                 request.getUpgradeOrderCount(),
-                request.getUpgradeOrderAmount()
+                request.getUpgradeOrderAmount(),
+                request.getMainColor(),
+                request.getTextColor()
         );
         return ResponseEntity.ok().build();
     }
@@ -75,7 +77,9 @@ public class AdminGradeSettingsController {
                 request.getDisplayName(),
                 request.getEarnRate(),
                 request.getUpgradeOrderCount(),
-                request.getUpgradeOrderAmount()
+                request.getUpgradeOrderAmount(),
+                request.getMainColor(),
+                request.getTextColor()
         );
         return ResponseEntity.ok().build();
     }

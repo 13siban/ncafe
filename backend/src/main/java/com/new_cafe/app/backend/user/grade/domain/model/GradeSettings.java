@@ -12,4 +12,6 @@ public class GradeSettings {
     private Integer upgradeOrderCount;
     private Integer upgradeOrderAmount;
     private Integer sortOrder;
+    private String mainColor;
+    private String textColor;
 }

@@ -246,7 +246,16 @@ export default function MyPage() {
                                                 <p className={styles.disabledText}>현재 등급 시스템이 비활성화되어 있습니다.</p>
                                             </div>
                                         ) : (
-                                            <div className={styles.gradeCard}>
+                                            <div
+                                                className={styles.gradeCard}
+                                                style={{
+                                                    background: gradeInfo.mainColor
+                                                        ? `linear-gradient(135deg, ${gradeInfo.mainColor}, ${gradeInfo.mainColor}cc)`
+                                                        : undefined,
+                                                    color: gradeInfo.textColor || undefined,
+                                                    borderColor: gradeInfo.mainColor || undefined
+                                                }}
+                                            >
                                                 <div className={styles.gradeCardHeader}>
                                                     <div className={styles.gradeName}>{gradeInfo.currentGradeName}</div>
                                                     <div className={styles.gradeBenefits}>
@@ -265,7 +274,8 @@ export default function MyPage() {
                                                                     style={{
                                                                         width: gradeInfo.nextGradeRequireAmount
                                                                             ? `${Math.min(100, (gradeInfo.currentOrderAmount / gradeInfo.nextGradeRequireAmount) * 100)}%`
-                                                                            : '100%'
+                                                                            : '100%',
+                                                                        backgroundColor: gradeInfo.mainColor || undefined
                                                                     }}
                                                                 />
                                                             </div>
@@ -588,7 +598,7 @@ export default function MyPage() {
                             <section className={styles.section}>
                                 <h2 className={styles.sectionTitle}>내 포인트</h2>
 
-                                <div className={styles.gradeCard} style={{ background: 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))', color: 'white', marginBottom: '24px' }}>
+                                <div className={styles.gradeCard} style={{ background: gradeInfo?.mainColor ? `linear-gradient(135deg, ${gradeInfo.mainColor}, ${gradeInfo.mainColor}dd)` : 'linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700))', color: gradeInfo?.textColor || 'white', marginBottom: '24px' }}>
                                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px 0' }}>
                                         <span style={{ fontSize: '0.9rem', opacity: 0.9, marginBottom: '8px' }}>사용 가능 포인트</span>
                                         <span style={{ fontSize: '2rem', fontWeight: 700 }}>{new Intl.NumberFormat('ko-KR').format(pointData.balance)} <span style={{ fontSize: '1.2rem', fontWeight: 400 }}>P</span></span>

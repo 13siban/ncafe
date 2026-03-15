@@ -46,12 +46,12 @@ public class AdminGradeSettingsService implements ManageGradeSettingsUseCase {
 
     @Override
     @Transactional
-    public void updateSettings(String grade, String displayName, Integer earnRate, Integer count, Integer amount) {
+    public void updateSettings(String grade, String displayName, Integer earnRate, Integer count, Integer amount, String mainColor, String textColor) {
         GradeSettingsJpaEntity entity = repository.findByGrade(grade);
         if (entity == null) {
             throw new IllegalArgumentException("등급 설정을 찾을 수 없습니다: " + grade);
         }
-        entity.updateSettings(displayName, earnRate, count, amount);
+        entity.updateSettings(displayName, earnRate, count, amount, mainColor, textColor);
         repository.save(entity);
     }
     
@@ -91,7 +91,7 @@ public class AdminGradeSettingsService implements ManageGradeSettingsUseCase {
 
     @Override
     @Transactional
-    public void createGrade(String grade, String displayName, Integer earnRate, Integer count, Integer amount) {
+    public void createGrade(String grade, String displayName, Integer earnRate, Integer count, Integer amount, String mainColor, String textColor) {
         if (repository.findByGrade(grade) != null) {
             throw new IllegalArgumentException("이미 존재하는 등급 코드입니다.");
         }
@@ -106,6 +106,8 @@ public class AdminGradeSettingsService implements ManageGradeSettingsUseCase {
                 .upgradeOrderCount(count)
                 .upgradeOrderAmount(amount)
                 .sortOrder(maxOrder + 1)
+                .mainColor(mainColor != null ? mainColor : "#333333")
+                .textColor(textColor != null ? textColor : "#FFFFFF")
                 .build();
                 
         repository.save(newGrade);
@@ -158,6 +160,8 @@ public class AdminGradeSettingsService implements ManageGradeSettingsUseCase {
                 .upgradeOrderCount(entity.getUpgradeOrderCount())
                 .upgradeOrderAmount(entity.getUpgradeOrderAmount())
                 .sortOrder(entity.getSortOrder())
+                .mainColor(entity.getMainColor())
+                .textColor(entity.getTextColor())
                 .build();
     }
 }

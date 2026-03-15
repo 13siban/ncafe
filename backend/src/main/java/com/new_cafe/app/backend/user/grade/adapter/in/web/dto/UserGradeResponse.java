@@ -18,4 +18,6 @@ public class UserGradeResponse {
     private String nextGradeName;
     private Integer nextGradeRequireCount;
     private Integer nextGradeRequireAmount;
+    private String mainColor;
+    private String textColor;
 }

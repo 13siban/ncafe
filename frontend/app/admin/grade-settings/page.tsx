@@ -12,6 +12,8 @@ type GradeSetting = {
     upgradeOrderCount: number | null;
     upgradeOrderAmount: number | null;
     sortOrder: number;
+    mainColor: string;
+    textColor: string;
 };
 
 export default function AdminGradeSettingsPage() {
@@ -28,7 +30,9 @@ export default function AdminGradeSettingsPage() {
         displayName: "",
         earnRate: 1,
         upgradeOrderCount: "",
-        upgradeOrderAmount: ""
+        upgradeOrderAmount: "",
+        mainColor: "#333333",
+        textColor: "#FFFFFF"
     });
 
     useEffect(() => {
@@ -85,7 +89,9 @@ export default function AdminGradeSettingsPage() {
 
     const handleChange = (grade: string, field: keyof GradeSetting, value: string) => {
         let parsedValue: any = value;
-        if (field !== 'displayName' && field !== 'grade') {
+        // 문자열 필드는 그대로, 숫자 필드만 parseInt 처리
+        const stringFields: (keyof GradeSetting)[] = ['displayName', 'grade', 'mainColor', 'textColor'];
+        if (!stringFields.includes(field)) {
             parsedValue = value === "" ? null : parseInt(value, 10);
         }
         setSettings(prev => prev.map(s => 
@@ -102,7 +108,9 @@ export default function AdminGradeSettingsPage() {
                     displayName: setting.displayName,
                     earnRate: setting.earnRate,
                     upgradeOrderCount: setting.upgradeOrderCount,
-                    upgradeOrderAmount: setting.upgradeOrderAmount
+                    upgradeOrderAmount: setting.upgradeOrderAmount,
+                    mainColor: setting.mainColor,
+                    textColor: setting.textColor
                 })
             });
             alert(`${setting.displayName} 설정이 저장되었습니다.`);
@@ -160,12 +168,14 @@ export default function AdminGradeSettingsPage() {
                     displayName: newGrade.displayName,
                     earnRate: newGrade.earnRate,
                     upgradeOrderCount: newGrade.upgradeOrderCount ? parseInt(newGrade.upgradeOrderCount) : null,
-                    upgradeOrderAmount: newGrade.upgradeOrderAmount ? parseInt(newGrade.upgradeOrderAmount) : null
+                    upgradeOrderAmount: newGrade.upgradeOrderAmount ? parseInt(newGrade.upgradeOrderAmount) : null,
+                    mainColor: newGrade.mainColor,
+                    textColor: newGrade.textColor
                 })
             });
             alert("새 등급이 추가되었습니다.");
             setIsAdding(false);
-            setNewGrade({ grade: "", displayName: "", earnRate: 1, upgradeOrderCount: "", upgradeOrderAmount: "" });
+            setNewGrade({ grade: "", displayName: "", earnRate: 1, upgradeOrderCount: "", upgradeOrderAmount: "", mainColor: "#333333", textColor: "#FFFFFF" });
             fetchSettings();
         } catch(e:any) {
             alert("추가 실패: " + e.message);
@@ -173,7 +183,7 @@ export default function AdminGradeSettingsPage() {
     };
 
     if (isLoading) {
-        return <div className={styles.loading}><Loader2 className="animate-spin" /></div>;
+        return <div className={styles.loading}><Loader2 className={styles.spin} /></div>;
     }
 
     return (
@@ -219,7 +229,7 @@ export default function AdminGradeSettingsPage() {
                                 disabled={isSavingConfig}
                                 className={styles.saveDefaultBtn}
                             >
-                                {isSavingConfig ? <Loader2 size={16} className="animate-spin" /> : (
+                                {isSavingConfig ? <Loader2 size={16} className={styles.spin} /> : (
                                     <>
                                         <Save size={16} /> 저장
                                     </>
@@ -258,6 +268,14 @@ export default function AdminGradeSettingsPage() {
                                 <label>승급 누적 금액</label>
                                 <input type="number" placeholder="무제한" value={newGrade.upgradeOrderAmount} onChange={e => setNewGrade({...newGrade, upgradeOrderAmount: e.target.value})} />
                             </div>
+                            <div>
+                                <label>메인 컬러</label>
+                                <input type="color" value={newGrade.mainColor} onChange={e => setNewGrade({...newGrade, mainColor: e.target.value})} />
+                            </div>
+                            <div>
+                                <label>텍스트 컬러</label>
+                                <input type="color" value={newGrade.textColor} onChange={e => setNewGrade({...newGrade, textColor: e.target.value})} />
+                            </div>
                         </div>
                         <div className={styles.formActions}>
                             <button type="button" onClick={() => setIsAdding(false)} className={styles.cancelBtn}>취소</button>
@@ -268,8 +286,8 @@ export default function AdminGradeSettingsPage() {
 
                 <div className={styles.cardList}>
                     {settings.map((setting, index) => (
-                        <div key={setting.grade} className={styles.card}>
-                            <div className={styles.cardHeader}>
+                        <div key={setting.grade} className={styles.card} style={{ borderColor: setting.mainColor }}>
+                            <div className={styles.cardHeader} style={{ backgroundColor: setting.mainColor, color: setting.textColor }}>
                                 <div className={styles.cardHeaderTop}>
                                     <input 
                                         className={styles.nameInput}
@@ -313,6 +331,44 @@ export default function AdminGradeSettingsPage() {
                                         disabled={index === 0}
                                     />
                                 </div>
+                                <div className={styles.fieldGroup}>
+                                    <label>배경 색상 (mainColor)</label>
+                                    <div className={styles.colorPickerRow}>
+                                        <div className={styles.colorSwatch} style={{ backgroundColor: setting.mainColor || '#333333' }} />
+                                        <input 
+                                            type="color" 
+                                            value={setting.mainColor || "#333333"} 
+                                            onChange={(e) => handleChange(setting.grade, 'mainColor', e.target.value)}
+                                            className={styles.colorInput}
+                                        />
+                                        <input
+                                            type="text"
+                                            value={setting.mainColor || "#333333"}
+                                            onChange={(e) => handleChange(setting.grade, 'mainColor', e.target.value)}
+                                            placeholder="#333333"
+                                            className={styles.colorTextInput}
+                                        />
+                                    </div>
+                                </div>
+                                <div className={styles.fieldGroup}>
+                                    <label>글자 색상 (textColor)</label>
+                                    <div className={styles.colorPickerRow}>
+                                        <div className={styles.colorSwatch} style={{ backgroundColor: setting.textColor || '#FFFFFF' }} />
+                                        <input 
+                                            type="color" 
+                                            value={setting.textColor || "#FFFFFF"} 
+                                            onChange={(e) => handleChange(setting.grade, 'textColor', e.target.value)}
+                                            className={styles.colorInput}
+                                        />
+                                        <input
+                                            type="text"
+                                            value={setting.textColor || "#FFFFFF"}
+                                            onChange={(e) => handleChange(setting.grade, 'textColor', e.target.value)}
+                                            placeholder="#FFFFFF"
+                                            className={styles.colorTextInput}
+                                        />
+                                    </div>
+                                </div>
                             </div>
                             <div className={styles.cardFooter}>
                                 {index !== 0 && (
@@ -329,7 +385,7 @@ export default function AdminGradeSettingsPage() {
                                     disabled={savingGrade === setting.grade}
                                     className={styles.saveBtn}
                                 >
-                                    {savingGrade === setting.grade ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />} 
+                                    {savingGrade === setting.grade ? <Loader2 size={16} className={styles.spin} /> : <Save size={16} />} 
                                     저장
                                 </button>
                             </div>

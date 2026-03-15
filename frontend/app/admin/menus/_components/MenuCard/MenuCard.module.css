@@ -69,6 +69,14 @@
     color: var(--color-error);
 }
 
+.dragButton {
+    cursor: grab;
+}
+
+.dragButton:active {
+    cursor: grabbing;
+}
+
 /* Toggle Switch */
 .toggleWrapper {
     display: flex;

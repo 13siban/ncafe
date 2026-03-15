@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import styles from './MenuDetailGallery.module.css';
 import { useMenuImages, MenuImageResponse } from './useMenuImages';
@@ -10,6 +11,7 @@ interface MenuDetailGalleryProps {
 export const MenuDetailGallery = ({ menuID }: MenuDetailGalleryProps) => {
   const { images, korName, isLoading, error, setPrimaryImage, deleteImage, uploadImages } = useMenuImages(menuID);
   const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 이미지 목록이 로드되면 첫 번째 이미지를 선택
@@ -70,7 +72,11 @@ export const MenuDetailGallery = ({ menuID }: MenuDetailGalleryProps) => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.mainImageWrapper}>
+      <div 
+        className={styles.mainImageWrapper}
+        onClick={() => setIsModalOpen(true)}
+        style={{ cursor: 'pointer' }}
+      >
         <Image
           src={getImageUrl(selectedImage.srcUrl)}
           alt={selectedImage.altText || "메뉴 이미지"}
@@ -123,7 +129,7 @@ export const MenuDetailGallery = ({ menuID }: MenuDetailGalleryProps) => {
               <Image
                 src={getImageUrl(img.srcUrl)}
                 alt={img.altText || "썸네일"}
-                width={80}
+                width={60}
                 height={80}
                 className={styles.thumbnailImage}
               />
@@ -131,6 +137,25 @@ export const MenuDetailGallery = ({ menuID }: MenuDetailGalleryProps) => {
             </button>
           ))}
         </div>
+      )}
+
+      {/* Image Modal - Rendered via Portal to escape parent z-index issues */}
+      {isModalOpen && typeof document !== 'undefined' && createPortal(
+        <div 
+          className={styles.modalOverlay}
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <Image
+              src={getImageUrl(selectedImage.srcUrl)}
+              alt="메뉴 이미지 원본"
+              layout="fill"
+              objectFit="contain"
+            />
+            <button className={styles.closeBtn} onClick={() => setIsModalOpen(false)}>×</button>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   );

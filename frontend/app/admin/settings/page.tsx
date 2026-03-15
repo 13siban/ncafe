@@ -43,7 +43,7 @@ export default function AdminSettingsPage() {
     if (isLoading) {
         return (
             <div className={styles.loadingContainer}>
-                <Loader2 className="animate-spin" size={40} />
+                <Loader2 className={styles.spin} size={40} />
                 <p>설정을 불러오는 중입니다...</p>
             </div>
         );
@@ -67,7 +67,7 @@ export default function AdminSettingsPage() {
                     onClick={handleUpdateSettings}
                     disabled={isUpdating}
                 >
-                    {isUpdating ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                    {isUpdating ? <Loader2 className={styles.spin} size={18} /> : <Save size={18} />}
                     {isUpdating ? '저장 중...' : '변경사항 저장'}
                 </button>
             </div>

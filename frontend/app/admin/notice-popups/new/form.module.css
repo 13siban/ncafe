@@ -1,0 +1,405 @@
+
+.container {
+  padding: 1.5rem;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding-bottom: 5rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+@media (min-width: 768px) {
+  .header {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.backBtn {
+  margin-right: 1rem;
+  padding: 0.5rem;
+  color: #9ca3af;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.backBtn:hover {
+  color: #111827;
+  background-color: #f3f4f6;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.contentWrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .contentWrapper {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  .previewSticky {
+    position: sticky;
+    top: 1.5rem;
+    align-self: flex-start;
+  }
+}
+
+/* Form Styles */
+.formBox {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid #f3f4f6;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.optionalText {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #9ca3af;
+  margin-left: 0.5rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  outline: none;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.inputIconWrap {
+  position: relative;
+}
+
+.inputWithIcon {
+  padding-left: 2.5rem;
+}
+
+.inputIcon {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  padding-left: 0.75rem;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  color: #9ca3af;
+}
+
+.textarea {
+  min-height: 150px;
+  resize: vertical;
+  font-family: monospace;
+  line-height: 1.6;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+/* Image Upload Dropzone */
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 2rem;
+  border: 2px dashed #d1d5db;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  background: #fafafa;
+}
+
+.dropzone:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  background: #eff6ff;
+}
+
+.dropzoneHint {
+  font-size: 0.75rem;
+  color: #d1d5db;
+}
+
+.imagePreviewWrap {
+  position: relative;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.imagePreview {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.imageRemoveBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.imageRemoveBtn:hover {
+  background: rgba(220, 38, 38, 0.9);
+}
+
+.uploadingOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #3b82f6;
+}
+
+.checkboxWrap {
+  padding-top: 1rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.checkboxLabel:hover {
+  background-color: #f9fafb;
+}
+
+.checkboxCheck {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 1.25rem;
+}
+
+.checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #2563eb;
+  border-color: #d1d5db;
+  border-radius: 0.25rem;
+}
+
+.checkboxTextWrap {
+  margin-left: 0.75rem;
+}
+
+.checkboxTitle {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.checkboxDesc {
+  display: block;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.125rem;
+}
+
+.submitWrap {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 1rem;
+}
+
+/* Preview Styles */
+.previewHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.previewIcon {
+  color: #9ca3af;
+}
+
+.previewLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.previewArea {
+  background-color: #f3f4f6;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+}
+
+.modalSim {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  max-width: 24rem;
+  width: 100%;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.modalSim:hover {
+  transform: scale(1.05);
+}
+
+.modalImgWrap {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.modalImg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.modalImgPlaceholder {
+  width: 100%;
+  height: 8rem;
+  background-color: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #d1d5db;
+}
+
+.placeholderText {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 0.5rem;
+}
+
+.modalContent {
+  padding: 1.5rem;
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #111827;
+  line-height: 1.25;
+}
+
+.modalBody {
+  font-size: 0.875rem;
+  color: #4b5563;
+  line-height: 1.625;
+  min-height: 3.75rem;
+}
+
+.modalBody p {
+  margin-top: 0;
+}
+
+.modalButtons {
+  display: flex;
+  border-top: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.modalBtn {
+  flex: 1;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  border: none;
+  background: transparent;
+  pointer-events: none;
+}
+
+.modalBtnLeft {
+  color: #6b7280;
+  border-right: 1px solid #e5e7eb;
+}
+
+.modalBtnRight {
+  color: #2563eb;
+  font-weight: 600;
+}

@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthErrorHandler } from "@/components/auth/AuthErrorHandler";
 import ChatWidget from "@/components/chat/ChatWidget";
 import { Toaster } from 'react-hot-toast';
+import NoticePopupModal from "@/components/common/NoticePopupModal";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -60,6 +61,7 @@ export default function RootLayout({
         {children}
         <Toaster position="bottom-center" toastOptions={{ duration: 2000 }} />
         <ChatWidget />
+        <NoticePopupModal />
       </body>
     </html>
   );

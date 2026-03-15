@@ -13,6 +13,8 @@ public class GradeSettingsResponse {
     private Integer upgradeOrderCount;
     private Integer upgradeOrderAmount;
     private Integer sortOrder;
+    private String mainColor;
+    private String textColor;
 
     public static GradeSettingsResponse fromDomain(GradeSettings settings) {
         return GradeSettingsResponse.builder()
@@ -22,6 +24,8 @@ public class GradeSettingsResponse {
                 .upgradeOrderCount(settings.getUpgradeOrderCount())
                 .upgradeOrderAmount(settings.getUpgradeOrderAmount())
                 .sortOrder(settings.getSortOrder())
+                .mainColor(settings.getMainColor())
+                .textColor(settings.getTextColor())
                 .build();
     }
 }

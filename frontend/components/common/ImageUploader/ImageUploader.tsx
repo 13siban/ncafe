@@ -16,6 +16,10 @@ interface PreviewFile extends File {
   preview: string;
 }
 
+export type ImageItem = 
+  | { type: 'existing'; url: string; id: string }
+  | { type: 'new'; url: string; id: string; file: PreviewFile };
+
 export const ImageUploader = ({
   onFilesChange,
   onInitialImagesChange,
@@ -24,6 +28,7 @@ export const ImageUploader = ({
 }: ImageUploaderProps) => {
   const [files, setFiles] = useState<PreviewFile[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>(initialImages);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   // Update existingImages if prop changes (e.g. initial load)
   useEffect(() => {
@@ -53,6 +58,13 @@ export const ImageUploader = ({
     const updatedFiles = [...files, ...newFiles];
     setFiles(updatedFiles);
     onFilesChange(updatedFiles);
+    
+    // Select the newly added image (first of the new batch)
+    if (existingImages.length + files.length === 0) {
+      setSelectedIndex(0);
+    } else {
+      setSelectedIndex(existingImages.length + files.length);
+    }
   }, [files, existingImages, maxFiles, onFilesChange]);
 
   const removeFile = (file: PreviewFile) => {
@@ -79,67 +91,83 @@ export const ImageUploader = ({
     disabled: (files.length + existingImages.length) >= maxFiles
   });
 
+  const allImages: ImageItem[] = [
+    ...existingImages.map(url => ({ type: 'existing' as const, url, id: url })),
+    ...files.map(f => ({ type: 'new' as const, url: f.preview, file: f, id: f.preview }))
+  ];
+
+  // Adjust selected index if an image is removed
+  useEffect(() => {
+    if (selectedIndex >= allImages.length) {
+      setSelectedIndex(Math.max(0, allImages.length - 1));
+    }
+  }, [allImages.length, selectedIndex]);
+
+  const mainImage = allImages[selectedIndex];
+
+  if (allImages.length === 0) {
+    return (
+      <div className={styles.uploader}>
+        <div className={styles.emptyContainer}>
+          <span className={styles.emptyText}>등록된 이미지가 없습니다.</span>
+          <div {...getRootProps({ className: styles.uploadBtnWrapper })}>
+            <input {...getInputProps()} />
+            <span className={styles.uploadBtn}>이미지 업로드하기</span>
+          </div>
+          <p className={styles.maxText}>(최대 {maxFiles}장)</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.uploader}>
-      <div {...getRootProps({ className: `${styles.dropzone} ${isDragActive ? styles.dropzoneActive : ''}` })}>
-        <input {...getInputProps()} />
-        <Upload className={styles.icon} />
-        <div className={styles.text}>
-          <p className={styles.highlight}>클릭하여 이미지 업로드</p>
-          <p>또는 이미지를 여기로 드래그하세요</p>
-        </div>
-        <p className={styles.text} style={{ fontSize: '0.8rem' }}>
-          (최대 {maxFiles}장)
-        </p>
-      </div>
-
-      {(files.length > 0 || existingImages.length > 0) && (
-        <div className={styles.previewGrid}>
-          {/* Existing Images */}
-          {existingImages.map((url, index) => (
-            <div key={`existing-${index}`} className={styles.previewItem}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={url}
-                className={styles.previewImage}
-                alt={`existing-${index}`}
-              />
-              <button
-                type="button"
-                className={styles.removeButton}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeExistingImage(url);
-                }}
-              >
-                <X size={14} />
-              </button>
-            </div>
-          ))}
-
-          {/* New Files */}
-          {files.map((file, index) => (
-            <div key={`${file.name}-${index}`} className={styles.previewItem}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={file.preview}
-                className={styles.previewImage}
-                alt={`preview-${index}`}
-              />
-              <button
-                type="button"
-                className={styles.removeButton}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeFile(file);
-                }}
-              >
-                <X size={14} />
-              </button>
-            </div>
-          ))}
+      {/* Main Image View */}
+      {mainImage && (
+        <div className={styles.mainImageContainer}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img 
+            src={mainImage.url} 
+            alt="Main preview" 
+            className={styles.mainImage} 
+          />
         </div>
       )}
+
+      {/* Thumbnails & Small Add Button */}
+      <div className={styles.thumbnailList}>
+        {allImages.map((img, idx) => (
+          <div 
+            key={img.id} 
+            className={`${styles.thumbnailBtn} ${selectedIndex === idx ? styles.activeThumbnail : ''}`}
+            onClick={() => setSelectedIndex(idx)}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={img.url} alt={`thumb-${idx}`} className={styles.thumbnailImage} />
+            <button
+              type="button"
+              className={styles.thumbnailRemove}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (img.type === 'existing') {
+                  removeExistingImage(img.url);
+                } else {
+                  removeFile(img.file);
+                }
+              }}
+            >
+              <X size={12} />
+            </button>
+          </div>
+        ))}
+        
+        {allImages.length < maxFiles && (
+          <div {...getRootProps({ className: styles.smallDropzone })}>
+            <input {...getInputProps()} />
+            <Upload className={styles.smallIcon} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

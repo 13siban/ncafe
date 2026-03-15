@@ -8,4 +8,6 @@ public class UpdateGradeSettingsRequest {
     private Integer earnRate;
     private Integer upgradeOrderCount;
     private Integer upgradeOrderAmount;
+    private String mainColor;
+    private String textColor;
 }

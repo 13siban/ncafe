@@ -43,7 +43,7 @@ export default function AdminOrdersPage() {
 
             {loading ? (
                 <div className={styles.emptyState}>
-                    <RefreshCw size={48} className="animate-spin" />
+                    <RefreshCw size={48} className={styles.spin} />
                     <p>주문 목록을 불러오고 있습니다...</p>
                 </div>
             ) : orders.length === 0 ? (

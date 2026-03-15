@@ -9,6 +9,29 @@ import { MenuResponse, MenuMode } from '../types';
 
 import { motion, Variants } from 'framer-motion';
 
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+export interface DragHandleProps {
+    attributes: Record<string, any>;
+    listeners: Record<string, any> | undefined;
+}
+
 interface MenuListProps {
     selectedCategory: number | null;
     searchQuery: string;
@@ -17,28 +40,22 @@ interface MenuListProps {
     menus?: MenuResponse[];
     setMenus?: React.Dispatch<React.SetStateAction<MenuResponse[] | undefined>>;
     /** 카드를 커스터마이징할 수 있는 렌더 함수 */
-    renderCard?: (menu: MenuResponse) => React.ReactNode;
+    renderCard?: (menu: MenuResponse, dragHandleProps?: DragHandleProps) => React.ReactNode;
     /** 빈 상태에 추가할 액션 */
     emptyAction?: React.ReactNode;
     /** 에러 상태에 추가할 액션 */
     errorAction?: React.ReactNode;
     /** 메뉴 상태 변경 시 부모에게 전달 */
     onMenusChange?: (menus: MenuResponse[] | undefined) => void;
+    /** DnD 정렬 활성화 (admin 모드에서 사용) */
+    sortable?: boolean;
+    /** DnD 순서 변경 완료 시 호출되는 콜백 */
+    onReorder?: (reorderedMenus: MenuResponse[]) => void;
 }
 
 const ITEMS_PER_PAGE = 9;
 
 // 애니메이션 베리언트 정의
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.08, // 각 카드별 등장 간격
-        },
-    },
-};
-
 const itemVariants: Variants = {
     hidden: { opacity: 0, y: 24 },
     visible: {
@@ -46,6 +63,30 @@ const itemVariants: Variants = {
         y: 0,
     },
 };
+
+// DnD용 SortableItem 래퍼 - 핸들은 renderCard에서 직접 렌더
+function SortableItem({ id, children }: { id: number; children: (dragHandleProps: DragHandleProps) => React.ReactNode }) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+        <div ref={setNodeRef} style={style}>
+            {children({ attributes, listeners })}
+        </div>
+    );
+}
 
 export const MenuList = ({
     selectedCategory,
@@ -57,12 +98,14 @@ export const MenuList = ({
     onMenusChange,
     menus: externalMenus,
     setMenus: externalSetMenus,
+    sortable = false,
+    onReorder,
 }: MenuListProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
 
     const scrollToContent = () => {
         if (typeof window !== 'undefined' && containerRef.current) {
-            const offset = 80; // 헤더 높이 등을 고려한 여백
+            const offset = 80;
             const elementPosition = containerRef.current.getBoundingClientRect().top;
             const offsetPosition = elementPosition + window.pageYOffset - offset;
 
@@ -86,9 +129,14 @@ export const MenuList = ({
 
     const [currentPage, setCurrentPage] = useState(1);
 
+    // DnD sensors
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    );
+
     useEffect(() => {
         setCurrentPage(1);
-        // 카테고리나 검색어 변경 시 메뉴 리스트 위치로 스크롤 이동
         scrollToContent();
     }, [selectedCategory, searchQuery]);
 
@@ -98,25 +146,40 @@ export const MenuList = ({
         }
     }, [internalState.menus, onMenusChange, isLoading]);
 
-    // 페이지 번호 변경 시에도 메뉴 리스트 위치로 스크롤
     useEffect(() => {
         if (isMounted) {
             scrollToContent();
         }
     }, [currentPage]);
     
-    // isMounted check to prevent initial scroll on mount
     const [isMounted, setIsMounted] = useState(false);
     useEffect(() => {
         setIsMounted(true);
     }, []);
 
-    const paginatedMenus = useMemo(() => {
+    // DnD가 활성화되면 페이지네이션 없이 전체 표시
+    const displayMenus = useMemo(() => {
+        if (sortable) return menus;
         const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
         return menus.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-    }, [menus, currentPage]);
+    }, [menus, currentPage, sortable]);
 
-    const totalPages = Math.ceil(menus.length / ITEMS_PER_PAGE);
+    const totalPages = sortable ? 1 : Math.ceil(menus.length / ITEMS_PER_PAGE);
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+        if (!over || active.id === over.id) return;
+
+        const oldIndex = menus.findIndex(m => m.id === active.id);
+        const newIndex = menus.findIndex(m => m.id === over.id);
+        const reordered = arrayMove(menus, oldIndex, newIndex).map((m, i) => ({
+            ...m,
+            sortOrder: i + 1,
+        }));
+
+        setMenus(reordered as any);
+        onReorder?.(reordered);
+    };
 
     // Loading
     if (isLoading) {
@@ -144,33 +207,46 @@ export const MenuList = ({
         );
     }
 
-    return (
-        <div className={styles.container} ref={containerRef}>
+    const renderCardItem = (menu: MenuResponse, index: number) => {
+        if (sortable) {
+            return (
+                <SortableItem key={menu.id} id={menu.id}>
+                    {(dragHandleProps) => {
+                        const cardContent = renderCard ? renderCard(menu, dragHandleProps) : <MenuCard menu={menu} />;
+                        return cardContent;
+                    }}
+                </SortableItem>
+            );
+        }
+
+        const cardContent = renderCard ? renderCard(menu) : <MenuCard menu={menu} />;
+
+        return (
+            <motion.div
+                key={menu.id}
+                variants={itemVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{
+                    duration: 0.5,
+                    ease: [0.21, 0.47, 0.32, 0.98],
+                    delay: (index % 3) * 0.15
+                }}
+            >
+                {cardContent}
+            </motion.div>
+        );
+    };
+
+    const gridContent = (
+        <>
             {menus.length > 0 ? (
                 <div
                     key={`${selectedCategory}-${searchQuery}-${currentPage}`}
                     className={styles.grid}
                 >
-                    {paginatedMenus.map((menu, index) => (
-                        <motion.div
-                            key={menu.id}
-                            variants={itemVariants}
-                            initial="hidden"
-                            whileInView="visible"
-                            viewport={{ once: true, amount: 0.3 }}
-                            transition={{
-                                duration: 0.5,
-                                ease: [0.21, 0.47, 0.32, 0.98],
-                                // 그리드 한 줄(3개) 안에서 주어지는 순차적 딜레이 효과 유지
-                                delay: (index % 3) * 0.15
-                            }}
-                        >
-                            {renderCard
-                                ? renderCard(menu)
-                                : <MenuCard menu={menu} />
-                            }
-                        </motion.div>
-                    ))}
+                    {displayMenus.map((menu, index) => renderCardItem(menu, index))}
                 </div>
             ) : (
                 <div className={styles.emptyState}>
@@ -189,8 +265,8 @@ export const MenuList = ({
                 </div>
             )}
 
-            {/* Pagination */}
-            {totalPages > 1 && (
+            {/* Pagination (DnD 모드에서는 숨김) */}
+            {!sortable && totalPages > 1 && (
                 <div className={styles.pagination}>
                     <button
                         className={styles.pageButton}
@@ -220,6 +296,20 @@ export const MenuList = ({
                         <ChevronRight size={20} />
                     </button>
                 </div>
+            )}
+        </>
+    );
+
+    return (
+        <div className={styles.container} ref={containerRef}>
+            {sortable ? (
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <SortableContext items={menus.map(m => m.id)} strategy={rectSortingStrategy}>
+                        {gridContent}
+                    </SortableContext>
+                </DndContext>
+            ) : (
+                gridContent
             )}
         </div>
     );

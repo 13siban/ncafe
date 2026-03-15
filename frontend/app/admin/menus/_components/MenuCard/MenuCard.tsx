@@ -3,21 +3,24 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Edit2, Trash2, Eye } from 'lucide-react';
+import { Edit2, Trash2, Eye, GripVertical } from 'lucide-react';
 import { MenuCard as BaseMenuCard } from '@/components/menu/MenuCard/MenuCard';
 import { MenuResponse } from '@/components/menu/types';
+import { DragHandleProps } from '@/components/menu/MenuList/MenuList';
 import styles from './MenuCard.module.css';
 
 interface MenuCardProps {
     menu: MenuResponse;
     onAvailableToggle?: (menuId: number, isOrderable: boolean) => void;
     onDelete?: (menuId: number) => void;
+    dragHandleProps?: DragHandleProps;
 }
 
 export const MenuCard = ({
     menu,
     onAvailableToggle,
     onDelete,
+    dragHandleProps,
 }: MenuCardProps) => {
     const router = useRouter();
 
@@ -59,6 +62,16 @@ export const MenuCard = ({
                     >
                         <Eye size={18} />
                     </Link>
+                    {dragHandleProps && (
+                        <div
+                            className={`${styles.actionButton} ${styles.dragButton}`}
+                            title="드래그하여 순서 변경"
+                            {...dragHandleProps.attributes}
+                            {...dragHandleProps.listeners}
+                        >
+                            <GripVertical size={18} />
+                        </div>
+                    )}
                     <Link
                         href={`/admin/menus/${menu.id}/edit`}
                         className={styles.actionButton}

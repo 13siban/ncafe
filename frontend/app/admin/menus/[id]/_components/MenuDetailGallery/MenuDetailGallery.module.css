@@ -18,9 +18,8 @@
 
 .mainImageWrapper {
   position: relative;
-  aspect-ratio: 1;
+  aspect-ratio: 3 / 4;
   width: 100%;
-  border-radius: var(--radius-md);
   overflow: hidden;
   background-color: var(--color-gray-50);
   margin-bottom: 1rem;
@@ -58,11 +57,10 @@
   padding: 0;
   background: none;
   cursor: pointer;
-  border-radius: var(--radius-md);
   overflow: hidden;
   flex-shrink: 0;
   transition: all 0.2s ease;
-  width: 80px;
+  width: 60px;
   height: 80px;
 }
 
@@ -76,7 +74,6 @@
   transition: all 0.2s ease;
   pointer-events: none;
   border: 4px solid transparent;
-  border-radius: var(--radius-md);
 }
 
 .thumbnailButton:hover .overlay {
@@ -165,4 +162,52 @@
 
 .uploadBtn:hover {
   background: var(--color-primary-50);
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modalContent {
+  position: relative;
+  width: 80vw;
+  height: 80vh;
+  max-width: 800px;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.closeBtn {
+  position: absolute;
+  top: -40px;
+  right: -50px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 3rem;
+  font-weight: 300;
+  cursor: pointer;
+  padding: 0;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  transition: color 0.2s;
+}
+
+.closeBtn:hover {
+  color: #ccc;
 }
