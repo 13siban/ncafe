@@ -18,6 +18,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import java.util.Map;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -40,32 +46,30 @@ public class GoogleLoginService implements GoogleLoginUseCase {
     @Transactional
     public LoginUseCase.Result loginWithGoogle(Command command) {
         try {
-            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
-                    .setAudience(Collections.singletonList(googleClientId))
-                    .build();
+            RestTemplate restTemplate = new RestTemplate();
+            String userInfoUrl = "https://www.googleapis.com/oauth2/v3/userinfo";
 
-            // FIXME: 실제 환경에서는 verify()를 통해 토큰을 검증해야 합니다.
-            // 개발자 참고용: 발급받은 클라이언트 ID로 설정되어 있지 않은 경우 검증을 우회하려면 
-            // idTokenObj = GoogleIdToken.parse(new JacksonFactory(), command.getIdToken()); 처럼 사용하기도 하지만
-            // 보안상 위험하므로 반드시 검증을 거쳐야 합니다.
-            GoogleIdToken idTokenObj = verifier.verify(command.getIdToken());
-            if (idTokenObj == null) {
-                // 클라이언트 ID 불일치 등 검증 실패 시
-                System.out.println("Google ID Token validation failed. Token: " + command.getIdToken());
-                System.out.println("Expected Aud Client ID: " + googleClientId);
-                throw new RuntimeException("유효하지 않은 구글 토큰이거나 클라이언트 ID가 일치하지 않습니다.");
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(command.getIdToken()); // We use idToken field to pass the generic token
+
+            HttpEntity<String> entity = new HttpEntity<>("", headers);
+            ResponseEntity<Map> response = restTemplate.exchange(userInfoUrl, HttpMethod.GET, entity, Map.class);
+            
+            Map<String, Object> payload = response.getBody();
+            if (payload == null) {
+                throw new RuntimeException("구글 사용자 정보를 가져오지 못했습니다.");
             }
 
-            GoogleIdToken.Payload payload = idTokenObj.getPayload();
-            String email = payload.getEmail();
+            String email = (String) payload.get("email");
             String name = (String) payload.get("name");
-            String subjectId = payload.getSubject(); // Google's unique ID
+            String subjectId = (String) payload.get("sub"); // Google's unique ID
 
             // 구글 소셜 로그인은 google_{subjectId} 로 username을 지정
             String username = "google_" + subjectId;
 
             Optional<User> userOptional = loadUserPort.loadUser(username);
             User user;
+            boolean restored = false;
 
             if (userOptional.isEmpty()) {
                 // 이메일이 이미 일반 회원으로 등록되어 있을 수 있지만, 
@@ -93,8 +97,10 @@ public class GoogleLoginService implements GoogleLoginUseCase {
                     if (daysRemaining <= 0) {
                         throw new RuntimeException("탈퇴 처리가 완료된 계정입니다.");
                     }
-                    String deletedDate = user.getDeletedAt().toLocalDate().toString();
-                    throw new RuntimeException("ACCOUNT_DELETED|" + deletedDate + "|" + daysRemaining);
+                    // 소셜 로그인은 비밀번호 확인이 불가하므로, 유예기간 내 로그인 시 자동 복구
+                    user.restoreAccount();
+                    saveUserPort.saveUser(user);
+                    restored = true;
                 }
             }
 
@@ -111,6 +117,7 @@ public class GoogleLoginService implements GoogleLoginUseCase {
                     .token(token)
                     .username(user.getUsername())
                     .role(role)
+                    .accountRestored(restored)
                     .build();
 
         } catch (Exception e) {

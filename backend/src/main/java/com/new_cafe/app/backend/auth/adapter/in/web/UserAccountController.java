@@ -31,18 +31,21 @@ public class UserAccountController {
             return ResponseEntity.status(401).body(Map.of("message", "인증되지 않은 사용자입니다."));
         }
 
-        String password = body.get("password");
-        if (password == null || password.isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "비밀번호를 입력해주세요."));
-        }
-
         User dbUser = userRepository.findById(user.getId()).orElse(null);
         if (dbUser == null) {
             return ResponseEntity.status(404).body(Map.of("message", "사용자를 찾을 수 없습니다."));
         }
 
-        if (!passwordEncoder.matches(password, dbUser.getPassword())) {
-            return ResponseEntity.badRequest().body(Map.of("message", "비밀번호가 일치하지 않습니다."));
+        boolean isSocialUser = dbUser.getUsername() != null && dbUser.getUsername().startsWith("google_");
+
+        if (!isSocialUser) {
+            String password = body.get("password");
+            if (password == null || password.isBlank()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "비밀번호를 입력해주세요."));
+            }
+            if (!passwordEncoder.matches(password, dbUser.getPassword())) {
+                return ResponseEntity.badRequest().body(Map.of("message", "비밀번호가 일치하지 않습니다."));
+            }
         }
 
         dbUser.requestDeletion();

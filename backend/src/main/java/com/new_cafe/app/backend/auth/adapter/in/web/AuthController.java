@@ -72,6 +72,7 @@ public class AuthController {
                 .token(result.getToken())
                 .username(result.getUsername())
                 .role(result.getRole())
+                .accountRestored(result.isAccountRestored())
                 .build();
     }
 

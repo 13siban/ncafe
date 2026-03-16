@@ -130,7 +130,7 @@ async function unifiedHandler(req: NextRequest) {
             };
             await session.save();
 
-            return NextResponse.json({ user: session.user });
+            return NextResponse.json({ user: session.user, accountRestored: tokenData.accountRestored || false });
         } catch (e: any) {
             return NextResponse.json({ message: e.message }, { status: 500 });
         }

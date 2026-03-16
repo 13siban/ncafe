@@ -16,6 +16,7 @@ export default function MyPage() {
     const [nickname, setNickname] = useState('');
     const [email, setEmail] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [isSocialUser, setIsSocialUser] = useState(false);
 
     // 비밀번호 변경 상태
     const [currentPassword, setCurrentPassword] = useState('');
@@ -42,6 +43,7 @@ export default function MyPage() {
                 setNickname(profileData.nickname || '');
                 setEmail(profileData.email || '');
                 setPhoneNumber(profileData.phoneNumber || '');
+                setIsSocialUser(profileData.username?.startsWith('google_') || false);
 
                 const favData = await userFavoriteAPI.getFavorites();
                 setFavorites(favData);
@@ -312,6 +314,8 @@ export default function MyPage() {
                                     </form>
                                 </section>
 
+                                {/* 소셜 로그인 사용자는 비밀번호 변경 섹션 숨김 */}
+                                {!isSocialUser && (
                                 <section className={styles.section}>
                                     <h2 className={styles.sectionTitle}>비밀번호 변경</h2>
                                     <form onSubmit={handlePasswordUpdate} className={styles.form}>
@@ -349,6 +353,7 @@ export default function MyPage() {
                                         <button type="submit" className={styles.submitBtn}>비밀번호 변경</button>
                                     </form>
                                 </section>
+                                )}
 
 
 <section className={styles.section}>
@@ -560,27 +565,30 @@ export default function MyPage() {
                                 ) : (
                                     <div className={styles.deleteConfirmBox}>
                                         <p style={{ fontWeight: 600, marginBottom: '12px', color: '#e74c3c' }}>
-                                            정말 탈퇴하시겠습니까? 비밀번호를 입력해주세요.
+                                            {isSocialUser
+                                                ? '정말 탈퇴하시겠습니까?'
+                                                : '정말 탈퇴하시겠습니까? 비밀번호를 입력해주세요.'}
                                         </p>
-                                        <input
-                                            type="password"
-                                            placeholder="현재 비밀번호 입력"
-                                            value={deletePassword}
-                                            onChange={(e) => setDeletePassword(e.target.value)}
-                                            className={styles.deleteInput}
-                                        />
+                                        {!isSocialUser && (
+                                            <input
+                                                type="password"
+                                                placeholder="현재 비밀번호 입력"
+                                                value={deletePassword}
+                                                onChange={(e) => setDeletePassword(e.target.value)}
+                                                className={styles.deleteInput}
+                                            />
+                                        )}
                                         <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
                                             <button
                                                 className={styles.dangerBtn}
                                                 onClick={async () => {
-                                                    if (!deletePassword) {
+                                                    if (!isSocialUser && !deletePassword) {
                                                         alert('비밀번호를 입력해주세요.');
                                                         return;
                                                     }
                                                     try {
-                                                        const res = await userAPI.deleteAccount(deletePassword);
+                                                        const res = await userAPI.deleteAccount(isSocialUser ? '' : deletePassword);
                                                         alert(res.message || '탈퇴 요청이 처리되었습니다.');
-                                                        // 로그아웃 처리
                                                         window.location.href = '/login';
                                                     } catch (error: any) {
                                                         alert(error.message || '탈퇴 요청 중 오류가 발생했습니다.');

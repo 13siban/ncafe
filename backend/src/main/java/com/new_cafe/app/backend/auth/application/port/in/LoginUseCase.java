@@ -19,5 +19,6 @@ public interface LoginUseCase {
         private String token;
         private String username;
         private String role;
+        private boolean accountRestored;
     }
 }
