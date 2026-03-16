@@ -203,7 +203,8 @@ async function unifiedHandler(req: NextRequest) {
             // duplex 옵션은 더 이상 스트림을 직접 전달하지 않으므로 제거됩니다.
         });
 
-        if ((proxyRes.status === 401 || proxyRes.status === 403) && session.token) {
+        // 401(인증 만료)일 때만 세션 파괴. 403(권한 부족)은 로그인은 유효하므로 세션 유지
+        if (proxyRes.status === 401 && session.token) {
             session.destroy();
         }
 

@@ -129,7 +129,7 @@ export const MenuList = ({
         }
     };
 
-    const handleReorder = async (reorderedMenus: MenuResponse[]) => {
+    const handleReorder = async (reorderedMenus: MenuResponse[], previousMenus?: MenuResponse[]) => {
         try {
             await fetchAPI('/admin/menus/reorder', {
                 method: 'PUT',
@@ -140,6 +140,11 @@ export const MenuList = ({
             });
         } catch (e) {
             console.error('Reorder failed', e);
+            // 실패 시 이전 순서로 롤백
+            if (previousMenus) {
+                setMenus(previousMenus);
+            }
+            alert('순서 변경에 실패했습니다.');
         }
     };
 
@@ -183,6 +188,7 @@ export const MenuList = ({
         const { active, over } = event;
         if (!over || !menus || active.id === over.id) return;
 
+        const previousMenus = [...menus];
         const oldIndex = menus.findIndex(m => m.id === active.id);
         const newIndex = menus.findIndex(m => m.id === over.id);
         const reordered = arrayMove(menus, oldIndex, newIndex).map((m, i) => ({
@@ -191,7 +197,7 @@ export const MenuList = ({
         }));
 
         setMenus(reordered as any);
-        handleReorder(reordered);
+        handleReorder(reordered, previousMenus);
     };
 
     const filtered = menus?.filter(m => m.korName.includes(searchQuery)) || [];
