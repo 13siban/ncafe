@@ -17,6 +17,11 @@ class IngestRequest(BaseModel):
     content: str
     metadata: Optional[dict] = None
 
+class UpdateRequest(BaseModel):
+    filename: str
+    content: str
+    metadata: Optional[dict] = None
+
 class SearchRequest(BaseModel):
     query: str
     limit: int = 5

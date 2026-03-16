@@ -13,9 +13,9 @@ export default function AdminSettingsPage() {
     const {
         isLoading, isUpdating,
         openTime, closeTime, cafeName, description,
-        contactNumber, address, faviconUrl, faviconDarkUrl,
+        contactNumber, address, addressEn, faviconUrl, faviconDarkUrl,
         setOpenTime, setCloseTime, setCafeName, setDescription,
-        setContactNumber, setAddress,
+        setContactNumber, setAddress, setAddressEn,
         handleUpdateSettings, handleUploadFavicon
     } = useSettings();
 
@@ -53,8 +53,8 @@ export default function AdminSettingsPage() {
                     onUploadFavicon={handleUploadFavicon}
                 />
                 <ContactCard
-                    contactNumber={contactNumber} address={address}
-                    setContactNumber={setContactNumber} setAddress={setAddress}
+                    contactNumber={contactNumber} address={address} addressEn={addressEn}
+                    setContactNumber={setContactNumber} setAddress={setAddress} setAddressEn={setAddressEn}
                 />
             </div>
             

@@ -72,6 +72,7 @@ public class AdminStoreController {
                 request.description(),
                 request.contactNumber(),
                 request.address(),
+                request.addressEn(),
                 request.faviconUrl(),
                 request.faviconDarkUrl()
         ));
@@ -84,6 +85,7 @@ public class AdminStoreController {
             String description,
             String contactNumber,
             String address,
+            String addressEn,
             String faviconUrl,
             String faviconDarkUrl
     ) {}

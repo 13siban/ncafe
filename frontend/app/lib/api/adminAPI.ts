@@ -19,6 +19,7 @@ export const adminStoreAPI = {
         description?: string;
         contactNumber?: string;
         address?: string;
+        addressEn?: string;
         faviconUrl?: string;
         faviconDarkUrl?: string;
     }) =>

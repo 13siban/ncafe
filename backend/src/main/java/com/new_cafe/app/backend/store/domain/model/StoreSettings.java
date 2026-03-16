@@ -18,6 +18,7 @@ public class StoreSettings {
     private String description;
     private String contactNumber;
     private String address;
+    private String addressEn;
     private String faviconUrl;
     private String faviconDarkUrl;
     private LocalDateTime updatedAt;

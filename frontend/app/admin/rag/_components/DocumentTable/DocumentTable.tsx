@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
-import { FileText, Trash2, RefreshCw, AlertCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { FileText, Trash2, RefreshCw, AlertCircle, Edit } from 'lucide-react';
 import styles from '../../page.module.css';
+import DocumentEditModal from '../DocumentEditModal';
 
 interface Doc {
     id: number;
@@ -19,9 +20,12 @@ interface DocumentTableProps {
     error: string | null;
     onDelete: (id: number) => void;
     onRefresh: () => void;
+    onUpdate: (id: number, filename: string, content: string) => Promise<void>;
 }
 
-const DocumentTable: React.FC<DocumentTableProps> = ({ docs, loading, error, onDelete, onRefresh }) => {
+const DocumentTable: React.FC<DocumentTableProps> = ({ docs, loading, error, onDelete, onRefresh, onUpdate }) => {
+    const [editingDoc, setEditingDoc] = useState<Doc | null>(null);
+
     return (
         <div className={styles.card}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
@@ -54,7 +58,7 @@ const DocumentTable: React.FC<DocumentTableProps> = ({ docs, loading, error, onD
                                 <th>파일명</th>
                                 <th>내용 미리보기</th>
                                 <th>등록일</th>
-                                <th>작업</th>
+                                <th style={{ textAlign: 'center' }}>작업</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -65,9 +69,14 @@ const DocumentTable: React.FC<DocumentTableProps> = ({ docs, loading, error, onD
                                     <td>{doc.content.slice(0, 100)}...</td>
                                     <td>{new Date(doc.created_at).toLocaleString()}</td>
                                     <td>
-                                        <button className={styles.actionButton} onClick={() => onDelete(doc.id)}>
-                                            <Trash2 size={18} />
-                                        </button>
+                                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                                            <button className={styles.actionButton} onClick={() => setEditingDoc(doc)} title="조회 및 수정">
+                                                <Edit size={18} />
+                                            </button>
+                                            <button className={styles.actionButton} onClick={() => onDelete(doc.id)} title="삭제">
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -77,6 +86,15 @@ const DocumentTable: React.FC<DocumentTableProps> = ({ docs, loading, error, onD
                     <div className={styles.empty}>저장된 문서가 없습니다.</div>
                 )}
             </div>
+
+            {editingDoc && (
+                <DocumentEditModal
+                    doc={editingDoc}
+                    isOpen={!!editingDoc}
+                    onClose={() => setEditingDoc(null)}
+                    onSave={onUpdate}
+                />
+            )}
         </div>
     );
 };

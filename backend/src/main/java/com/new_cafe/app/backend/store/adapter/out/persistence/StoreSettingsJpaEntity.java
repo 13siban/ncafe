@@ -44,6 +44,9 @@ public class StoreSettingsJpaEntity {
     @Column(name = "address")
     private String address;
 
+    @Column(name = "address_en")
+    private String addressEn;
+
     @Column(name = "favicon_url")
     private String faviconUrl;
 

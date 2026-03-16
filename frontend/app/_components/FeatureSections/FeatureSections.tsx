@@ -54,8 +54,8 @@ export function FeatureSections() {
                         favourite coffee
                     </motion.h2>
                     <motion.p variants={childVariants} className={styles.sectionDescription}>
-                        More than 100+ type of coffee are ready to serve by our professionals.
-                        Experience the true taste of premium beans.
+                        More than 100+ type of coffee are ready to serve by our professionals.<br />
+                        전문가들이 엄선한 100여 가지의 커피를 만나보세요.
                     </motion.p>
                     <motion.div variants={childVariants} className={styles.menuList}>
                         <span>Cappucino</span>
@@ -94,8 +94,8 @@ export function FeatureSections() {
                         coffee with sweets
                     </motion.h2>
                     <motion.p variants={childVariants} className={styles.sectionDescription}>
-                        Enjoy your coffee with our tasty desserts that will build your mood.
-                        Freshly baked every morning.
+                        Enjoy your coffee with our tasty desserts that will build your mood.<br />
+                        커피의 완성, 기분까지 특별해지는 맛있는 디저트와 함께.
                     </motion.p>
                     <motion.div variants={childVariants} className={styles.menuList}>
                         <span>Croissant</span>

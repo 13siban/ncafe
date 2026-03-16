@@ -11,121 +11,198 @@
 }
 
 .heroSection {
-    padding: 160px 5% 100px;
-    background: linear-gradient(to bottom, #fcfbf7, #f5f0e8);
+    position: relative;
+    padding: 80px 5%;
     text-align: center;
-}
-
-.subtitle {
-    display: block;
-    font-size: 0.9rem;
-    font-weight: 600;
-    letter-spacing: 0.2em;
-    color: #8b5e3c;
-    margin-bottom: 20px;
-}
-
-.title {
-    font-size: clamp(2.5rem, 8vw, 4.5rem);
-    font-family: var(--font-serif);
-    line-height: 1.1;
-    margin-bottom: 30px;
-    color: #2c1810;
-}
-
-.description {
-    max-width: 800px;
-    margin: 0 auto;
-    font-size: 1.15rem;
-    line-height: 1.8;
-    color: #555;
-}
-
-.missionSection {
-    padding: 100px 5%;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-}
-
-.imageWrapper {
-    width: 100%;
-    aspect-ratio: 4/5;
+    justify-content: center;
+    background-color: #1a1a1a;
     overflow: hidden;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
 }
 
-.image {
+.heroBackground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+}
+
+.heroBackground img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.8s ease;
+    object-position: center;
 }
 
-.imageWrapper:hover .image {
-    transform: scale(1.05);
+.heroOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8));
+    z-index: 1;
+}
+
+.heroText {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.subtitle {
+    display: inline-block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    color: #e5d5c5;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(229, 213, 197, 0.5);
+    padding-bottom: 8px;
+}
+
+.title {
+    font-size: clamp(2rem, 8vw, 6rem);
+    font-family: var(--font-serif);
+    line-height: 1.1;
+    margin-bottom: 50px;
+    color: #ffffff;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    font-weight: 400;
+}
+
+.descriptionWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.description {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+}
+
+.description:first-child {
+    font-size: 1.3rem;
+    color: #ffffff;
+    font-weight: 300;
+}
+
+.howToGetHereSection {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 100px var(--space-6);
+}
+
+.featureRow {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    align-items: center;
+    padding: var(--space-8) 0;
+}
+
+@media (min-width: 1024px) {
+    .featureRow {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-12);
+    }
+
+    .desktopTextFirst .featureTextContent {
+        order: -1;
+    }
+}
+
+.featureImageWrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+}
+
+.featureImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.featureImageWrapper:hover .featureImage {
+    transform: scale(1.03);
+}
+
+.featureTextContent {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.sectionLabel {
+    font-size: var(--text-sm);
+    font-weight: var(--font-bold);
+    color: var(--color-primary-600);
+    letter-spacing: 0.1em;
+    margin-bottom: var(--space-4);
+    text-transform: uppercase;
 }
 
 .sectionTitle {
-    font-size: 2.5rem;
     font-family: var(--font-serif);
-    margin-bottom: 24px;
-    color: #2c1810;
+    font-optical-sizing: auto;
+    font-variation-settings: "SOFT" 0, "WONK" 0;
+    font-size: var(--text-3xl);
+    font-weight: 500;
+    color: var(--color-gray-900);
+    margin-bottom: var(--space-8);
+    line-height: 1.2;
 }
 
-.sectionText {
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: #666;
-    margin-bottom: 40px;
-}
-
-.stats {
-    display: flex;
-    gap: 40px;
-}
-
-.statItem {
+.contactInfo {
     display: flex;
     flex-direction: column;
+    gap: var(--space-2);
 }
 
-.statNumber {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #8b5e3c;
-    font-family: var(--font-serif);
+.contactItem {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
 }
 
-.statLabel {
-    font-size: 0.9rem;
-    color: #999;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+.contactValue {
+    font-size: var(--text-base);
+    color: var(--color-gray-500);
+    line-height: 1.6;
 }
 
 @media (max-width: 768px) {
-    .grid {
-        grid-template-columns: 1fr;
-        gap: 40px;
-    }
-
     .heroSection {
-        padding: 120px 5% 60px;
+        padding: 80px 5%;
+        min-height: 100vh;
     }
 
     .title {
         font-size: 2.8rem;
     }
 
-    .textWrapper {
+    .featureTextContent {
         order: -1;
+    }
+
+    .howToGetHereSection {
+        padding: 60px var(--space-6);
     }
 }

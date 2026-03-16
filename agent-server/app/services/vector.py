@@ -78,6 +78,22 @@ class VectorService:
             cur.close()
             conn.close()
 
+    def update_document(self, doc_id, filename, content, metadata=None):
+        embedding = self.embed_text(content, prefix="passage: ")
+        
+        conn = get_connection()
+        cur = conn.cursor()
+        try:
+            cur.execute("""
+                UPDATE rag_documents
+                SET filename = %s, content = %s, embedding = %s, metadata = %s
+                WHERE id = %s
+            """, (filename, content, embedding, json.dumps(metadata) if metadata else None, doc_id))
+            conn.commit()
+        finally:
+            cur.close()
+            conn.close()
+
 # Initialize as a singleton if needed
 _vector_service = None
 

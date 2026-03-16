@@ -14,6 +14,7 @@ public interface GetStoreSettingsUseCase {
             String description,
             String contactNumber,
             String address,
+            String addressEn,
             String faviconUrl,
             String faviconDarkUrl
     ) {}

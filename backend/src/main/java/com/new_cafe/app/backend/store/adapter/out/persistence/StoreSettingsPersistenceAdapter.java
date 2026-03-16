@@ -44,6 +44,9 @@ public class StoreSettingsPersistenceAdapter implements StoreSettingsRepositoryP
         if (settings.getAddress() != null) {
             entity.setAddress(settings.getAddress());
         }
+        if (settings.getAddressEn() != null) {
+            entity.setAddressEn(settings.getAddressEn());
+        }
         if (settings.getFaviconUrl() != null) {
             entity.setFaviconUrl(settings.getFaviconUrl());
         }
@@ -65,6 +68,7 @@ public class StoreSettingsPersistenceAdapter implements StoreSettingsRepositoryP
                 .description(entity.getDescription())
                 .contactNumber(entity.getContactNumber())
                 .address(entity.getAddress())
+                .addressEn(entity.getAddressEn())
                 .faviconUrl(entity.getFaviconUrl())
                 .faviconDarkUrl(entity.getFaviconDarkUrl())
                 .updatedAt(entity.getUpdatedAt())

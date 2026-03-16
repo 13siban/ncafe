@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import styles from './Header.module.css';
 import { ShoppingCart } from 'lucide-react';
 import { authAPI } from '@/app/lib/api/authAPI';
+import { userAPI } from '@/app/lib/api/userAPI';
 import { useCartStore } from '@/store/useCartStore';
 
 interface SessionUser {
@@ -23,18 +24,11 @@ const Header = () => {
     const pathname = usePathname();
     const router = useRouter();
     const [user, setUser] = useState<SessionUser | null>(null);
+    const [gradeInfo, setGradeInfo] = useState<any>(null);
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
 
-    const getGradeBadge = (grade?: string) => {
-        switch(grade) {
-            case 'GREEN_BEAN': return { text: '🌱 Green Bean', bg: '#8BC34A', color: '#fff' };
-            case 'GOLDEN_BROWN': return { text: '✨ Golden Brown', bg: '#D4A574', color: '#fff' };
-            case 'DEEP_BROWN': return { text: '🫘 Deep Brown', bg: '#6D4C41', color: '#fff' };
-            case 'BLACK_ROAST': return { text: '🖤 Black Roast', bg: '#212121', color: '#fff' };
-            default: return null;
-        }
-    };
+
 
     const cartItemsCount = useCartStore((state) => state.getTotalItems());
 
@@ -43,8 +37,19 @@ const Header = () => {
             // BFF 방식: JWT 없이 세션 쿠키만으로 사용자 정보 조회
             const data = await authAPI.getSession();
             setUser(data?.user || null);
+            if (data?.user) {
+                try {
+                    const gradeData = await userAPI.getGradeInfo();
+                    setGradeInfo(gradeData);
+                } catch {
+                    setGradeInfo(null);
+                }
+            } else {
+                setGradeInfo(null);
+            }
         } catch {
             setUser(null);
+            setGradeInfo(null);
         }
     };
 
@@ -81,6 +86,7 @@ const Header = () => {
     const handleLogout = async () => {
         await authAPI.logout();
         setUser(null);
+        setGradeInfo(null);
         window.dispatchEvent(new Event('logout'));
         router.push('/');
         router.refresh(); // 서버 컴포넌트 재검증
@@ -88,7 +94,8 @@ const Header = () => {
 
     const isHomePage = pathname === '/';
     const isMenuPage = pathname === '/menus';
-    const displayScrolled = (!isHomePage && !isMenuPage) || isScrolled;
+    const isAboutPage = pathname === '/about';
+    const displayScrolled = (!isHomePage && !isMenuPage && !isAboutPage) || isScrolled;
 
     return (
         <nav className={`${styles.nav} ${displayScrolled ? styles.scrolled : styles.transparent}`}>
@@ -104,7 +111,10 @@ const Header = () => {
                         <Link href="/mypage" className={isActive('/mypage') ? styles.active : ''}>My Page</Link>
                     )}
                     {isMounted && (user?.role === 'ADMIN' || user?.role === 'ROLE_ADMIN' || user?.role === 'ROLE_SUB_ADMIN') && (
-                        <Link href="/admin" className={isActive('/admin') ? styles.active : ''}>Admin</Link>
+                        <>
+                            <Link href="/admin" className={isActive('/admin') ? styles.active : ''}>Admin</Link>
+                            <Link href="/404" className={isActive('/404') ? styles.active : ''}>404</Link>
+                        </>
                     )}
                 </div>
                 <div className={styles.rightSection}>
@@ -119,21 +129,17 @@ const Header = () => {
                     <div className={styles.authLinks}>
                         {isMounted && user ? (
                             <div className={styles.userSection} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                {user.grade && (() => {
-                                    const badge = getGradeBadge(user.grade);
-                                    if (!badge) return null;
-                                    return (
-                                        <span style={{
-                                            background: badge.bg, color: badge.color, 
-                                            padding: '2px 8px', borderRadius: '12px', 
-                                            fontSize: '0.75rem', fontWeight: 600,
-                                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                                            border: '1px solid white'
-                                        }}>
-                                            {badge.text}
-                                        </span>
-                                    );
-                                })()}
+                                {gradeInfo && (
+                                    <span style={{
+                                        background: gradeInfo.mainColor || 'var(--color-primary-600)', color: gradeInfo.textColor || '#fff', 
+                                        padding: '2px 8px', borderRadius: '12px', 
+                                        fontSize: '0.75rem', fontWeight: 600,
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                        border: '1px solid white'
+                                    }}>
+                                        {gradeInfo.icon ? `${gradeInfo.icon} ` : ''}{gradeInfo.currentGradeName}
+                                    </span>
+                                )}
                                 
                                 {user.pointBalance !== undefined && (
                                     <span style={{

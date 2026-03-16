@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from app.services.vector import get_vector_service, VectorService
-from app.models.schemas import IngestRequest, SearchRequest, DocumentResponse
+from app.models.schemas import IngestRequest, SearchRequest, DocumentResponse, UpdateRequest
 
 router = APIRouter(prefix="/api/vector", tags=["Vector Management"])
 
@@ -34,5 +34,13 @@ async def delete_document(doc_id: int, service: VectorService = Depends(get_vect
     try:
         service.delete_document(doc_id)
         return {"message": f"Document {doc_id} deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.put("/documents/{doc_id}")
+async def update_document(doc_id: int, request: UpdateRequest, service: VectorService = Depends(get_vector_service)):
+    try:
+        service.update_document(doc_id, request.filename, request.content, request.metadata)
+        return {"message": f"Document {doc_id} updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

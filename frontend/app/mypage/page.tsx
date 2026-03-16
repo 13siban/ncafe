@@ -18,6 +18,7 @@ import DeleteAccount from './_components/DeleteAccount';
 export default function MyPage() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState('membership'); // 'membership', 'orders', 'profile'
 
     // 프로필 정보 상태
     const [nickname, setNickname] = useState('');
@@ -103,21 +104,59 @@ export default function MyPage() {
             <div className={styles.container}>
                 <div className={styles.content}>
                     <h1 className={styles.title}>마이페이지</h1>
+                    <div className={styles.tabs}>
+                        <button
+                            className={`${styles.tabBtn} ${activeTab === 'membership' ? styles.activeTab : ''}`}
+                            onClick={() => setActiveTab('membership')}
+                        >
+                            등급 및 포인트
+                        </button>
+                        <button
+                            className={`${styles.tabBtn} ${activeTab === 'orders' ? styles.activeTab : ''}`}
+                            onClick={() => setActiveTab('orders')}
+                        >
+                            주문 및 관심 메뉴
+                        </button>
+                        <button
+                            className={`${styles.tabBtn} ${activeTab === 'profile' ? styles.activeTab : ''}`}
+                            onClick={() => setActiveTab('profile')}
+                        >
+                            회원정보 수정
+                        </button>
+                    </div>
                     <div className={styles.tabContent}>
-                        <GradeSection gradeInfo={gradeInfo} />
-                        <ProfileSection
-                            nickname={nickname}
-                            email={email}
-                            phoneNumber={phoneNumber}
-                            setNickname={setNickname}
-                            setEmail={setEmail}
-                            setPhoneNumber={setPhoneNumber}
-                        />
-                        {!isSocialUser && <PasswordSection />}
-                        <OrderHistory orders={orders} topMenus={topMenus} />
-                        <FavoritesList favorites={favorites} setFavorites={setFavorites} />
-                        <PointSection pointData={pointData} gradeInfo={gradeInfo} />
-                        <DeleteAccount isSocialUser={isSocialUser} />
+                        {activeTab === 'membership' && (
+                            <>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                    <GradeSection gradeInfo={gradeInfo} />
+                                    <PointSection pointData={pointData} gradeInfo={gradeInfo} view="balance" />
+                                </div>
+                                <PointSection pointData={pointData} view="history" />
+                            </>
+                        )}
+                        {activeTab === 'orders' && (
+                            <>
+                                <OrderHistory 
+                                    orders={orders} 
+                                    topMenus={topMenus} 
+                                    favoritesNode={<FavoritesList favorites={favorites} setFavorites={setFavorites} />}
+                                />
+                            </>
+                        )}
+                        {activeTab === 'profile' && (
+                            <>
+                                <ProfileSection
+                                    nickname={nickname}
+                                    email={email}
+                                    phoneNumber={phoneNumber}
+                                    setNickname={setNickname}
+                                    setEmail={setEmail}
+                                    setPhoneNumber={setPhoneNumber}
+                                />
+                                {!isSocialUser && <PasswordSection />}
+                                <DeleteAccount isSocialUser={isSocialUser} />
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

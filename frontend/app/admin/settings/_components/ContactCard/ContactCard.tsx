@@ -7,12 +7,14 @@ import styles from '../../page.module.css';
 interface ContactCardProps {
     contactNumber: string;
     address: string;
+    addressEn: string;
     setContactNumber: (v: string) => void;
     setAddress: (v: string) => void;
+    setAddressEn: (v: string) => void;
 }
 
 const ContactCard: React.FC<ContactCardProps> = ({
-    contactNumber, address, setContactNumber, setAddress
+    contactNumber, address, addressEn, setContactNumber, setAddress, setAddressEn
 }) => {
     return (
         <section className={styles.card}>
@@ -44,6 +46,19 @@ const ContactCard: React.FC<ContactCardProps> = ({
                             placeholder="서울특별시 강남구..."
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
+                        />
+                    </div>
+                </div>
+                <div className={styles.formGroup}>
+                    <label className={styles.label}>매장 영문 주소</label>
+                    <div className={styles.inputWrapper}>
+                        <MapPin className={styles.inputIcon} size={16} />
+                        <input
+                            type="text"
+                            className={styles.input}
+                            placeholder="123, Teheran-ro, Gangnam-gu..."
+                            value={addressEn}
+                            onChange={(e) => setAddressEn(e.target.value)}
                         />
                     </div>
                 </div>

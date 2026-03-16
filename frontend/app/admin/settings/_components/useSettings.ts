@@ -16,6 +16,7 @@ export function useSettings() {
     const [description, setDescription] = useState('');
     const [contactNumber, setContactNumber] = useState('');
     const [address, setAddress] = useState('');
+    const [addressEn, setAddressEn] = useState('');
     const [faviconUrl, setFaviconUrl] = useState('');
     const [faviconDarkUrl, setFaviconDarkUrl] = useState('');
 
@@ -29,6 +30,7 @@ export function useSettings() {
             setDescription(data.description || '');
             setContactNumber(data.contactNumber || '');
             setAddress(data.address || '');
+            setAddressEn(data.addressEn || '');
             setFaviconUrl(data.faviconUrl || '');
             setFaviconDarkUrl(data.faviconDarkUrl || '');
         } catch (error) {
@@ -52,6 +54,7 @@ export function useSettings() {
                 description,
                 contactNumber,
                 address,
+                addressEn,
                 faviconUrl,
                 faviconDarkUrl
             });
@@ -86,6 +89,7 @@ export function useSettings() {
         description,
         contactNumber,
         address,
+        addressEn,
         faviconUrl,
         faviconDarkUrl,
         setOpenTime,
@@ -94,6 +98,7 @@ export function useSettings() {
         setDescription,
         setContactNumber,
         setAddress,
+        setAddressEn,
         setFaviconUrl,
         setFaviconDarkUrl,
         handleUpdateSettings,

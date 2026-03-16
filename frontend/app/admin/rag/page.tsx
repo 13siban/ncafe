@@ -50,6 +50,18 @@ export default function RagManagementPage() {
         } catch (error) { console.error('Delete error:', error); }
     };
 
+    const handleUpdate = async (id: number, filename: string, content: string) => {
+        const res = await fetch(`/api/vector/documents/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename, content, metadata: {} })
+        });
+        if (!res.ok) {
+            throw new Error('업데이트 실패');
+        }
+        await fetchDocs();
+    };
+
     return (
         <div className={styles.container}>
             {/* Stats Overview */}
@@ -76,7 +88,14 @@ export default function RagManagementPage() {
                 <SearchPlayground />
             </div>
 
-            <DocumentTable docs={docs} loading={loading} error={error} onDelete={handleDelete} onRefresh={fetchDocs} />
+            <DocumentTable 
+                docs={docs} 
+                loading={loading} 
+                error={error} 
+                onDelete={handleDelete} 
+                onRefresh={fetchDocs} 
+                onUpdate={handleUpdate}
+            />
         </div>
     );
 }

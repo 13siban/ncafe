@@ -7,9 +7,10 @@ import styles from '../../mypage.module.css';
 interface OrderHistoryProps {
     orders: any[];
     topMenus: any[];
+    favoritesNode?: React.ReactNode;
 }
 
-const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, topMenus }) => {
+const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, topMenus, favoritesNode }) => {
     const router = useRouter();
 
     return (
@@ -48,38 +49,42 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, topMenus }) => {
                 </div>
             </section>
 
-            <section className={styles.section}>
-                <h2 className={styles.sectionTitle}>자주 주문한 메뉴 Top 5</h2>
-                <div className={styles.topMenuList}>
-                    {topMenus.length === 0 ? (
-                        <p style={{ color: 'var(--color-gray-500)', textAlign: 'center', padding: '2rem 0' }}>
-                            주문 기록이 없습니다.
-                        </p>
-                    ) : (
-                        topMenus.map((topMenu, idx) => (
-                            <div
-                                key={topMenu.menuId}
-                                className={styles.topMenuCard}
-                                onClick={() => router.push(`/menus/${topMenu.engName ? topMenu.engName.toLowerCase().replace(/\s+/g, '-') : topMenu.menuId}`)}
-                            >
-                                <div className={styles.topMenuRank}>{idx + 1}</div>
-                                <img
-                                    src={`/images/${topMenu.imageUrl || 'placeholder.jpg'}`}
-                                    alt={topMenu.menuName}
-                                    className={styles.topMenuImg}
-                                    onError={(e) => {
-                                        (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
-                                    }}
-                                />
-                                <div className={styles.topMenuInfo}>
-                                    <div className={styles.topMenuName}>{topMenu.menuName}</div>
-                                    <div className={styles.topMenuCount}>주문 횟수: {topMenu.totalQuantity}회</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                {favoritesNode}
+
+                <section className={styles.section}>
+                    <h2 className={styles.sectionTitle}>자주 주문한 메뉴 Top 5</h2>
+                    <div className={styles.topMenuList}>
+                        {topMenus.length === 0 ? (
+                            <p style={{ color: 'var(--color-gray-500)', textAlign: 'center', padding: '2rem 0' }}>
+                                주문 기록이 없습니다.
+                            </p>
+                        ) : (
+                            topMenus.map((topMenu, idx) => (
+                                <div
+                                    key={topMenu.menuId}
+                                    className={styles.topMenuCard}
+                                    onClick={() => router.push(`/menus/${topMenu.engName ? topMenu.engName.toLowerCase().replace(/\s+/g, '-') : topMenu.menuId}`)}
+                                >
+                                    <div className={styles.topMenuRank}>{idx + 1}</div>
+                                    <img
+                                        src={`/images/${topMenu.imageUrl || 'placeholder.jpg'}`}
+                                        alt={topMenu.menuName}
+                                        className={styles.topMenuImg}
+                                        onError={(e) => {
+                                            (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
+                                        }}
+                                    />
+                                    <div className={styles.topMenuInfo}>
+                                        <div className={styles.topMenuName}>{topMenu.menuName}</div>
+                                        <div className={styles.topMenuCount}>주문 횟수: {topMenu.totalQuantity}회</div>
+                                    </div>
                                 </div>
-                            </div>
-                        ))
-                    )}
-                </div>
-            </section>
+                            ))
+                        )}
+                    </div>
+                </section>
+            </div>
         </>
     );
 };

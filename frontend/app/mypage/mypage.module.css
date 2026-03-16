@@ -116,8 +116,7 @@
     padding: 2rem;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-    break-inside: avoid;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0;
 }
 
 .sectionTitle {
@@ -393,8 +392,11 @@
 }
 
 .tabContent {
-    column-count: 2;
-    column-gap: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+    width: 100%;
 }
 
 /* Orders */
@@ -618,8 +620,14 @@
     color: #27ae60;
 }
 
+@media (max-width: 1024px) {
+    .tabContent {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 640px) {
     .tabContent {
-        column-count: 1;
+        grid-template-columns: 1fr;
     }
 }
