@@ -6,6 +6,7 @@ import Link from 'next/link';
 import styles from './LoginForm.module.css';
 import { authAPI, userAPI } from '@/app/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 const LoginForm = () => {
     const router = useRouter();
@@ -61,6 +62,33 @@ const LoginForm = () => {
             } else {
                 setError(msg || '로그인 중 오류가 발생했습니다.');
             }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleGoogleLogin = async (credentialResponse: any) => {
+        setIsLoading(true);
+        setError('');
+        try {
+            if (!credentialResponse.credential) {
+                throw new Error('Google credential not found');
+            }
+            
+            const res = await authAPI.googleLogin(credentialResponse.credential);
+            
+            if (res && res.user) {
+                useAuthStore.getState().setUser(res.user);
+            }
+            window.dispatchEvent(new Event('login'));
+            let redirect = searchParams.get('redirect') || '/';
+            if (redirect.startsWith('/login')) {
+                redirect = '/';
+            }
+            router.push(redirect);
+            router.refresh();
+        } catch (err: any) {
+            setError(err.message || '구글 로그인 중 오류가 발생했습니다.');
         } finally {
             setIsLoading(false);
         }
@@ -131,6 +159,22 @@ const LoginForm = () => {
                     <Link href="/signup" style={{ color: 'var(--color-primary-600)', fontWeight: 600, textDecoration: 'underline' }}>
                         회원가입
                     </Link>
+                </div>
+
+                <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ textTransform: 'uppercase', fontSize: '0.8rem', color: 'var(--color-gray-400)', marginBottom: '1rem' }}>
+                        Or continue with
+                    </div>
+                    {/* 구글 로그인 버튼 */}
+                    {/* 사용 환경에서는 NEXT_PUBLIC_GOOGLE_CLIENT_ID 환경 변수를 설정해야 합니다. */}
+                    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || 'dummy-client-id'}>
+                        <GoogleLogin
+                            onSuccess={handleGoogleLogin}
+                            onError={() => {
+                                setError('구글 로그인에 실패했습니다.');
+                            }}
+                        />
+                    </GoogleOAuthProvider>
                 </div>
             </form>
 

@@ -3,6 +3,7 @@ package com.new_cafe.app.backend.auth.adapter.in.web;
 import com.new_cafe.app.backend.auth.adapter.in.web.dto.LoginRequest;
 import com.new_cafe.app.backend.auth.adapter.in.web.dto.LoginResponse;
 import com.new_cafe.app.backend.auth.adapter.in.web.dto.MeResponse;
+import com.new_cafe.app.backend.auth.application.port.in.GoogleLoginUseCase;
 import com.new_cafe.app.backend.auth.application.port.in.LoginUseCase;
 import com.new_cafe.app.backend.auth.application.port.in.SignupUseCase;
 import com.new_cafe.app.backend.auth.application.port.out.LoadUserPort;
@@ -28,6 +29,7 @@ public class AuthController {
 
     private final LoginUseCase loginUseCase;
     private final SignupUseCase signupUseCase;
+    private final GoogleLoginUseCase googleLoginUseCase;
     private final LoadUserPort loadUserPort;
 
     @PostMapping("/signup")
@@ -50,6 +52,20 @@ public class AuthController {
                 LoginUseCase.Command.builder()
                         .username(request.getUsername())
                         .password(request.getPassword())
+                        .build());
+
+        return LoginResponse.builder()
+                .token(result.getToken())
+                .username(result.getUsername())
+                .role(result.getRole())
+                .build();
+    }
+
+    @PostMapping("/google")
+    public LoginResponse googleLogin(@RequestBody com.new_cafe.app.backend.auth.adapter.in.web.dto.GoogleLoginRequest request) {
+        LoginUseCase.Result result = googleLoginUseCase.loginWithGoogle(
+                GoogleLoginUseCase.Command.builder()
+                        .idToken(request.getIdToken())
                         .build());
 
         return LoginResponse.builder()

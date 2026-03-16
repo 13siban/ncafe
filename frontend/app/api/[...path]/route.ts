@@ -86,6 +86,55 @@ async function unifiedHandler(req: NextRequest) {
             return NextResponse.json({ message: e.message }, { status: 500 });
         }
     }
+    
+    // 1-1. [특수 경로] 구글 소셜 로그인 프로세스
+    if (pathname === '/api/auth/google' && req.method === 'POST') {
+        try {
+            const body = await req.json();
+            const loginRes = await fetch(`${API_BASE}/auth/google`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+            });
+
+            if (!loginRes.ok) {
+                const error = await loginRes.json().catch(() => ({ message: 'Google Login failed' }));
+                return NextResponse.json(error, { status: loginRes.status });
+            }
+
+            const tokenData = await loginRes.json();
+            const token = tokenData.accessToken || tokenData.token;
+
+            if (!token) return NextResponse.json({ message: 'Token not found' }, { status: 500 });
+
+            // 사용자 정보 조회
+            const meRes = await fetch(`${API_BASE}/auth/me`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const user = meRes.ok ? await meRes.json() : null;
+
+            // 세션 저장
+            session.token = token;
+            session.user = user ? {
+                id: user.id || user.nickname,
+                email: user.email || user.nickname,
+                nickname: user.nickname,
+                role: user.role,
+                phoneNumber: user.phoneNumber,
+                grade: user.grade,
+            } : {
+                id: tokenData.username,
+                email: tokenData.username,
+                nickname: tokenData.username,
+                role: tokenData.role,
+            };
+            await session.save();
+
+            return NextResponse.json({ user: session.user });
+        } catch (e: any) {
+            return NextResponse.json({ message: e.message }, { status: 500 });
+        }
+    }
 
     // 2. [특수 경로] 로그아웃
     if (pathname === '/api/auth/logout' && req.method === 'POST') {

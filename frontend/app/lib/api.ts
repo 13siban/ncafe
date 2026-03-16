@@ -83,6 +83,15 @@ export const authAPI = {
             body: JSON.stringify({ username, password }),
         }),
 
+    /**
+     * 구글 로그인: 구글에서 받은 credential(ID Token)으로 소셜 로그인
+     */
+    googleLogin: (idToken: string) =>
+        fetchAPI('/auth/google', {
+            method: 'POST',
+            body: JSON.stringify({ idToken }),
+        }),
+
     /** 로그아웃: 서버에서 세션 쿠키 삭제 */
     logout: () => fetchAPI('/auth/logout', { method: 'POST' }),
 
