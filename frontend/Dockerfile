@@ -60,6 +60,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/node_modules/sharp ./node_modules/sharp
 COPY --from=builder /app/node_modules/@img ./node_modules/@img
 
+# DnD-kit, framer-motion: standalone에서 자동 감지되지 않는 클라이언트 라이브러리 복사
+COPY --from=builder /app/node_modules/@dnd-kit ./node_modules/@dnd-kit
+COPY --from=builder /app/node_modules/framer-motion ./node_modules/framer-motion
+COPY --from=builder /app/node_modules/motion ./node_modules/motion
+
 USER nextjs
 
 EXPOSE 3000
