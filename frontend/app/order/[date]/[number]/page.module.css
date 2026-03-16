@@ -307,3 +307,23 @@
     justify-content: center;
     gap: 0.5rem;
 }
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+    .statusCard {
+        padding: 1.5rem 1rem;
+    }
+    .stepLabel {
+        font-size: 0.7rem;
+        text-align: center;
+    }
+    .stepIcon {
+        width: 28px;
+        height: 28px;
+    }
+    .trackingBar::before {
+        top: 12px;
+    }
+}

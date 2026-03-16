@@ -107,3 +107,20 @@
     background: #e0e7ff;
     color: #3730a3;
 }
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+    .item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .itemCheckbox {
+        margin-top: 4px;
+    }
+    .itemLeft {
+        align-items: flex-start;
+    }
+}

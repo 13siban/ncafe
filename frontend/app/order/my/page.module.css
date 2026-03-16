@@ -177,3 +177,15 @@
     font-weight: 700;
     text-decoration: none;
 }
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem 0.5rem;
+    }
+    .orderCard {
+        padding: 1rem;
+    }
+    .displayNumber, .totalPrice {
+        font-size: 1rem;
+    }
+}

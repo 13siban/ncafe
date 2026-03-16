@@ -246,3 +246,25 @@
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 16px;
+        margin: 20px auto;
+    }
+    .statsGrid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .searchBox {
+        flex-direction: column;
+    }
+    .button {
+        width: 100%;
+        text-align: center;
+    }
+    .resultHeader {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+}

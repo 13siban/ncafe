@@ -488,5 +488,30 @@
 
 .addBtnText:hover {
     background-color: var(--color-primary-50, #fdf8f6);
-    color: var(--color-primary-700, #6f4a31);
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 16px;
+    }
+    .grid {
+        grid-template-columns: 1fr;
+    }
+    .modal {
+        padding: 1.5rem;
+    }
+    .modalActions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .btnCancel, .btnSubmit {
+        width: 100%;
+        text-align: center;
+    }
+    .sectionHeader {
+        padding: 1rem;
+    }
+    .groupCard {
+        padding: 1rem;
+    }
 }

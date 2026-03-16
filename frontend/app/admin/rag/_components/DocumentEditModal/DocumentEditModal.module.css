@@ -143,3 +143,17 @@
     opacity: 0.6;
     cursor: not-allowed;
 }
+
+@media (max-width: 768px) {
+    .modal {
+        width: 95%;
+        padding: 16px;
+    }
+    .actions {
+        flex-direction: column;
+    }
+    .btnCancel, .btnSave {
+        width: 100%;
+        justify-content: center;
+    }
+}

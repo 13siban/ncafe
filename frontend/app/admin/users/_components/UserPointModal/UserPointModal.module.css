@@ -174,3 +174,27 @@
     padding: 20px;
     color: #64748b;
 }
+
+@media (max-width: 768px) {
+    .modal {
+        width: 95vw;
+        max-height: 95vh;
+    }
+    .header {
+        padding: 16px;
+    }
+    .content {
+        padding: 16px;
+    }
+    .inputGroup {
+        flex-direction: column;
+    }
+    .submitBtn {
+        width: 100%;
+        margin-top: 8px;
+    }
+    .historyTable th, .historyTable td {
+        padding: 8px 4px;
+        font-size: 0.8rem;
+    }
+}

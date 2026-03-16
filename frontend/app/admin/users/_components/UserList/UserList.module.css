@@ -152,3 +152,28 @@
     opacity: 0.3;
     cursor: not-allowed;
 }
+
+/* Scrollbar explicitly customized for table overflow */
+.container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.container::-webkit-scrollbar-track {
+    background: var(--color-gray-100);
+    border-radius: 4px;
+}
+
+.container::-webkit-scrollbar-thumb {
+    background: var(--color-gray-300);
+    border-radius: 4px;
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gray-400);
+}
+
+@media (max-width: 768px) {
+    .table th, .table td {
+        padding: 0.5rem;
+    }
+}

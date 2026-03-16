@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import styles from './Header.module.css';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Menu, X } from 'lucide-react';
 import { authAPI } from '@/app/lib/api/authAPI';
 import { userAPI } from '@/app/lib/api/userAPI';
 import { useCartStore } from '@/store/useCartStore';
@@ -27,8 +27,7 @@ const Header = () => {
     const [gradeInfo, setGradeInfo] = useState<any>(null);
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
-
-
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const cartItemsCount = useCartStore((state) => state.getTotalItems());
 
@@ -98,7 +97,7 @@ const Header = () => {
     const isHomePage = pathname === '/';
     const isMenuPage = pathname === '/menus';
     const isAboutPage = pathname === '/about';
-    const displayScrolled = (!isHomePage && !isMenuPage && !isAboutPage) || isScrolled;
+    const displayScrolled = (!isHomePage && !isMenuPage && !isAboutPage) || isScrolled || isMobileMenuOpen;
 
     return (
         <nav className={`${styles.nav} ${displayScrolled ? styles.scrolled : styles.transparent}`}>
@@ -169,8 +168,34 @@ const Header = () => {
                             </>
                         ) : null}
                     </div>
+                    {/* 햄버거 메뉴 모바일 버튼 */}
+                    <button 
+                        className={styles.mobileMenuButton} 
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        aria-label="메뉴 열기/닫기"
+                    >
+                        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
                 </div>
             </div>
+            
+            {/* 모바일 다운 메뉴 Ovely */}
+            {isMobileMenuOpen && (
+                <div className={styles.mobileMenuOverlay}>
+                    <Link href="/menus" className={isActive('/menus') ? styles.active : ''} onClick={() => setIsMobileMenuOpen(false)}>Menu</Link>
+                    <Link href="/order/my" className={isActive('/order/my') ? styles.active : ''} onClick={() => setIsMobileMenuOpen(false)}>My Order</Link>
+                    <Link href="/about" className={isActive('/about') ? styles.active : ''} onClick={() => setIsMobileMenuOpen(false)}>About</Link>
+                    {isMounted && user && (
+                        <Link href="/mypage" className={isActive('/mypage') ? styles.active : ''} onClick={() => setIsMobileMenuOpen(false)}>My Page</Link>
+                    )}
+                    {isMounted && (user?.role === 'ADMIN' || user?.role === 'ROLE_ADMIN' || user?.role === 'ROLE_SUB_ADMIN') && (
+                        <>
+                            <Link href="/admin" className={isActive('/admin') ? styles.active : ''} onClick={() => setIsMobileMenuOpen(false)}>Admin</Link>
+                            <Link href="/404" className={isActive('/404') ? styles.active : ''} onClick={() => setIsMobileMenuOpen(false)}>404</Link>
+                        </>
+                    )}
+                </div>
+            )}
         </nav>
     );
 };

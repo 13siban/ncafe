@@ -117,3 +117,15 @@
     background-color: rgba(255, 255, 255, 0.15);
     transform: scale(1.02);
 }
+
+@media (max-width: 768px) {
+    .heroButtons {
+        flex-direction: column;
+        width: 100%;
+        padding: 0 20px;
+    }
+    
+    .primaryButton, .secondaryButton {
+        width: 100%;
+    }
+}
