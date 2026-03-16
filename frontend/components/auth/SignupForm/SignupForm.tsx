@@ -50,8 +50,47 @@ const SignupForm = () => {
         e.preventDefault();
         setError('');
 
+        // 아이디 유효성 검사
+        if (username.length < 4 || username.length > 20) {
+            setError('아이디는 4~20자 사이로 입력해주세요.');
+            return;
+        }
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+            setError('아이디는 영문, 숫자, 밑줄(_)만 사용할 수 있습니다.');
+            return;
+        }
+
+        // 닉네임 유효성 검사
+        if (nickname.trim().length < 2 || nickname.trim().length > 10) {
+            setError('닉네임은 2~10자 사이로 입력해주세요.');
+            return;
+        }
+
+        // 비밀번호 강도 검사
+        if (password.length < 8) {
+            setError('비밀번호는 최소 8자 이상이어야 합니다.');
+            return;
+        }
+        if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(password)) {
+            setError('비밀번호는 영문과 숫자를 모두 포함해야 합니다.');
+            return;
+        }
+
+        // 비밀번호 확인
         if (password !== passwordConfirm) {
             setError('비밀번호가 일치하지 않습니다.');
+            return;
+        }
+
+        // 이메일 형식 검사
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            setError('올바른 이메일 형식을 입력해주세요.');
+            return;
+        }
+
+        // 전화번호 형식 검사
+        if (phoneNumber && !/^01[0-9]-?\d{3,4}-?\d{4}$/.test(phoneNumber)) {
+            setError('전화번호 형식이 올바르지 않습니다. (예: 010-1234-5678)');
             return;
         }
 

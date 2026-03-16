@@ -9,11 +9,31 @@ const PasswordSection: React.FC = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordMessage, setPasswordMessage] = useState('');
+    const [passwordError, setPasswordError] = useState('');
 
     const handlePasswordUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
+        setPasswordError('');
+
+        // 새 비밀번호 강도 검사
+        if (newPassword.length < 8) {
+            setPasswordError('새 비밀번호는 최소 8자 이상이어야 합니다.');
+            return;
+        }
+        if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(newPassword)) {
+            setPasswordError('새 비밀번호는 영문과 숫자를 모두 포함해야 합니다.');
+            return;
+        }
+
+        // 현재 비밀번호와 새 비밀번호 동일 여부
+        if (currentPassword === newPassword) {
+            setPasswordError('현재 비밀번호와 새 비밀번호가 동일합니다.');
+            return;
+        }
+
+        // 비밀번호 확인 일치 여부
         if (newPassword !== confirmPassword) {
-            alert('새 비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+            setPasswordError('새 비밀번호와 비밀번호 확인이 일치하지 않습니다.');
             return;
         }
 
@@ -25,7 +45,7 @@ const PasswordSection: React.FC = () => {
             setConfirmPassword('');
             setTimeout(() => setPasswordMessage(''), 3000);
         } catch (error: any) {
-            alert(error.message || '비밀번호 변경 중 오류가 발생했습니다.');
+            setPasswordError(error.message || '비밀번호 변경 중 오류가 발생했습니다.');
         }
     };
 
@@ -63,6 +83,7 @@ const PasswordSection: React.FC = () => {
                         required
                     />
                 </div>
+                {passwordError && <div style={{ padding: '0.75rem', backgroundColor: '#fee2e2', color: '#b91c1c', borderRadius: '8px', fontSize: '0.875rem', textAlign: 'center' }}>⚠️ {passwordError}</div>}
                 {passwordMessage && <div className={styles.successMessage}>{passwordMessage}</div>}
                 <button type="submit" className={styles.submitBtn}>비밀번호 변경</button>
             </form>
