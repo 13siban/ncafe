@@ -164,8 +164,10 @@ export default function MyPage() {
 
         const optionTotalPrice = fav.options.reduce((sum: number, opt: any) => sum + (opt.additionalPrice || 0), 0);
 
+        const cartId = `${fav.menuId}-${fav.options.map((o: any) => `${o.optionGroupId}:${o.optionItemId}`).sort().join('-')}`;
+
         const cartItem = {
-            cartId: `fav-${fav.id}-${Date.now()}`,
+            cartId,
             menuId: fav.menuId,
             menuName: fav.menuName,
             menuEngName: fav.menuName,

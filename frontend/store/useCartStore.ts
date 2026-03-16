@@ -49,13 +49,17 @@ export const useCartStore = create<CartState>()(
                 set((state) => {
                     // Check if an item with the same menuId and options already exists
                     const existingItemIndex = state.items.findIndex((item) => {
+                        // 1. cartId가 완전히 같으면 보장됨
+                        if (item.cartId === newItem.cartId) return true;
+
+                        // 2. 혹시 cartId가 다른 규칙으로 생성되었을 경우 방어 코드 (타입 안전한 비교)
                         if (item.menuId !== newItem.menuId) return false;
                         if (item.selectedOptions.length !== newItem.selectedOptions.length) return false;
 
-                        // Note: Simplistic option comparison. Sorting/hashing might be needed if order isn't guaranteed
                         const optionsMatch = item.selectedOptions.every(opt =>
                             newItem.selectedOptions.some(newOpt =>
-                                newOpt.optionGroupId === opt.optionGroupId && newOpt.optionItemId === opt.optionItemId
+                                String(newOpt.optionGroupId) === String(opt.optionGroupId) &&
+                                String(newOpt.optionItemId) === String(opt.optionItemId)
                             )
                         );
                         return optionsMatch;

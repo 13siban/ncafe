@@ -16,12 +16,13 @@ interface ChatState {
     openChat: () => void;
     closeChat: () => void;
     sendMessage: (content: string, userId?: string | null, cartSummary?: string | null) => Promise<void>;
-    clearMessages: () => void;
+    clearMessages: () => Promise<void>;
     pendingAction:
         | { type: 'navigate'; path: string }
         | { type: 'add_to_cart'; slug: string; quantity: number }
         | { type: 'show_menu_cards'; menus: { slug: string; name: string; price: number }[] }
         | { type: 'reorder'; items: { menuId: number; menuName: string; quantity: number }[] }
+        | { type: 'open_favorite_panel'; slug: string }
         | null;
     clearPendingAction: () => void;
 }
@@ -136,6 +137,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
                                         type: 'reorder',
                                         items: parsed.items,
                                     };
+                                } else if (parsed.action === 'open_favorite_panel' && parsed.slug) {
+                                    action = {
+                                        type: 'open_favorite_panel',
+                                        slug: parsed.slug,
+                                    };
                                 }
                             }
                             // 텍스트 청크
@@ -174,6 +180,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
             if (isFirstChunk && action) {
                 // 텍스트 없이 액션만 온 경우 (프롬프트에서 '바로 호출하세요' 지시 때문)
                 if (action.type === 'add_to_cart') defaultContent = "옵션을 선택해주세요.";
+                else if (action.type === 'open_favorite_panel') defaultContent = "즐겨찾기에 추가할 옵션을 선택해주세요.";
                 else if (action.type === 'show_menu_cards') defaultContent = "추천 메뉴입니다.";
                 else if (action.type === 'reorder') defaultContent = "이전 주문 상품의 옵션을 확인해주세요.";
                 else if (action.type === 'navigate') defaultContent = "해당 페이지로 이동합니다.";
@@ -217,19 +224,27 @@ export const useChatStore = create<ChatState>((set, get) => ({
     },
 
     clearPendingAction: () => set({ pendingAction: null }),
-    clearMessages: () => {
+    clearMessages: async () => {
         const oldSessionId = get().sessionId;
-        // 서버측 세션 히스토리 삭제
+        // 서버측 세션 히스토리 먼저 삭제 (await로 완료 대기)
         if (oldSessionId) {
-            fetch('/api/chat', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sessionId: oldSessionId }),
-            }).catch(() => {});
+            try {
+                await fetch('/api/chat', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sessionId: oldSessionId }),
+                });
+            } catch { /* 실패해도 계속 진행 */ }
         }
+        // sessionStorage 세션ID도 제거
         if (typeof window !== 'undefined') {
             sessionStorage.removeItem('chat-session-id');
         }
-        set({ messages: [], sessionId: '' });
+        // 새 sessionId 즉시 생성해서 저장 (빈 값이면 다음 sendMessage에서 꼬일 수 있음)
+        const newSessionId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+        if (typeof window !== 'undefined') {
+            sessionStorage.setItem('chat-session-id', newSessionId);
+        }
+        set({ messages: [], sessionId: newSessionId });
     },
 }));

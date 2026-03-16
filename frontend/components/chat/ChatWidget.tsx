@@ -31,6 +31,7 @@ interface OptionPanelData {
     basePrice: number;
     quantity: number;
     optionGroups: OptionGroup[];
+    purpose: 'cart' | 'favorite';
 }
 
 const ChatWidget = () => {
@@ -74,7 +75,7 @@ const ChatWidget = () => {
     const addItem = useCartStore((state) => state.addItem);
 
     // 옵션 패널 열기: slug로 메뉴+옵션 정보를 fetch해서 패널 표시
-    const openOptionPanel = async (slug: string, quantity: number = 1) => {
+    const openOptionPanel = async (slug: string, quantity: number = 1, purpose: 'cart' | 'favorite' = 'cart') => {
         try {
             const res = await fetch(`/api/menus/slug/${slug}`);
             if (!res.ok) return;
@@ -98,6 +99,47 @@ const ChatWidget = () => {
             });
             setSelectedOptions(defaults);
 
+            // 중요: 옵션이 하나도 없는 메뉴인 경우 패널을 띄우지 않고 바로 수행
+            if (optionGroups.length === 0) {
+                if (purpose === 'cart') {
+                    const cartId = `${menu.id}-`;
+                    addItem({
+                        cartId,
+                        menuId: menu.id,
+                        menuName: menu.korName,
+                        menuEngName: menu.engName,
+                        imageSrc: menu.images && menu.images.length > 0 ? menu.images[0].srcUrl : '',
+                        basePrice: menu.price,
+                        quantity,
+                        selectedOptions: [],
+                        optionTotalPrice: 0,
+                        subtotal: menu.price * quantity,
+                    });
+                    // 모달 없이 담겼다는 메시지나 처리가 가능
+                } else if (purpose === 'favorite') {
+                    // 바로 API 호출
+                    try {
+                        const res = await fetch('/api/users/me/favorites', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                menuId: menu.id,
+                                selectedOptions: [],
+                                alias: ''
+                            })
+                        });
+                        if (res.ok) {
+                            alert(`${menu.korName} 메뉴가 즐겨찾기에 등록되었습니다!`);
+                        } else {
+                            alert('즐겨찾기 추가 중 오류가 발생했습니다.');
+                        }
+                    } catch (err) {
+                        console.error('Add favorite failed', err);
+                    }
+                }
+                return; // 패널 상태를 세팅하지 않고 종료
+            }
+
             setOptionPanel({
                 menuId: menu.id,
                 menuName: menu.korName,
@@ -106,6 +148,7 @@ const ChatWidget = () => {
                 basePrice: menu.price,
                 quantity,
                 optionGroups,
+                purpose,
             });
         } catch (e) {
             console.error('Failed to load menu options', e);
@@ -169,6 +212,47 @@ const ChatWidget = () => {
         setSelectedOptions({});
     };
 
+    // 옵션 패널에서 "즐겨찾기 완료" 클릭
+    const handleAddFavoriteFromPanel = async () => {
+        if (!optionPanel || !user) return;
+
+        const payloadOptions: { optionGroupId: number; optionItemId: number }[] = [];
+        optionPanel.optionGroups.forEach((group) => {
+            const ids = selectedOptions[group.id] || [];
+            ids.forEach((id) => {
+                payloadOptions.push({
+                    optionGroupId: group.id,
+                    optionItemId: id
+                });
+            });
+        });
+
+        try {
+            const res = await fetch('/api/users/me/favorites', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    menuId: optionPanel.menuId,
+                    selectedOptions: payloadOptions,
+                    alias: ''
+                })
+            });
+            if (res.ok) {
+                // 추가 성공 (필요시 메시지를 뿌리거나 Toast 추가 가능)
+                alert(`${optionPanel.menuName} 메뉴가 즐겨찾기에 등록되었습니다!`);
+            } else {
+                alert('즐겨찾기 추가 중 오류가 발생했습니다.');
+            }
+        } catch (err) {
+            console.error(err);
+        }
+
+        setOptionPanel(null);
+        setSelectedOptions({});
+    };
+
     // 옵션총가격 계산
     const getOptionTotalPrice = () => {
         if (!optionPanel) return 0;
@@ -190,8 +274,11 @@ const ChatWidget = () => {
             router.push(pendingAction.path);
             clearPendingAction();
         } else if (pendingAction.type === 'add_to_cart') {
-            // 바로 담기 대신 옵션 패널 열기
-            openOptionPanel(pendingAction.slug, pendingAction.quantity).finally(clearPendingAction);
+            // 바로 담기 대신 옵션 패널 열기 (목적: cart)
+            openOptionPanel(pendingAction.slug, pendingAction.quantity, 'cart').finally(clearPendingAction);
+        } else if (pendingAction.type === 'open_favorite_panel') {
+            // 오픈 페이보릿 패널 열기 (목적: favorite)
+            openOptionPanel(pendingAction.slug, 1, 'favorite').finally(clearPendingAction);
         } else if (pendingAction.type === 'show_menu_cards') {
             setMenuCards(pendingAction.menus);
             clearPendingAction();
@@ -203,7 +290,7 @@ const ChatWidget = () => {
                         if (res.ok) {
                             const menu = await res.json();
                             const slug = (menu.engName || '').toLowerCase().replace(/\s+/g, '-');
-                            if (slug) await openOptionPanel(slug, item.quantity);
+                            if (slug) await openOptionPanel(slug, item.quantity, 'cart');
                         }
                     } catch (e) {
                         console.error('Reorder item failed', e);
@@ -399,12 +486,18 @@ const ChatWidget = () => {
                                         <p className={styles.optionNoOption}>선택 가능한 옵션이 없습니다.</p>
                                     )}
 
-                                    <button className={styles.optionAddBtn} onClick={handleAddFromPanel}>
-                                        <ShoppingCart size={14} />
-                                        {new Intl.NumberFormat('ko-KR').format(
-                                            (optionPanel.basePrice + getOptionTotalPrice()) * optionPanel.quantity
-                                        )}원 담기
-                                    </button>
+                                    {optionPanel.purpose === 'cart' ? (
+                                        <button className={styles.optionAddBtn} onClick={handleAddFromPanel}>
+                                            <ShoppingCart size={14} />
+                                            {new Intl.NumberFormat('ko-KR').format(
+                                                (optionPanel.basePrice + getOptionTotalPrice()) * optionPanel.quantity
+                                            )}원 장바구니 담기
+                                        </button>
+                                    ) : (
+                                        <button className={styles.optionAddBtn} onClick={handleAddFavoriteFromPanel} style={{ backgroundColor: '#2dd4bf' }}>
+                                            즐겨찾기 추가
+                                        </button>
+                                    )}
                                 </div>
                             )}
 

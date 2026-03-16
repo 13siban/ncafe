@@ -4,6 +4,7 @@ from typing import AsyncGenerator, Optional, Union
 from app.config import GEMINI_API_KEY, GEMINI_MODEL
 from app.services.tools import AGENT_TOOLS, execute_function
 
+
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 
@@ -93,44 +94,68 @@ async def chat_stream(
 
     action = None  # 프론트엔드에 전달할 액션 (있다면)
     max_fc_loops = 5  # Function Calling 무한 루프 방지
+    accumulated_text = []  # FC 턴에서도 텍스트를 보존
+    max_retries = 2  # Gemini 빈 응답 시 재시도 횟수
 
     try:
-        for _ in range(max_fc_loops):
-            function_calls_in_turn = []
+        for retry in range(max_retries + 1):
+            action = None
+            accumulated_text = []
+            empty_response = False
+            
+            for _ in range(max_fc_loops):
+                function_calls_in_turn = []
+                text_buffer = []
 
-            response = await client.aio.models.generate_content_stream(
-                model=GEMINI_MODEL,
-                contents=contents,
-                config=config,
-            )
+                response = await client.aio.models.generate_content_stream(
+                    model=GEMINI_MODEL,
+                    contents=contents,
+                    config=config,
+                )
 
-            async for chunk in response:
-                if chunk.text:
-                    yield chunk.text
+                async for chunk in response:
+                    if chunk.text:
+                        text_buffer.append(chunk.text)
 
-                if chunk.candidates:
-                    for candidate in chunk.candidates:
-                        if candidate.content and candidate.content.parts:
-                            for part in candidate.content.parts:
-                                if part.function_call:
-                                    function_calls_in_turn.append(part.function_call)
+                    if chunk.candidates:
+                        for candidate in chunk.candidates:
+                            if candidate.content and candidate.content.parts:
+                                for part in candidate.content.parts:
+                                    if part.function_call:
+                                        function_calls_in_turn.append(part.function_call)
 
-            if not function_calls_in_turn:
+                if not function_calls_in_turn:
+                    if not text_buffer and not accumulated_text:
+                        # 텍스트도 FC도 없는 빈 응답 → 재시도
+                        empty_response = True
+                        break
+                    # FC 없는 최종 턴 → 축적된 텍스트 + 이번 턴 텍스트를 한꺼번에 yield
+                    for t in accumulated_text:
+                        yield t
+                    for t in text_buffer:
+                        yield t
+                    break
+
+                # FC가 있는 턴 → 텍스트를 축적 (버리지 않음)
+                accumulated_text.extend(text_buffer)
+                
+                fc_parts = [types.Part(function_call=fc) for fc in function_calls_in_turn]
+                contents.append(types.Content(role="model", parts=fc_parts))
+
+                fr_parts = []
+                for fc in function_calls_in_turn:
+                    result, fn_action = execute_function(fc)
+                    if fn_action:
+                        action = fn_action
+                    fr_parts.append(types.Part.from_function_response(
+                        name=fc.name,
+                        response=result,
+                    ))
+                contents.append(types.Content(role="user", parts=fr_parts))
+
+            if not empty_response:
                 break
-
-            fc_parts = [types.Part(function_call=fc) for fc in function_calls_in_turn]
-            contents.append(types.Content(role="model", parts=fc_parts))
-
-            fr_parts = []
-            for fc in function_calls_in_turn:
-                result, fn_action = execute_function(fc)
-                if fn_action:
-                    action = fn_action
-                fr_parts.append(types.Part.from_function_response(
-                    name=fc.name,
-                    response=result,
-                ))
-            contents.append(types.Content(role="user", parts=fr_parts))
+            # 빈 응답이면 재시도 (contents를 원래대로 유지하므로 그대로 다시 시도)
 
         if action:
             yield action

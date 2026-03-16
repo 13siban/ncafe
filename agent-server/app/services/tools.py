@@ -90,8 +90,8 @@ AGENT_TOOLS = types.Tool(
                 properties={
                     "info_type": types.Schema(
                         type=types.Type.STRING,
-                        enum=["all", "points", "grade", "orders"],
-                        description="조회할 정보 유형 (all: 전체, points: 포인트, grade: 등급, orders: 주문 통계)",
+                        enum=["all", "points", "grade", "orders", "account"],
+                        description="조회할 정보 유형 (all: 전체, points: 포인트, grade: 등급, orders: 주문 통계, account: 계정 정보(이메일/연락처))",
                     ),
                 },
                 required=["info_type"],
@@ -234,6 +234,33 @@ AGENT_TOOLS = types.Tool(
                 required=["items"],
             ),
         ),
+        # --- 즐겨찾기 (Phase 7+) ---
+        types.FunctionDeclaration(
+            name="add_to_favorite",
+            description="특정 메뉴를 로그인한 사용자의 즐겨찾기에 추가합니다. '즐겨찾기에 등록해줘', '찜해줘' 등의 요청에 사용합니다.",
+            parameters=types.Schema(
+                type=types.Type.OBJECT,
+                properties={
+                    "slug": types.Schema(
+                        type=types.Type.STRING,
+                        description="즐겨찾기에 추가할 메뉴의 영문 슬러그 (예: americano, cafe-latte)",
+                    ),
+                    "alias": types.Schema(
+                        type=types.Type.STRING,
+                        description="해당 즐겨찾기 항목에 지정할 별칭(옵션) (예: '매일 아침 커피')",
+                    ),
+                },
+                required=["slug"],
+            ),
+        ),
+        types.FunctionDeclaration(
+            name="add_favorites_to_cart",
+            description="로그인한 사용자의 즐겨찾기 목록에 있는 모든 메뉴를 조회하여 장바구니에 일괄로 담습니다. '즐겨찾기에 있는 거 담아줘' 등의 요청에 사용합니다.",
+            parameters=types.Schema(
+                type=types.Type.OBJECT,
+                properties={},
+            ),
+        ),
     ]
 )
 
@@ -310,16 +337,43 @@ def _execute_function_inner(function_call) -> tuple[dict, dict | None]:
             return {"error": "로그인이 필요합니다. 로그인 후 다시 시도해주세요."}, None
         info_type = args.get("info_type", "all")
         rows = execute_query(
-            "SELECT nickname, username, grade, point_balance, total_order_count, total_order_amount FROM users WHERE id = %s",
+            "SELECT nickname, username, email, phone_number, grade, point_balance FROM users WHERE id = %s",
             (user_id,), fetch=True
         )
         if not rows:
             return {"error": "사용자 정보를 찾을 수 없습니다."}, None
         u = rows[0]
         pb = u["point_balance"] or 0
-        toc = u["total_order_count"] or 0
-        toa = u["total_order_amount"] or 0
-        grade_name = u["grade"] or "GREEN_BEAN"
+
+        # ★ 실시간 주문 집계 (users 테이블 캐시 대신 orders 테이블에서 직접 카운트)
+        order_stats = execute_query(
+            "SELECT COUNT(*) as order_count, COALESCE(SUM(total_price), 0) as order_amount "
+            "FROM orders WHERE user_id = %s AND status NOT IN ('CANCELLED')",
+            (user_id,), fetch=True
+        )
+        toc = int(order_stats[0]["order_count"]) if order_stats else 0
+        toa = int(order_stats[0]["order_amount"]) if order_stats else 0
+
+        # ★ 등급: DB 값이 없으면 실적 기반으로 현재 적용 등급 계산
+        grade_name = u["grade"] or None
+        if not grade_name:
+            # 모든 등급 조건을 가져와서 현재 실적에 맞는 최고 등급 산정
+            all_grades = execute_query(
+                "SELECT grade, display_name, sort_order, earn_rate, upgrade_order_count, upgrade_order_amount "
+                "FROM grade_settings ORDER BY sort_order ASC",
+                fetch=True
+            )
+            grade_name = all_grades[0]["grade"] if all_grades else "GREEN_BEAN"
+            for g in all_grades:
+                req_cnt = g["upgrade_order_count"] or 0
+                req_amt = g["upgrade_order_amount"] or 0
+                if req_cnt == 0 and req_amt == 0:
+                    # 최저 등급(조건 없음)은 기본 할당
+                    grade_name = g["grade"]
+                    continue
+                if toc >= req_cnt or toa >= req_amt:
+                    grade_name = g["grade"]
+
         grade_rows = execute_query(
             "SELECT display_name, earn_rate, sort_order FROM grade_settings WHERE grade = %s",
             (grade_name,), fetch=True
@@ -336,16 +390,23 @@ def _execute_function_inner(function_call) -> tuple[dict, dict | None]:
         next_grade_info = None
         if next_grade_rows:
             ng = next_grade_rows[0]
+            req_cnt = ng["upgrade_order_count"] or 0
+            req_amt = ng["upgrade_order_amount"] or 0
             next_grade_info = {
                 "nextGradeName": ng["display_name"],
-                "requiredOrderCount": ng["upgrade_order_count"],
-                "requiredOrderAmount": ng["upgrade_order_amount"],
-                "remainingOrderCount": max(0, (ng["upgrade_order_count"] or 0) - toc),
-                "remainingOrderAmount": max(0, (ng["upgrade_order_amount"] or 0) - toa),
+                "requiredOrderCount": req_cnt,
+                "requiredOrderAmount": req_amt,
+                "currentOrderCount": toc,
+                "currentOrderAmount": toa,
+                "remainingOrderCount": max(0, req_cnt - toc),
+                "remainingOrderAmount": max(0, req_amt - toa),
             }
 
         result = {
             "nickname": u["nickname"] or u["username"],
+            "username": u["username"],
+            "email": u["email"],
+            "phoneNumber": u["phone_number"],
             "gradeName": display_name,
             "earnRate": earn_rate,
             "pointBalance": pb,
@@ -367,6 +428,13 @@ def _execute_function_inner(function_call) -> tuple[dict, dict | None]:
                 result["isMaxGrade"] = True
         elif info_type == "orders":
             result = {"totalOrderCount": toc, "totalOrderAmount": toa}
+        elif info_type == "account":
+            result = {
+                "nickname": u["nickname"] or u["username"],
+                "username": u["username"],
+                "email": u["email"],
+                "phoneNumber": u["phone_number"]
+            }
         return result, None
 
     elif name == "get_queue_status":
@@ -485,17 +553,25 @@ def _execute_function_inner(function_call) -> tuple[dict, dict | None]:
             """SELECT o.order_number, o.order_date, o.total_price,
                       oi.menu_id, oi.menu_name, oi.quantity
                FROM orders o JOIN order_items oi ON o.id = oi.order_id
-               WHERE o.user_id = %s
-               AND o.order_date = (
-                   SELECT DISTINCT order_date FROM orders WHERE user_id = %s
-                   ORDER BY order_date DESC OFFSET %s LIMIT 1
+               WHERE o.id = (
+                   SELECT id FROM orders WHERE user_id = %s
+                   AND status NOT IN ('CANCELLED')
+                   ORDER BY id DESC OFFSET %s LIMIT 1
                )
                ORDER BY oi.id""",
-            (user_id, user_id, order_index), fetch=True
+            (user_id, order_index), fetch=True
         )
         if not rows:
             return {"error": "주문 내역을 찾을 수 없습니다."}, None
-        items = [{"menuId": r["menu_id"], "menuName": r["menu_name"], "quantity": r["quantity"]} for r in rows]
+        # 같은 메뉴는 수량으로 합산
+        merged: dict = {}
+        for r in rows:
+            mid = r["menu_id"]
+            if mid in merged:
+                merged[mid]["quantity"] += r["quantity"]
+            else:
+                merged[mid] = {"menuId": mid, "menuName": r["menu_name"], "quantity": r["quantity"]}
+        items = list(merged.values())
         summary = f"{rows[0]['order_date']} 주문 #{rows[0]['order_number']} ({len(items)}개 메뉴, {rows[0]['total_price']}원)"
         action = {"action": "reorder", "items": items}
         return {"success": True, "orderSummary": summary, "items": items}, action
@@ -610,5 +686,49 @@ def _execute_function_inner(function_call) -> tuple[dict, dict | None]:
             if ub and ub[0].get("point_balance"):
                 result["availablePoints"] = ub[0]["point_balance"]
         return result, None
+
+    elif name == "add_to_favorite":
+        user_id = get_user_id()
+        if not user_id:
+            return {"error": "로그인이 필요합니다. 로그인 후 다시 시도해주세요."}, None
+        slug = args.get("slug", "").lower().replace(" ", "-")
+        alias = args.get("alias", "")
+        if not slug:
+            return {"error": "슬러그가 지정되지 않았습니다."}, None
+            
+        rows = execute_query(
+            "SELECT id, kor_name FROM menus WHERE LOWER(REPLACE(eng_name, ' ', '-')) = %s",
+            (slug,), fetch=True
+        )
+        if not rows:
+            return {"error": f"슬러그 {slug}에 해당하는 메뉴를 찾을 수 없습니다."}, None
+
+        menu_name = rows[0]["kor_name"]
+        
+        # 프론트엔드로 즐겨찾기 옵션 선택 창을 띄우는 액션만 리턴함 (실제 DB 저장은 프론트엔드에서 API 호출로 진행)
+        action = {"action": "open_favorite_panel", "slug": slug}
+        return {"success": True, "message": f"'{menu_name}' 메뉴의 상세 옵션을 선택해주세요. (옵션을 고른 후 '즐겨찾기 추가' 버튼을 눌러야 최종 저장됩니다.)"}, action
+
+    elif name == "add_favorites_to_cart":
+        user_id = get_user_id()
+        if not user_id:
+            return {"error": "로그인이 필요합니다. 로그인 후 다시 시도해주세요."}, None
+            
+        rows = execute_query(
+            """SELECT ufm.menu_id, m.kor_name 
+               FROM user_favorite_menus ufm
+               JOIN menus m ON ufm.menu_id = m.id
+               WHERE ufm.user_id = %s
+               ORDER BY ufm.created_at ASC""",
+            (user_id,), fetch=True
+        )
+        
+        if not rows:
+            return {"error": "즐겨찾기에 등록된 메뉴가 없습니다. 먼저 즐겨찾기에 메뉴를 추가해주세요."}, None
+            
+        items = [{"menuId": r["menu_id"], "menuName": r["kor_name"], "quantity": 1} for r in rows]
+        summary = f"즐겨찾기 항목 총 {len(items)}개의 메뉴를 장바구니 추가 목록으로 보냅니다."
+        action = {"action": "reorder", "items": items}
+        return {"success": True, "message": summary, "items": items}, action
 
     return {"error": f"알 수 없는 함수: {name}"}, None

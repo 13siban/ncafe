@@ -17,6 +17,30 @@ const MAX_HISTORY = 50;
 
 const chatServerUrl = process.env.CHAT_SERVER_URL || 'http://localhost:8000';
 
+/**
+ * SSE 텍스트에서 응답 content만 추출한다.
+ */
+function extractReplyFromSSE(sseText: string): string {
+    let fullReply = '';
+    const lines = sseText.split('\n');
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('data: ') || trimmed.startsWith('data:')) {
+            const data = trimmed.startsWith('data: ') ? trimmed.slice(6) : trimmed.slice(5);
+            if (data === '[DONE]') continue;
+            try {
+                const parsed = JSON.parse(data);
+                if (parsed.content) {
+                    fullReply += parsed.content;
+                }
+            } catch {
+                // 불완전한 JSON은 무시
+            }
+        }
+    }
+    return fullReply;
+}
+
 export async function POST(request: NextRequest) {
     try {
         const { message, sessionId, stream, userId, cartSummary } = await request.json();
@@ -28,15 +52,18 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 기존 히스토리 가져오기 (없으면 빈 배열)
-        let history = chatHistories.get(sessionId) || [];
-
-        // 유저 메시지 추가
-        history.push({
-            role: 'user',
-            content: message,
-            timestamp: Date.now(),
-        });
+        // 기존 히스토리 가져오기 (없으면 빈 배열, 직접 수정 안함)
+        const oldHistory = chatHistories.get(sessionId) || [];
+        
+        // 새 유저 메시지를 포함한 새로운 히스토리 배열
+        let history: ChatMessage[] = [
+            ...oldHistory,
+            {
+                role: 'user' as const,
+                content: message,
+                timestamp: Date.now(),
+            }
+        ];
 
         const agentPayload = JSON.stringify({
             messages: history.map((m) => ({
@@ -51,14 +78,39 @@ export async function POST(request: NextRequest) {
         // === SSE 스트리밍 모드 ===
         if (stream) {
             const sseStream = await requestStreamFromAgent(agentPayload);
+
+            // tee() 대신 수동으로 chunk를 복제하여 backpressure deadlock 방지
+            const historyChunks: Uint8Array[] = [];
             
-            // 스트리밍 응답의 전체 텍스트를 히스토리에 저장하기 위해 tee
-            const [forClient, forHistory] = sseStream.tee();
+            const passThrough = new TransformStream<Uint8Array, Uint8Array>({
+                transform(chunk, controller) {
+                    // 클라이언트에 즉시 전달
+                    controller.enqueue(chunk);
+                    // 히스토리용으로 복사본 저장
+                    historyChunks.push(new Uint8Array(chunk));
+                },
+                flush() {
+                    // 스트림 완료 후 히스토리 저장
+                    const decoder = new TextDecoder();
+                    const text = historyChunks.map(c => decoder.decode(c, { stream: true })).join('') + decoder.decode();
+                    const fullReply = extractReplyFromSSE(text);
+                    if (fullReply) {
+                        history.push({
+                            role: 'assistant',
+                            content: fullReply,
+                            timestamp: Date.now(),
+                        });
+                        if (history.length > MAX_HISTORY) {
+                            history = history.slice(-MAX_HISTORY);
+                        }
+                        chatHistories.set(sessionId, history);
+                    }
+                }
+            });
 
-            // 백그라운드에서 히스토리 축적 (응답 전달에는 영향 없음)
-            collectStreamedReply(forHistory, sessionId, history);
+            const clientStream = sseStream.pipeThrough(passThrough);
 
-            return new NextResponse(forClient, {
+            return new NextResponse(clientStream, {
                 headers: {
                     'Content-Type': 'text/event-stream',
                     'Cache-Control': 'no-cache, no-transform',
@@ -163,63 +215,6 @@ function requestStreamFromAgent(payload: string): Promise<ReadableStream<Uint8Ar
         httpReq.write(payload);
         httpReq.end();
     });
-}
-
-/**
- * SSE 스트림에서 전체 응답 텍스트를 축적하여 히스토리에 저장한다.
- */
-async function collectStreamedReply(
-    stream: ReadableStream<Uint8Array>,
-    sessionId: string,
-    history: ChatMessage[]
-) {
-    const reader = stream.getReader();
-    const decoder = new TextDecoder('utf-8', { fatal: false });
-    let fullReply = '';
-    let buffer = '';
-
-    try {
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split('\n');
-            buffer = lines.pop() || '';
-
-            for (const line of lines) {
-                const trimmed = line.trim();
-                if (trimmed.startsWith('data: ') || trimmed.startsWith('data:')) {
-                    const data = trimmed.startsWith('data: ') ? trimmed.slice(6) : trimmed.slice(5);
-                    if (data === '[DONE]') continue;
-                    try {
-                        const parsed = JSON.parse(data);
-                        if (parsed.content) {
-                            fullReply += parsed.content;
-                        }
-                    } catch {
-                        // 불완전한 JSON은 무시
-                    }
-                }
-            }
-        }
-    } catch {
-        // 스트림 에러 시에도 가능한 만큼 저장
-    }
-
-    if (fullReply) {
-        history.push({
-            role: 'assistant',
-            content: fullReply,
-            timestamp: Date.now(),
-        });
-
-        if (history.length > MAX_HISTORY) {
-            history = history.slice(-MAX_HISTORY);
-        }
-
-        chatHistories.set(sessionId, history);
-    }
 }
 
 export async function DELETE(request: NextRequest) {
