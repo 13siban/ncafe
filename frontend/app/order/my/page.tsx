@@ -12,7 +12,7 @@ import {
     Clock,
     Coffee
 } from "lucide-react";
-import { fetchAPI } from "@/app/lib/api";
+import { fetchAPI } from '@/app/lib/api/client';
 import styles from "./page.module.css";
 
 interface OrderHistoryItem {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { adminStoreAPI } from '@/app/lib/api';
+import { adminStoreAPI } from '@/app/lib/api/adminAPI';
 
 export function useSettings() {
     const [isLoading, setIsLoading] = useState(true);

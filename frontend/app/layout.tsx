@@ -4,7 +4,7 @@ import { AuthErrorHandler } from "@/components/auth/AuthErrorHandler";
 import ChatWidget from "@/components/chat/ChatWidget";
 import { Toaster } from 'react-hot-toast';
 import NoticePopupModal from "@/components/common/NoticePopupModal";
-import GlobalOrderTracker from "@/components/common/GlobalOrderTracker/GlobalOrderTracker";
+import GlobalOrderTracker from "@/components/common/GlobalOrderTracker";
 
 export async function generateMetadata(): Promise<Metadata> {
   // 서버 사이드에서 실행되므로 Docker 내부 네트워크 주소를 사용

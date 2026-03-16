@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { ClipboardList } from 'lucide-react';
-import { userAPI, authAPI } from '@/app/lib/api';
+import { authAPI } from '@/app/lib/api/authAPI';
+import { userAPI } from '@/app/lib/api/userAPI';
 import styles from '../../page.module.css';
 import { OrderDetail } from '../../types';
 

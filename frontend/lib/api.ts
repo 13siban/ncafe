@@ -9,7 +9,8 @@
  */
 
 // 하위 호환성을 위해 app/lib/api.ts의 함수를 re-export합니다.
-export { fetchAPI, authAPI } from '@/app/lib/api';
+export { fetchAPI } from '@/app/lib/api/client';
+export { authAPI } from '@/app/lib/api/authAPI';
 
 /**
  * @deprecated fetchAPI를 사용하세요.

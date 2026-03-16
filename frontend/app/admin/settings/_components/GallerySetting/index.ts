@@ -1,0 +1,1 @@
+export { GallerySetting } from './GallerySetting';

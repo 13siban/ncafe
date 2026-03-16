@@ -27,7 +27,7 @@
 
 .title {
     font-size: clamp(2.5rem, 8vw, 4.5rem);
-    font-family: var(--font-fraunces);
+    font-family: var(--font-serif);
     line-height: 1.1;
     margin-bottom: 30px;
     color: #2c1810;
@@ -75,7 +75,7 @@
 
 .sectionTitle {
     font-size: 2.5rem;
-    font-family: var(--font-fraunces);
+    font-family: var(--font-serif);
     margin-bottom: 24px;
     color: #2c1810;
 }
@@ -101,7 +101,7 @@
     font-size: 2rem;
     font-weight: 700;
     color: #8b5e3c;
-    font-family: var(--font-fraunces);
+    font-family: var(--font-serif);
 }
 
 .statLabel {

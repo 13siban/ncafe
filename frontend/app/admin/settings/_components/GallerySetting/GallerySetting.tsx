@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Image as ImageIcon, Trash2, Eye, EyeOff, Upload } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
-import { galleryAPI } from '@/app/lib/api';
+import { galleryAPI } from '@/app/lib/api/adminAPI';
 import styles from './GallerySetting.module.css';
 
 interface GalleryImage {

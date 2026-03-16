@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchAPI } from '@/app/lib/api';
+import { fetchAPI } from '@/app/lib/api/client';
 import Link from 'next/link';
 import { Plus, Edit2, Trash2, LayoutGrid } from 'lucide-react';
 import { Button } from '@/components/common/Button/Button';

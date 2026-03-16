@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { X, GripVertical, Trash2, Plus } from 'lucide-react';
 import styles from './CategoryManageModal.module.css';
 import { CategoryResponseDto } from '@/components/menu/types';
-import { fetchAPI } from '@/app/lib/api';
+import { fetchAPI } from '@/app/lib/api/client';
 
 interface CategoryManageModalProps {
     isOpen: boolean;

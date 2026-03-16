@@ -5,7 +5,7 @@
  * 이 스토어는 클라이언트 측의 사용자 인터페이스 상태(로그인 여부, 유저 정보)를 동기화합니다.
  */
 import { create } from 'zustand';
-import { authAPI } from '@/app/lib/api';
+import { authAPI } from '@/app/lib/api/authAPI';
 
 interface SessionUser {
     id: string;

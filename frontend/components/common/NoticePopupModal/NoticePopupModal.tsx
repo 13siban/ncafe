@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
-import { fetchAPI } from '@/app/lib/api';
+import { fetchAPI } from '@/app/lib/api/client';
 import styles from './NoticePopupModal.module.css';
 
 interface NoticePopup {

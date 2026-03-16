@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchAPI } from '@/app/lib/api';
+import { fetchAPI } from '@/app/lib/api/client';
 
 export interface MenuImageResponse {
   id: number;

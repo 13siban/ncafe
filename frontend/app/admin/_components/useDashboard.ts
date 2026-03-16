@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { adminStoreAPI, adminDashboardAPI, adminSalesAPI } from '@/app/lib/api';
+import { adminStoreAPI, adminDashboardAPI, adminSalesAPI } from '@/app/lib/api/adminAPI';
 import { StoreStatus, DashboardStats, DashboardRecentOrder, DashboardPopularMenu } from '../types';
 
 export function useDashboard(period: string) {

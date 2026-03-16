@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import styles from './Header.module.css';
 import { ShoppingCart } from 'lucide-react';
-import { authAPI } from '@/app/lib/api';
+import { authAPI } from '@/app/lib/api/authAPI';
 import { useCartStore } from '@/store/useCartStore';
 
 interface SessionUser {

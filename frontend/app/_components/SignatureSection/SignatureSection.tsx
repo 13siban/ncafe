@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { fetchAPI } from '@/app/lib/api';
+import { fetchAPI } from '@/app/lib/api/client';
 import { MenuResponse } from '@/components/menu/types';
 import styles from './SignatureSection.module.css';
 import { motion } from 'framer-motion';

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { fetchAPI } from '@/app/lib/api';
+import { fetchAPI } from '@/app/lib/api/client';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Coffee, CheckCircle, XCircle, X } from 'lucide-react';
 import styles from './GlobalOrderTracker.module.css';

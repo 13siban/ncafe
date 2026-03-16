@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { fetchAPI } from '@/app/lib/api';
+import { fetchAPI } from '@/app/lib/api/client';
 import { MenuForm, MenuFormValues } from '../_components/MenuForm/MenuForm';
 import styles from './page.module.css';
 

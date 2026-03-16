@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { fetchAPI } from '@/app/lib/api';
+import { fetchAPI } from '@/app/lib/api/client';
 import { MenuForm, MenuFormValues } from '../../_components/MenuForm/MenuForm';
 import { menus } from '@/mocks/menuData';
 import styles from './page.module.css';

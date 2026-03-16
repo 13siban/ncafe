@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Plus, GripHorizontal, Save } from 'lucide-react';
-import { fetchAPI } from '@/app/lib/api';
+import { fetchAPI } from '@/app/lib/api/client';
 import { MenuList as BaseMenuList } from '@/components/menu/MenuList/MenuList';
 import { MenuCard } from '../MenuCard/MenuCard';
 import { Button } from '@/components/common';

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchAPI } from '@/app/lib/api';
+import { fetchAPI } from '@/app/lib/api/client';
 import { MenuResponse, MenuListResponse, MenuMode } from '../types';
 
 export interface UseMenusOptions {

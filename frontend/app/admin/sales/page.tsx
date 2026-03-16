@@ -16,7 +16,7 @@ import { CategoryPieChart } from './_components/CategoryPieChart/CategoryPieChar
 
 import { OrderDetailModal } from '../orders/_components/OrderDetailModal/OrderDetailModal';
 import { OrderFull } from '../orders/types';
-import { fetchAPI } from '@/app/lib/api';
+import { fetchAPI } from '@/app/lib/api/client';
 import toast from 'react-hot-toast';
 
 export default function SalesAnalysisPage() {

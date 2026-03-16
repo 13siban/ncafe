@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { galleryAPI } from '@/app/lib/api';
+import { galleryAPI } from '@/app/lib/api/adminAPI';
 import styles from './GallerySection.module.css';
 
 interface GalleryImage {
@@ -9,6 +9,9 @@ interface GalleryImage {
     imageUrl: string;
     sortOrder: number;
 }
+
+const PATTERN = ['m', 'y', 'm', 'y', 'y'];
+const PATTERN_ITEMS = Array.from({ length: 1000 }); // 충분한 개수로 정적 렌더링
 
 export default function GallerySection() {
     const [images, setImages] = useState<GalleryImage[]>([]);
@@ -37,6 +40,15 @@ export default function GallerySection() {
 
     return (
         <section className={styles.galleryWrapper}>
+            {/* Background mymyy Pattern */}
+            <div className={styles.patternGrid}>
+                {PATTERN_ITEMS.map((_, i) => (
+                    <div key={i} className={styles.patternItem}>
+                        <span className={styles.patternChar}>{PATTERN[i % PATTERN.length]}</span>
+                    </div>
+                ))}
+            </div>
+
             <div className={styles.galleryHeader}>
                 <span className={styles.subtitle}>OUR MOMENTS</span>
                 <h2 className={styles.title}>NCAFE GALLERY</h2>

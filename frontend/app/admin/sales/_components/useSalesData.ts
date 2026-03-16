@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { format, addDays, subDays, isSameDay } from 'date-fns';
-import { adminSalesAPI } from '@/app/lib/api';
+import { adminSalesAPI } from '@/app/lib/api/adminAPI';
 import { SalesSummary, SalesChartData, SalesOrderItem, MenuRanking, SalesPeriod } from '../types';
 
 export function useSalesData(period: SalesPeriod, currentDate: Date) {
