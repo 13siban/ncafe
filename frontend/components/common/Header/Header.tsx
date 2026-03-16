@@ -69,7 +69,10 @@ const Header = () => {
 
         // LoginForm 또는 다른 컴포넌트에서 login/logout 이벤트 발생 시 상태 갱신
         const onLogin = () => checkLoginStatus();
-        const onLogout = () => setUser(null);
+        const onLogout = () => {
+            setUser(null);
+            setGradeInfo(null);
+        };
 
         window.addEventListener('login', onLogin);
         window.addEventListener('logout', onLogout);

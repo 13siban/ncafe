@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Menu, Search, Bell, HelpCircle } from 'lucide-react';
+import { Menu, Bell, HelpCircle } from 'lucide-react';
 import styles from './AdminHeader.module.css';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
@@ -43,7 +43,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           toast((t) => (
             <span 
               onClick={() => {
-                router.push(`/admin/orders/${data.orderId}`);
+                router.push('/admin/orders');
                 toast.dismiss(t.id);
               }}
             >
@@ -110,16 +110,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 
         {/* Right Section */}
         <div className={styles.rightSection}>
-          {/* Search */}
-          <div className={styles.searchContainer}>
-            <Search size={18} className={styles.searchIcon} />
-            <input
-              type="text"
-              placeholder="검색..."
-              className={styles.searchInput}
-            />
-            <span className={styles.searchShortcut}>⌘K</span>
-          </div>
+
 
           {/* Help */}
           <button className={styles.iconButton} aria-label="도움말">

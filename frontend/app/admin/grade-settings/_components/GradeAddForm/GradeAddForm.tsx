@@ -14,12 +14,51 @@ const GradeAddForm: React.FC<GradeAddFormProps> = ({ onSubmit, onCancel }) => {
         upgradeOrderCount: "", upgradeOrderAmount: "",
         mainColor: "#333333", textColor: "#FFFFFF"
     });
+    const [formError, setFormError] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setFormError('');
+
+        // 등급 코드 유효성 검사
+        if (!newGrade.grade.trim()) {
+            setFormError('등급 코드를 입력해주세요.');
+            return;
+        }
+        if (!/^[A-Z][A-Z0-9_]*$/.test(newGrade.grade.trim())) {
+            setFormError('등급 코드는 대문자 영문, 숫자, 밑줄(_)만 사용 가능합니다. (예: VIP_GOLD)');
+            return;
+        }
+
+        // 표시 이름 유효성 검사
+        if (!newGrade.displayName.trim()) {
+            setFormError('표시 이름을 입력해주세요.');
+            return;
+        }
+        if (newGrade.displayName.trim().length > 20) {
+            setFormError('표시 이름은 20자 이내로 입력해주세요.');
+            return;
+        }
+
+        // 적립률 유효성 검사
+        if (newGrade.earnRate < 0 || newGrade.earnRate > 100) {
+            setFormError('적립률은 0~100% 사이로 입력해주세요.');
+            return;
+        }
+
+        // 승급 조건 음수 검사
+        if (newGrade.upgradeOrderCount && parseInt(newGrade.upgradeOrderCount) < 0) {
+            setFormError('승급 주문 횟수는 0 이상이어야 합니다.');
+            return;
+        }
+        if (newGrade.upgradeOrderAmount && parseInt(newGrade.upgradeOrderAmount) < 0) {
+            setFormError('승급 누적 금액은 0 이상이어야 합니다.');
+            return;
+        }
+
         await onSubmit({
-            grade: newGrade.grade,
-            displayName: newGrade.displayName,
+            grade: newGrade.grade.trim(),
+            displayName: newGrade.displayName.trim(),
             earnRate: newGrade.earnRate,
             upgradeOrderCount: newGrade.upgradeOrderCount ? parseInt(newGrade.upgradeOrderCount) : null,
             upgradeOrderAmount: newGrade.upgradeOrderAmount ? parseInt(newGrade.upgradeOrderAmount) : null,
@@ -31,10 +70,15 @@ const GradeAddForm: React.FC<GradeAddFormProps> = ({ onSubmit, onCancel }) => {
 
     return (
         <form className={styles.addForm} onSubmit={handleSubmit}>
+            {formError && (
+                <div style={{ padding: '0.75rem', backgroundColor: '#fee2e2', color: '#b91c1c', borderRadius: '8px', fontSize: '0.875rem', textAlign: 'center', marginBottom: '1rem' }}>
+                    ⚠️ {formError}
+                </div>
+            )}
             <div className={styles.formGrid}>
                 <div>
                     <label>등급 코드 (영문)</label>
-                    <input required value={newGrade.grade} onChange={e => setNewGrade({...newGrade, grade: e.target.value})} placeholder="예: VIP_GOLD" />
+                    <input required value={newGrade.grade} onChange={e => setNewGrade({...newGrade, grade: e.target.value.toUpperCase()})} placeholder="예: VIP_GOLD" />
                 </div>
                 <div>
                     <label>표시 이름</label>
@@ -42,15 +86,15 @@ const GradeAddForm: React.FC<GradeAddFormProps> = ({ onSubmit, onCancel }) => {
                 </div>
                 <div>
                     <label>적립률 (%)</label>
-                    <input type="number" required value={newGrade.earnRate} onChange={e => setNewGrade({...newGrade, earnRate: parseInt(e.target.value) || 0})} />
+                    <input type="number" required min={0} max={100} value={newGrade.earnRate} onChange={e => setNewGrade({...newGrade, earnRate: parseInt(e.target.value) || 0})} />
                 </div>
                 <div>
                     <label>승급 주문 횟수</label>
-                    <input type="number" placeholder="무제한" value={newGrade.upgradeOrderCount} onChange={e => setNewGrade({...newGrade, upgradeOrderCount: e.target.value})} />
+                    <input type="number" placeholder="무제한" min={0} value={newGrade.upgradeOrderCount} onChange={e => setNewGrade({...newGrade, upgradeOrderCount: e.target.value})} />
                 </div>
                 <div>
                     <label>승급 누적 금액</label>
-                    <input type="number" placeholder="무제한" value={newGrade.upgradeOrderAmount} onChange={e => setNewGrade({...newGrade, upgradeOrderAmount: e.target.value})} />
+                    <input type="number" placeholder="무제한" min={0} value={newGrade.upgradeOrderAmount} onChange={e => setNewGrade({...newGrade, upgradeOrderAmount: e.target.value})} />
                 </div>
                 <div>
                     <label>메인 컬러</label>

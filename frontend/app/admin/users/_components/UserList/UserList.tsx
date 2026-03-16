@@ -209,11 +209,11 @@ export const UserList = () => {
                                         </span>
                                     )}
                                 </td>
-                                <td style={{ display: 'flex', gap: '4px' }}>
+                                <td>
+                                    <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                                     {isAdmin && (
                                         <button
-                                            className={styles.lockBtn}
-                                            style={{ backgroundColor: '#f39c12' }}
+                                            className={styles.pointBtn}
                                             onClick={() => setSelectedUserForPoints(user)}
                                             title="포인트 관리"
                                         >
@@ -236,6 +236,7 @@ export const UserList = () => {
                                     >
                                         삭제
                                     </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))

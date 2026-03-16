@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { userAPI } from '@/app/lib/api/userAPI';
+import { authAPI } from '@/app/lib/api/authAPI';
 import styles from '../../mypage.module.css';
 
 interface DeleteAccountProps {
@@ -53,6 +54,8 @@ const DeleteAccount: React.FC<DeleteAccountProps> = ({ isSocialUser }) => {
                                 try {
                                     const res = await userAPI.deleteAccount(isSocialUser ? '' : deletePassword);
                                     alert(res.message || '탈퇴 요청이 처리되었습니다.');
+                                    await authAPI.logout();
+                                    window.dispatchEvent(new Event('logout'));
                                     window.location.href = '/login';
                                 } catch (error: any) {
                                     alert(error.message || '탈퇴 요청 중 오류가 발생했습니다.');

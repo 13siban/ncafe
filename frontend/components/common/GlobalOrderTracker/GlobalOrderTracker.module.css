@@ -123,16 +123,35 @@
   color: #b91c1c;
 }
 
-/* Base vibrate animation */
-@keyframes vibrate {
-  0% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-  100% { transform: translate(0); }
+/* Subtle tracker body shake */
+@keyframes shakeTracker {
+  0% { transform: translateX(0); }
+  10% { transform: translateX(-4px); }
+  20% { transform: translateX(4px); }
+  30% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  50% { transform: translateX(0); }
+  100% { transform: translateX(0); }
 }
 
-.statusCompleted .iconContainer {
-  animation: vibrate 0.5s ease-in-out infinite;
+.statusCompleted {
+  animation: shakeTracker 2.5s cubic-bezier(.36,.07,.19,.97) infinite;
+}
+
+/* Energetic ring animation for the icon */
+@keyframes ring {
+  0% { transform: scale(1) rotate(0deg); }
+  10% { transform: scale(1.2) rotate(-25deg); }
+  20% { transform: scale(1.2) rotate(25deg); }
+  30% { transform: scale(1.2) rotate(-25deg); }
+  40% { transform: scale(1.2) rotate(25deg); }
+  50% { transform: scale(1.2) rotate(-25deg); }
+  60% { transform: scale(1.2) rotate(25deg); }
+  70% { transform: scale(1) rotate(0deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.statusCompleted .iconContainer svg {
+  animation: ring 1.2s ease-in-out infinite;
+  transform-origin: center;
 }

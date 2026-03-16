@@ -62,7 +62,7 @@ export default function AdminGradeSettingsPage() {
         let parsedValue: any = value;
         const stringFields: (keyof GradeSetting)[] = ['displayName', 'grade', 'mainColor', 'textColor'];
         if (!stringFields.includes(field)) {
-            parsedValue = value === "" ? null : parseInt(value, 10);
+            parsedValue = value === "" ? "" : parseInt(value, 10);
         }
         setSettings(prev => prev.map(s => s.grade === grade ? { ...s, [field]: parsedValue } : s));
     };
@@ -143,7 +143,7 @@ export default function AdminGradeSettingsPage() {
                             <span className={styles.defaultEarnRateDesc}>등급 시스템이 꺼져있을 때 모든 주문에 일괄 적용될 적립률입니다.</span>
                         </div>
                         <div className={styles.defaultEarnRateInput}>
-                            <input type="number" min={0} max={100} value={defaultEarnRate} onChange={(e) => setDefaultEarnRate(parseInt(e.target.value) || 0)} />
+                            <input type="number" min={0} max={100} value={defaultEarnRate} onChange={(e) => setDefaultEarnRate(e.target.value === '' ? '' as any : parseInt(e.target.value))} />
                             <span className={styles.percentText}>%</span>
                             <button onClick={handleSaveDefaultEarnRate} disabled={isSavingConfig} className={styles.saveDefaultBtn}>
                                 {isSavingConfig ? <Loader2 size={16} className={styles.spin} /> : <><Save size={16} /> 저장</>}
