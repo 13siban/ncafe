@@ -129,7 +129,7 @@ export const MenuList = ({
             await fetchAPI('/admin/menus/reorder', {
                 method: 'PUT',
                 body: JSON.stringify(reorderedMenus.map(m => ({
-                    id: m.id,
+                    menuId: m.id,
                     sortOrder: m.sortOrder,
                 }))),
             });
