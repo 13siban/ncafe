@@ -302,7 +302,7 @@ export const MenuList = ({
 
     return (
         <div className={styles.container} ref={containerRef}>
-            {sortable ? (
+            {sortable && isMounted ? (
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                     <SortableContext items={menus.map(m => m.id)} strategy={rectSortingStrategy}>
                         {gridContent}

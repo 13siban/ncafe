@@ -61,6 +61,11 @@ export const MenuList = ({
 }: MenuListProps) => {
     const [menus, setMenus] = React.useState<MenuResponse[] | undefined>(undefined);
     const [isSaving, setIsSaving] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
+
+    React.useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     // 리스트 뷰용 DnD sensors
     const sensors = useSensors(
@@ -202,10 +207,11 @@ export const MenuList = ({
                         </Button>
                     </div>
                 )}
-                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleListDragEnd}>
-                    <SortableContext items={filtered.map(f => f.id)} strategy={verticalListSortingStrategy}>
-                        <div className={styles.listTable}>
-                            <div className={styles.listHeader}>
+                {isMounted ? (
+                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleListDragEnd}>
+                        <SortableContext items={filtered.map(f => f.id)} strategy={verticalListSortingStrategy}>
+                            <div className={styles.listTable}>
+                                <div className={styles.listHeader}>
                                 <div className={styles.listColGrip}></div>
                                 <div className={styles.listColName}>메뉴명</div>
                                 <div className={styles.listColPrice}>가격</div>
@@ -249,6 +255,17 @@ export const MenuList = ({
                         </div>
                     </SortableContext>
                 </DndContext>
+                ) : (
+                    <div className={styles.listTable}>
+                        <div className={styles.listHeader}>
+                            <div className={styles.listColGrip}></div>
+                            <div className={styles.listColName}>메뉴명</div>
+                            <div className={styles.listColPrice}>가격</div>
+                            <div className={styles.listColToggle}>표시</div>
+                            <div className={styles.listColToggle}>품절</div>
+                        </div>
+                    </div>
+                )}
             </div>
         );
     }
