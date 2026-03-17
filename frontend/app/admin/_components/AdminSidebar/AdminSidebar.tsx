@@ -20,7 +20,7 @@ import {
   MessageSquare
 } from 'lucide-react';
 import styles from './AdminSidebar.module.css';
-import { apiFetch } from '@/lib/api';
+import { fetchAPI } from '@/app/lib/api/client';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Logo } from '@/components/common/Logo/Logo';
 
@@ -65,12 +65,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       }
 
       try {
-        const menusRes = await apiFetch('/api/admin/menus');
-        if (menusRes.ok) {
-          const menusData = await menusRes.json();
-          const count = Array.isArray(menusData) ? menusData.length : (menusData.menus?.length || 0);
-          setMenuCount(count);
-        }
+        const menusData = await fetchAPI('/admin/menus');
+        const count = Array.isArray(menusData) ? menusData.length : (menusData.menus?.length || 0);
+        setMenuCount(count);
       } catch (error) {
         console.error('Sidebar data fetch error:', error);
       }

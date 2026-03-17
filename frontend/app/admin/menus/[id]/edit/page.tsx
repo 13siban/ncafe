@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { fetchAPI } from '@/app/lib/api/client';
 import { MenuForm, MenuFormValues } from '../../_components/MenuForm/MenuForm';
-import { menus } from '@/mocks/menuData';
 import styles from './page.module.css';
 
 export default function EditMenuPage() {
@@ -101,28 +100,24 @@ export default function EditMenuPage() {
           const opt = data.options[i];
           if (!opt.name.trim()) continue;
 
-          // 1. 옵션 그룹 생성
-          const groupRes = await fetch('/api/admin/option-groups', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name: opt.name,
-              type: opt.type,
-              isRequired: opt.required,
-              sortOrder: i + 1,
-            }),
-          });
-
-          if (groupRes.ok) {
-            const savedGroup = await groupRes.json();
+          try {
+            // 1. 옵션 그룹 생성
+            const savedGroup = await fetchAPI('/admin/option-groups', {
+              method: 'POST',
+              body: JSON.stringify({
+                name: opt.name,
+                type: opt.type,
+                isRequired: opt.required,
+                sortOrder: i + 1,
+              }),
+            });
 
             // 2. 옵션 항목(아이템) 추가
             for (let j = 0; j < opt.items.length; j++) {
               const item = opt.items[j];
               if (!item.name.trim()) continue;
-              await fetch(`/api/admin/option-groups/${savedGroup.id}/items`, {
+              await fetchAPI(`/admin/option-groups/${savedGroup.id}/items`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   name: item.name,
                   priceDelta: Number(item.priceDelta) || 0,
@@ -132,14 +127,15 @@ export default function EditMenuPage() {
             }
 
             // 3. 해당 카테고리에 옵션 그룹 연결
-            await fetch(`/api/admin/categories/${Number(data.categoryId)}/options`, {
+            await fetchAPI(`/admin/categories/${Number(data.categoryId)}/options`, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 optionGroupId: savedGroup.id,
                 sortOrder: i + 1,
               }),
             });
+          } catch (optErr) {
+            console.error('옵션 그룹 생성 실패:', optErr);
           }
         }
       }

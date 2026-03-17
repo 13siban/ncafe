@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { apiFetch } from '@/lib/api';
+import { fetchAPI } from '@/app/lib/api/client';
 
 export interface MenuDetailResponse {
   id: number;
@@ -31,11 +31,7 @@ export const useMenuDetail = (id: number) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await apiFetch(`/api/admin/menus/${id}`);
-      if (!response.ok) {
-        throw new Error('메뉴 정보를 불러오는데 실패했습니다.');
-      }
-      const data: MenuDetailResponse = await response.json();
+      const data: MenuDetailResponse = await fetchAPI(`/admin/menus/${id}`);
       setMenu(data);
     } catch (err) {
       console.error('Failed to fetch menu:', err);

@@ -1,7 +1,5 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
-import { apiFetch } from '@/lib/api';
+import { fetchAPI } from '@/app/lib/api/client';
 import styles from './UserPointModal.module.css';
 
 interface PointHistory {
@@ -34,19 +32,12 @@ export const UserPointModal = ({ user, onClose }: UserPointModalProps) => {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            // Fetch balance
-            const balanceRes = await apiFetch(`/api/admin/users/${user.id}/points`);
-            if (balanceRes.ok) {
-                const balanceData = await balanceRes.json();
-                setBalance(balanceData.pointBalance || 0);
-            }
-
-            // Fetch history
-            const historyRes = await apiFetch(`/api/admin/users/${user.id}/points/history`);
-            if (historyRes.ok) {
-                const historyData = await historyRes.json();
-                setHistory(historyData.content || []);
-            }
+            const [balanceData, historyData] = await Promise.all([
+                fetchAPI(`/admin/users/${user.id}/points`),
+                fetchAPI(`/admin/users/${user.id}/points/history`)
+            ]);
+            setBalance(balanceData.pointBalance || 0);
+            setHistory(historyData.content || []);
         } catch (err) {
             console.error('Failed to fetch point data', err);
         } finally {
@@ -68,15 +59,10 @@ export const UserPointModal = ({ user, onClose }: UserPointModalProps) => {
 
         setIsSubmitting(true);
         try {
-            const res = await apiFetch(`/api/admin/users/${user.id}/points`, {
+            await fetchAPI(`/admin/users/${user.id}/points`, {
                 method: 'POST',
                 body: JSON.stringify({ amount, description })
             });
-
-            if (!res.ok) {
-                const errData = await res.json();
-                throw new Error(errData.message || '포인트 변경에 실패했습니다.');
-            }
 
             alert('포인트가 성공적으로 변경되었습니다.');
             setAmountStr('');

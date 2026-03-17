@@ -33,59 +33,45 @@ export default function MyPage() {
     const [pointData, setPointData] = useState<{ balance: number, history: any[] }>({ balance: 0, history: [] });
 
     useEffect(() => {
-        const fetchProfileAndFavorites = async () => {
+        const fetchAllData = async () => {
             try {
+                // 프로필은 반드시 성공해야 함
                 const profileData = await userAPI.getProfile();
                 setNickname(profileData.nickname || '');
                 setEmail(profileData.email || '');
                 setPhoneNumber(profileData.phoneNumber || '');
                 setIsSocialUser(profileData.username?.startsWith('google_') || false);
-
-                const favData = await userFavoriteAPI.getFavorites();
-                setFavorites(favData);
-
-                try {
-                    const ordersData = await userAPI.getOrders();
-                    setOrders(ordersData);
-                } catch {
-                    setOrders([]);
-                }
-
-                try {
-                    const topMenusData = await userAPI.getTopMenus();
-                    setTopMenus(topMenusData);
-                } catch {
-                    setTopMenus([]);
-                }
-
-                try {
-                    const gradeData = await userAPI.getGradeInfo();
-                    setGradeInfo(gradeData);
-                } catch {
-                    setGradeInfo(null);
-                }
-
-                try {
-                    const [balanceRes, historyRes] = await Promise.all([
-                        userAPI.getPointBalance(),
-                        userAPI.getPointHistory(0, 20)
-                    ]);
-                    setPointData({
-                        balance: balanceRes.pointBalance || 0,
-                        history: historyRes.content || []
-                    });
-                } catch {
-                    // Ignore point load error
-                }
             } catch (error: any) {
                 alert(error.message || '정보를 불러오는 데 실패했습니다.');
                 router.push('/login');
-            } finally {
-                setIsLoading(false);
+                return;
             }
+
+            // 나머지 데이터는 병렬로 가져오되, 개별 실패 허용
+            const [favResult, ordersResult, topMenusResult, gradeResult, pointResult] = await Promise.allSettled([
+                userFavoriteAPI.getFavorites(),
+                userAPI.getOrders(),
+                userAPI.getTopMenus(),
+                userAPI.getGradeInfo(),
+                Promise.all([userAPI.getPointBalance(), userAPI.getPointHistory(0, 20)])
+            ]);
+
+            if (favResult.status === 'fulfilled') setFavorites(favResult.value);
+            if (ordersResult.status === 'fulfilled') setOrders(ordersResult.value);
+            if (topMenusResult.status === 'fulfilled') setTopMenus(topMenusResult.value);
+            if (gradeResult.status === 'fulfilled') setGradeInfo(gradeResult.value);
+            if (pointResult.status === 'fulfilled') {
+                const [balanceRes, historyRes] = pointResult.value;
+                setPointData({
+                    balance: balanceRes.pointBalance || 0,
+                    history: historyRes.content || []
+                });
+            }
+
+            setIsLoading(false);
         };
 
-        fetchProfileAndFavorites();
+        fetchAllData();
     }, [router]);
 
     if (isLoading) {
