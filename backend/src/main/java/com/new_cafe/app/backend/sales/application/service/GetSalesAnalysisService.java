@@ -3,7 +3,7 @@ package com.new_cafe.app.backend.sales.application.service;
 import com.new_cafe.app.backend.order.application.port.out.OrderRepositoryPort;
 import com.new_cafe.app.backend.order.domain.model.Order;
 import com.new_cafe.app.backend.order.domain.model.OrderStatus;
-import com.new_cafe.app.backend.sales.adapter.out.persistence.DailyMenuSalesJpaEntity;
+import com.new_cafe.app.backend.sales.domain.model.DailyMenuSales;
 import com.new_cafe.app.backend.sales.application.port.in.GetSalesAnalysisUseCase;
 import com.new_cafe.app.backend.sales.application.port.out.SalesRepositoryPort;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -82,12 +81,11 @@ public class GetSalesAnalysisService implements GetSalesAnalysisUseCase {
             end = date.withDayOfMonth(date.lengthOfMonth());
         }
 
-        List<DailyMenuSalesJpaEntity> dailySales = salesRepository.findBySaleDateBetween(start, end);
+        List<DailyMenuSales> dailySales = salesRepository.findBySaleDateBetween(start, end);
         
-        // Group by menuId/menuName since we have multiple days
         Map<String, MenuRankingDto> aggregated = dailySales.stream()
                 .collect(Collectors.toMap(
-                        DailyMenuSalesJpaEntity::getMenuName,
+                        DailyMenuSales::getMenuName,
                         s -> MenuRankingDto.builder()
                                 .menuName(s.getMenuName())
                                 .categoryName(s.getCategoryName())

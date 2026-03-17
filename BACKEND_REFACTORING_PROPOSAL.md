@@ -428,28 +428,28 @@ OrderJpaEntity order = orderRepository.findAll().stream()
 
 > 효과 대비 노력이 적은 순서로 정렬
 
-### Phase 1: 빠른 수정 (각 1-2시간)
-1. **notice 모듈 리팩토링** — 가장 작은 모듈(9파일)에서 Out Port + Adapter + DTO 분리 연습
-2. **sales Out Port 수정** — `DailyMenuSalesJpaEntity` → 도메인 모델 변환 (도메인 클래스 1개 + Port/Adapter 수정)
-3. **payment 구조화** — UseCase 인터페이스 추출 (1파일 → 2파일)
+### Phase 1: 빠른 수정 ✅ 완료
+1. ✅ **notice 모듈 리팩토링** — Out Port + PersistenceAdapter + DTO 분리 완료
+2. ✅ **sales Out Port 수정** — 도메인 모델 `DailyMenuSales` 추가, Port/Adapter/Service 반영
+3. ✅ **payment 구조화** — `PaymentVerificationUseCase` 인터페이스 추출
 
-### Phase 2: 도메인 개선 (각 2-3시간)
-4. **Order 도메인에 행위 추가** — `changeStatus()`, `reject()` 메서드로 빌더 중복 제거
-5. **GalleryImage 도메인에 행위 추가** — `updateSort()`, `updateVisibility()`
-6. **Order DTO inner class를 별도 파일로 분리**
+### Phase 2: 도메인 개선 ✅ 완료
+4. ✅ **Order 도메인에 행위 추가** — `changeStatus()`, `reject()` 메서드 추가
+5. ✅ **GalleryImage 도메인에 행위 추가** — `updateSort()`, `updateVisibility()` 추가
+6. ✅ **Order DTO inner class를 별도 파일로 분리** — `StatusRequest`, `RejectRequest`
 
-### Phase 3: 의존성 정리 (각 3-4시간)
-7. **GetOrderService 리팩토링** — JPA → Port 전환 + findAll().filter() → 전용 쿼리 메서드
-8. **CreateOrderService 리팩토링** — 외부 모듈 Port 전환 + 메서드 분리
-9. **ManageOrderStatusService 리팩토링** — 외부 모듈 Port 전환 + sales 위임
+### Phase 3: 의존성 정리 ✅ 완료
+7. ✅ **GetOrderService 리팩토링** — JPA Entity/Repository 6개 직접 참조 → OrderRepositoryPort + MenuRepositoryPort. findAll().filter() 성능 문제 해결.
+8. ✅ **CreateOrderService 리팩토링** — AdminMenuJpaRepo/OptionGroupJpaRepo/OptionItemJpaRepo 3개 → MenuRepositoryPort + MenuOptionRepositoryPort. 238줄 모노리식 메서드 → 7개 private 메서드로 분리.
+9. ✅ **ManageOrderStatusService 리팩토링** — 빌더 중복 제거 + 포인트 환급 메서드 추출 + orderItemRepo → Port
 
-### Phase 4: 잔여 모듈 정리
-10. **FavoriteService** — 6개 JPA Repository → Port 전환
-11. **AdminGradeSettingsService** — Out Port + Adapter 추가
-12. **AdminUserController** — `toggleLock()` 로직을 UseCase로 추출
-13. **UserPointService** — `auth` → `user/point` 패키지 이동
-14. **SecurityConfig** — `/orders/**` 보안 강화
+### Phase 4: 잔여 모듈 정리 ✅ 완료
+10. ✅ **FavoriteService** — 6개 JPA Repository → Port 전환 (FavoriteRepositoryPort + LoadUserPort + MenuRepositoryPort + MenuImageRepositoryPort + MenuOptionRepositoryPort)
+11. ✅ **AdminGradeSettingsService** — GradeSettingsRepositoryPort + GradeSettingsPersistenceAdapter 추가
+12. ✅ **AdminUserController** — `toggleLock()` → `ToggleAdminUserLockUseCase`로 추출
+13. ✅ **UserPointService** — `auth` → `user/point` 패키지 이동 완료
+14. ✅ **SecurityConfig** — `/orders/**` permitAll 유지 + OrderController 런타임 권한 체크 (비회원 주문 호환)
 
-### Phase 5: 코드 품질
-15. **AdminMenuOptionController** — `Map<String, Object>` → Request DTO
-16. **AdminOrderController** — inner class DTO 분리
+### Phase 5: 코드 품질 ✅ 완료
+15. ✅ **AdminMenuOptionController** — `Map<String, Object>` → `CategoryOptionMapRequest` / `MenuOptionExclusionRequest` DTO
+16. ✅ **AdminOrderController** — inner class DTO → 별도 `dto/` 패키지 분리

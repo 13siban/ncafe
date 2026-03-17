@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderJpaRepository extends JpaRepository<OrderJpaEntity, Long> {
     interface TopMenuProjection {
@@ -16,6 +17,8 @@ public interface OrderJpaRepository extends JpaRepository<OrderJpaEntity, Long> 
         Long getTotalQuantity();
     }
     List<OrderJpaEntity> findByOrderDateOrderByCreatedAtDesc(LocalDate orderDate);
+    List<OrderJpaEntity> findByUserIdOrderByCreatedAtDesc(String userId);
+    Optional<OrderJpaEntity> findByOrderDateAndOrderNumber(LocalDate orderDate, Integer orderNumber);
     
     long countByOrderDate(LocalDate orderDate);
     

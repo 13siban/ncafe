@@ -126,3 +126,17 @@
 .iconBtn:hover {
     background-color: rgba(0,0,0,0.05);
 }
+
+.iconBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.iconBtn:disabled:hover {
+    background-color: transparent;
+}
+
+.sortBtns {
+    display: flex;
+    gap: 2px;
+}

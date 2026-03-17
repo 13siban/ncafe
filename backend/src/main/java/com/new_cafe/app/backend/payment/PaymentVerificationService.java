@@ -1,5 +1,6 @@
 package com.new_cafe.app.backend.payment;
 
+import com.new_cafe.app.backend.payment.application.port.in.PaymentVerificationUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -13,7 +14,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class PaymentVerificationService {
+public class PaymentVerificationService implements PaymentVerificationUseCase {
 
     @Value("${portone.api-secret}")
     private String apiSecret;

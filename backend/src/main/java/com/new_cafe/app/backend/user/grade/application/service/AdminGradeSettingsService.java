@@ -1,105 +1,96 @@
 package com.new_cafe.app.backend.user.grade.application.service;
 
-import com.new_cafe.app.backend.user.grade.adapter.out.persistence.GradeSettingsJpaEntity;
-import com.new_cafe.app.backend.user.grade.adapter.out.persistence.GradeSettingsJpaRepository;
 import com.new_cafe.app.backend.user.grade.application.port.in.ManageGradeSettingsUseCase;
+import com.new_cafe.app.backend.user.grade.application.port.out.GradeSettingsRepositoryPort;
 import com.new_cafe.app.backend.user.grade.domain.model.GradeSettings;
+import com.new_cafe.app.backend.auth.adapter.out.persistence.UserJpaRepository;
+import com.new_cafe.app.backend.auth.domain.model.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import com.new_cafe.app.backend.user.grade.adapter.out.persistence.GradeSystemConfigJpaEntity;
-import com.new_cafe.app.backend.user.grade.adapter.out.persistence.GradeSystemConfigJpaRepository;
-import com.new_cafe.app.backend.auth.adapter.out.persistence.UserJpaRepository;
-import com.new_cafe.app.backend.auth.domain.model.User;
 
 @Service
 @RequiredArgsConstructor
 public class AdminGradeSettingsService implements ManageGradeSettingsUseCase {
 
-    private final GradeSettingsJpaRepository repository;
-    private final GradeSystemConfigJpaRepository configRepository;
-    private final UserJpaRepository userRepository;
+    private final GradeSettingsRepositoryPort repositoryPort;
+    private final UserJpaRepository userRepository; // TODO: LoadUserPort로 전환 필요
     private final UserGradeService userGradeService;
 
     @Override
     @Transactional(readOnly = true)
     public List<GradeSettings> getAllSettings() {
-        return repository.findAll(Sort.by(Sort.Direction.ASC, "sortOrder")).stream()
-                .map(this::mapToDomain)
-                .collect(Collectors.toList());
+        return repositoryPort.findAllSorted();
     }
 
     @Override
     @Transactional(readOnly = true)
     public GradeSettings getSettingsByGrade(String grade) {
-        GradeSettingsJpaEntity entity = repository.findByGrade(grade);
-        if (entity == null) {
+        GradeSettings settings = repositoryPort.findByGrade(grade);
+        if (settings == null) {
             throw new IllegalArgumentException("등급 설정을 찾을 수 없습니다: " + grade);
         }
-        return mapToDomain(entity);
+        return settings;
     }
 
     @Override
     @Transactional
     public void updateSettings(String grade, String displayName, Integer earnRate, Integer count, Integer amount, String mainColor, String textColor) {
-        GradeSettingsJpaEntity entity = repository.findByGrade(grade);
-        if (entity == null) {
+        GradeSettings existing = repositoryPort.findByGrade(grade);
+        if (existing == null) {
             throw new IllegalArgumentException("등급 설정을 찾을 수 없습니다: " + grade);
         }
-        entity.updateSettings(displayName, earnRate, count, amount, mainColor, textColor);
-        repository.save(entity);
+        GradeSettings updated = GradeSettings.builder()
+                .grade(grade)
+                .displayName(displayName)
+                .earnRate(earnRate)
+                .upgradeOrderCount(count)
+                .upgradeOrderAmount(amount)
+                .sortOrder(existing.getSortOrder())
+                .mainColor(mainColor)
+                .textColor(textColor)
+                .build();
+        repositoryPort.save(updated);
     }
     
     @Override
     @Transactional(readOnly = true)
     public boolean isGradeSystemEnabled() {
-        return configRepository.findById(1L)
-                .map(GradeSystemConfigJpaEntity::isEnabled)
-                .orElse(true);
+        return repositoryPort.isGradeSystemEnabled();
     }
     
     @Override
     @Transactional
     public void updateGradeSystemConfig(boolean isEnabled) {
-        GradeSystemConfigJpaEntity config = configRepository.findById(1L)
-                .orElseGet(() -> GradeSystemConfigJpaEntity.builder().id(1L).build());
-        config.setEnabled(isEnabled);
-        configRepository.save(config);
+        repositoryPort.updateGradeSystemEnabled(isEnabled);
     }
 
     @Override
     @Transactional(readOnly = true)
     public int getDefaultEarnRate() {
-        return configRepository.findById(1L)
-                .map(GradeSystemConfigJpaEntity::getDefaultEarnRate)
-                .orElse(1);
+        return repositoryPort.getDefaultEarnRate();
     }
 
     @Override
     @Transactional
     public void updateDefaultEarnRate(int defaultEarnRate) {
-        GradeSystemConfigJpaEntity config = configRepository.findById(1L)
-                .orElseGet(() -> GradeSystemConfigJpaEntity.builder().id(1L).build());
-        config.setDefaultEarnRate(defaultEarnRate);
-        configRepository.save(config);
+        repositoryPort.updateDefaultEarnRate(defaultEarnRate);
     }
 
     @Override
     @Transactional
     public void createGrade(String grade, String displayName, Integer earnRate, Integer count, Integer amount, String mainColor, String textColor) {
-        if (repository.findByGrade(grade) != null) {
+        if (repositoryPort.findByGrade(grade) != null) {
             throw new IllegalArgumentException("이미 존재하는 등급 코드입니다.");
         }
         
-        List<GradeSettingsJpaEntity> all = repository.findAll();
-        int maxOrder = all.stream().mapToInt(GradeSettingsJpaEntity::getSortOrder).max().orElse(0);
+        List<GradeSettings> all = repositoryPort.findAllSorted();
+        int maxOrder = all.stream().mapToInt(GradeSettings::getSortOrder).max().orElse(0);
         
-        GradeSettingsJpaEntity newGrade = GradeSettingsJpaEntity.builder()
+        GradeSettings newGrade = GradeSettings.builder()
                 .grade(grade.toUpperCase().replace(" ", "_"))
                 .displayName(displayName)
                 .earnRate(earnRate == null ? 1 : earnRate)
@@ -110,30 +101,30 @@ public class AdminGradeSettingsService implements ManageGradeSettingsUseCase {
                 .textColor(textColor != null ? textColor : "#FFFFFF")
                 .build();
                 
-        repository.save(newGrade);
+        repositoryPort.save(newGrade);
     }
     
     @Override
     @Transactional
     public void deleteGrade(String grade) {
-        GradeSettingsJpaEntity entity = repository.findByGrade(grade);
-        if (entity == null) {
+        GradeSettings settings = repositoryPort.findByGrade(grade);
+        if (settings == null) {
             throw new IllegalArgumentException("등급 설정을 찾을 수 없습니다.");
         }
         
-        List<GradeSettingsJpaEntity> all = repository.findAll(Sort.by(Sort.Direction.ASC, "sortOrder"));
-        if (all.size() > 0 && all.get(0).getGrade().equals(grade)) {
+        List<GradeSettings> all = repositoryPort.findAllSorted();
+        if (!all.isEmpty() && all.get(0).getGrade().equals(grade)) {
             throw new IllegalArgumentException("최하위 기본 등급은 삭제할 수 없습니다.");
         }
         
-        // 해당 등급의 회원을 기본 등급으로 임시 강등 후, 조건에 맞는 등급 재계산
+        // 해당 등급의 회원을 기본 등급으로 임시 강등 후, 재계산
         List<User> affectedUsers = userRepository.findByGrade(grade);
         for (User user : affectedUsers) {
-            user.updateGrade("GREEN_BEAN"); // 가장 기본 등급으로 내림 (최하위 등급 코드가 GREEN_BEAN이 아니더라도 이후 바로 재설정됨)
+            user.updateGrade("GREEN_BEAN");
             userRepository.save(user);
         }
         
-        repository.delete(entity);
+        repositoryPort.deleteByGrade(grade);
         
         for (User user : affectedUsers) {
             userGradeService.updateUserGrade(user.getId());
@@ -143,25 +134,6 @@ public class AdminGradeSettingsService implements ManageGradeSettingsUseCase {
     @Override
     @Transactional
     public void updateGradeOrders(Map<String, Integer> gradeOrders) {
-        List<GradeSettingsJpaEntity> entities = repository.findAll();
-        for (GradeSettingsJpaEntity entity : entities) {
-            if (gradeOrders.containsKey(entity.getGrade())) {
-                entity.setSortOrder(gradeOrders.get(entity.getGrade()));
-                repository.save(entity);
-            }
-        }
-    }
-
-    private GradeSettings mapToDomain(GradeSettingsJpaEntity entity) {
-        return GradeSettings.builder()
-                .grade(entity.getGrade())
-                .displayName(entity.getDisplayName())
-                .earnRate(entity.getEarnRate())
-                .upgradeOrderCount(entity.getUpgradeOrderCount())
-                .upgradeOrderAmount(entity.getUpgradeOrderAmount())
-                .sortOrder(entity.getSortOrder())
-                .mainColor(entity.getMainColor())
-                .textColor(entity.getTextColor())
-                .build();
+        repositoryPort.updateSortOrders(gradeOrders);
     }
 }

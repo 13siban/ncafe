@@ -3,6 +3,8 @@ package com.new_cafe.app.backend.order.adapter.out.persistence;
 import com.new_cafe.app.backend.order.application.port.out.OrderRepositoryPort;
 import com.new_cafe.app.backend.order.domain.model.Order;
 import com.new_cafe.app.backend.order.domain.model.OrderItem;
+import com.new_cafe.app.backend.order.domain.model.OrderOptionSelection;
+import com.new_cafe.app.backend.order.domain.model.OrderStatus;
 import com.new_cafe.app.backend.order.application.port.out.OrderOptionRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -44,7 +46,6 @@ public class OrderPersistenceAdapter implements OrderRepositoryPort, OrderOption
                 .build();
 
         OrderJpaEntity savedOrder = orderRepository.save(orderEntity);
-
         return mapToDomain(savedOrder);
     }
 
@@ -62,16 +63,7 @@ public class OrderPersistenceAdapter implements OrderRepositoryPort, OrderOption
                 .build();
 
         OrderItemJpaEntity saved = orderItemRepository.save(itemEntity);
-        return OrderItem.builder()
-                .id(saved.getId())
-                .orderId(saved.getOrderId())
-                .menuId(saved.getMenuId())
-                .menuName(saved.getMenuName())
-                .quantity(saved.getQuantity())
-                .unitPrice(saved.getUnitPrice())
-                .optionPrice(saved.getOptionPrice())
-                .subtotal(saved.getSubtotal())
-                .build();
+        return mapItemToDomain(saved);
     }
 
     @Override
@@ -81,17 +73,13 @@ public class OrderPersistenceAdapter implements OrderRepositoryPort, OrderOption
 
     @Override
     public Optional<Order> findByOrderDateAndOrderNumber(LocalDate orderDate, Integer orderNumber) {
-        return orderRepository.findByOrderDateOrderByCreatedAtDesc(orderDate).stream()
-                .filter(o -> o.getOrderNumber().equals(orderNumber))
-                .findFirst()
+        return orderRepository.findByOrderDateAndOrderNumber(orderDate, orderNumber)
                 .map(this::mapToDomain);
     }
 
     @Override
     public List<Order> findByUserId(String userId) {
-        return orderRepository.findAll().stream() // Ideally add findByUserId to repo, but keeping current if needed
-                .filter(o -> userId.equals(o.getUserId()))
-                .filter(o -> o.getUserId() != null)
+        return orderRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
                 .map(this::mapToDomain)
                 .collect(Collectors.toList());
     }
@@ -110,12 +98,26 @@ public class OrderPersistenceAdapter implements OrderRepositoryPort, OrderOption
     }
 
     @Override
+    public List<OrderItem> findItemsByOrderId(Long orderId) {
+        return orderItemRepository.findByOrderId(orderId).stream()
+                .map(this::mapItemToDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<OrderOptionSelection> findOptionsByOrderItemId(Long orderItemId) {
+        return orderOptionRepository.findByOrderItemId(orderItemId).stream()
+                .map(this::mapOptionToDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public long countByOrderDate(LocalDate orderDate) {
         return orderRepository.countByOrderDate(orderDate);
     }
 
     @Override
-    public long countByOrderDateAndStatus(LocalDate orderDate, com.new_cafe.app.backend.order.domain.model.OrderStatus status) {
+    public long countByOrderDateAndStatus(LocalDate orderDate, OrderStatus status) {
         return orderRepository.countByOrderDateAndStatus(orderDate, status);
     }
 
@@ -148,6 +150,14 @@ public class OrderPersistenceAdapter implements OrderRepositoryPort, OrderOption
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<Order> findByStatusAndOrderDate(String status, LocalDate date) {
+        return findAll().stream()
+                .filter(o -> (status == null || o.getStatus().name().equalsIgnoreCase(status)))
+                .filter(o -> (date == null || o.getOrderDate().equals(date)))
+                .collect(Collectors.toList());
+    }
+
     private Order mapToDomain(OrderJpaEntity entity) {
         return Order.builder()
                 .id(entity.getId())
@@ -167,6 +177,29 @@ public class OrderPersistenceAdapter implements OrderRepositoryPort, OrderOption
                 .paymentStatus(entity.getPaymentStatus())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
+                .build();
+    }
+
+    private OrderItem mapItemToDomain(OrderItemJpaEntity entity) {
+        return OrderItem.builder()
+                .id(entity.getId())
+                .orderId(entity.getOrderId())
+                .menuId(entity.getMenuId())
+                .menuName(entity.getMenuName())
+                .quantity(entity.getQuantity())
+                .unitPrice(entity.getUnitPrice())
+                .optionPrice(entity.getOptionPrice())
+                .subtotal(entity.getSubtotal())
+                .build();
+    }
+
+    private OrderOptionSelection mapOptionToDomain(OrderOptionSelectionJpaEntity entity) {
+        return OrderOptionSelection.builder()
+                .id(entity.getId())
+                .orderItemId(entity.getOrderItemId())
+                .optionGroupName(entity.getOptionGroupName())
+                .optionItemName(entity.getOptionItemName())
+                .priceDelta(entity.getPriceDelta())
                 .build();
     }
 

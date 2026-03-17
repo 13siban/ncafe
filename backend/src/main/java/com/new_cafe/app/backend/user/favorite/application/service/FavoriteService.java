@@ -2,18 +2,17 @@ package com.new_cafe.app.backend.user.favorite.application.service;
 
 import com.new_cafe.app.backend.auth.adapter.out.persistence.UserJpaRepository;
 import com.new_cafe.app.backend.auth.domain.model.User;
-import com.new_cafe.app.backend.menu.adapter.out.persistence.MenuImageJpaEntity;
-import com.new_cafe.app.backend.menu.adapter.out.persistence.MenuImageJpaRepository;
-import com.new_cafe.app.backend.menu.adapter.out.persistence.MenuJpaEntity;
-import com.new_cafe.app.backend.menu.adapter.out.persistence.MenuJpaRepository;
-import com.new_cafe.app.backend.menuoption.adapter.out.persistence.OptionGroupJpaEntity;
-import com.new_cafe.app.backend.menuoption.adapter.out.persistence.OptionGroupJpaRepository;
-import com.new_cafe.app.backend.menuoption.adapter.out.persistence.OptionItemJpaEntity;
-import com.new_cafe.app.backend.menuoption.adapter.out.persistence.OptionItemJpaRepository;
+import com.new_cafe.app.backend.menu.application.port.out.MenuImageRepositoryPort;
+import com.new_cafe.app.backend.menu.application.port.out.MenuRepositoryPort;
+import com.new_cafe.app.backend.menu.domain.model.Menu;
+import com.new_cafe.app.backend.menu.domain.model.MenuImage;
+import com.new_cafe.app.backend.menuoption.application.port.out.MenuOptionRepositoryPort;
+import com.new_cafe.app.backend.menuoption.domain.model.OptionGroup;
+import com.new_cafe.app.backend.menuoption.domain.model.OptionItem;
 import com.new_cafe.app.backend.user.favorite.adapter.in.web.dto.AddFavoriteRequest;
 import com.new_cafe.app.backend.user.favorite.adapter.in.web.dto.FavoriteMenuResponse;
-import com.new_cafe.app.backend.user.favorite.adapter.out.persistence.UserFavoriteMenuJpaRepository;
 import com.new_cafe.app.backend.user.favorite.application.port.in.ManageFavoriteUseCase;
+import com.new_cafe.app.backend.user.favorite.application.port.out.FavoriteRepositoryPort;
 import com.new_cafe.app.backend.user.favorite.domain.model.UserFavoriteMenu;
 import com.new_cafe.app.backend.user.favorite.domain.model.UserFavoriteMenuOption;
 import lombok.RequiredArgsConstructor;
@@ -28,19 +27,19 @@ import java.util.stream.Collectors;
 @Transactional
 public class FavoriteService implements ManageFavoriteUseCase {
 
-    private final UserFavoriteMenuJpaRepository favoriteMenuRepository;
+    private final FavoriteRepositoryPort favoriteRepositoryPort;
     private final UserJpaRepository userRepository;
-    private final MenuJpaRepository menuRepository;
-    private final MenuImageJpaRepository menuImageRepository;
-    private final OptionGroupJpaRepository optionGroupRepository;
-    private final OptionItemJpaRepository optionItemRepository;
+    private final MenuRepositoryPort menuRepository;
+    private final MenuImageRepositoryPort menuImageRepositoryPort;
+    private final MenuOptionRepositoryPort menuOptionRepository;
 
     @Override
     public Long addFavorite(String userId, AddFavoriteRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
                 
-        if (!menuRepository.existsById(request.getMenuId())) {
+        Menu menu = menuRepository.findById(request.getMenuId());
+        if (menu == null) {
             throw new RuntimeException("Menu not found");
         }
 
@@ -52,10 +51,14 @@ public class FavoriteService implements ManageFavoriteUseCase {
 
         if (request.getSelectedOptions() != null && !request.getSelectedOptions().isEmpty()) {
             for (AddFavoriteRequest.SelectedOption opt : request.getSelectedOptions()) {
-                if (!optionGroupRepository.existsById(opt.getOptionGroupId())) {
+                OptionGroup group = menuOptionRepository.findOptionGroupById(opt.getOptionGroupId());
+                if (group == null) {
                     throw new RuntimeException("OptionGroup not found");
                 }
-                if (!optionItemRepository.existsById(opt.getOptionItemId())) {
+                // Validate option item exists within the group's items
+                boolean itemFound = group.getItems() != null && group.getItems().stream()
+                        .anyMatch(item -> item.getId().equals(opt.getOptionItemId()));
+                if (!itemFound) {
                     throw new RuntimeException("OptionItem not found");
                 }
                         
@@ -68,19 +71,19 @@ public class FavoriteService implements ManageFavoriteUseCase {
             }
         }
 
-        return favoriteMenuRepository.save(favoriteMenu).getId();
+        return favoriteRepositoryPort.save(favoriteMenu).getId();
     }
 
     @Override
     public void removeFavorite(String userId, Long favoriteId) {
-        UserFavoriteMenu favoriteMenu = favoriteMenuRepository.findById(favoriteId)
+        UserFavoriteMenu favoriteMenu = favoriteRepositoryPort.findById(favoriteId)
                 .orElseThrow(() -> new RuntimeException("Favorite not found"));
                 
         if (!favoriteMenu.getUser().getId().equals(userId)) {
             throw new RuntimeException("Not authorized to remove this favorite");
         }
         
-        favoriteMenuRepository.delete(favoriteMenu);
+        favoriteRepositoryPort.delete(favoriteMenu);
     }
 
     @Override
@@ -89,13 +92,16 @@ public class FavoriteService implements ManageFavoriteUseCase {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
                 
-        List<UserFavoriteMenu> favorites = favoriteMenuRepository.findAllByUserOrderByCreatedAtDesc(user);
+        List<UserFavoriteMenu> favorites = favoriteRepositoryPort.findAllByUser(user);
         
         return favorites.stream().map(fav -> {
             boolean isOrderable = true;
             String unavailableReasonStr = null;
             
-            MenuJpaEntity menu = menuRepository.findById(fav.getMenuId()).orElse(null);
+            Menu menu = null;
+            try {
+                menu = menuRepository.findById(fav.getMenuId());
+            } catch (Exception ignored) {}
             
             if (menu == null) {
                 isOrderable = false;
@@ -111,16 +117,25 @@ public class FavoriteService implements ManageFavoriteUseCase {
             long basePrice = menu != null && menu.getPrice() != null ? menu.getPrice() : 0L;
             long calculatedTotal = basePrice;
             
+            // Get option groups for this menu to resolve names/prices
+            List<OptionGroup> allGroups = menuOptionRepository.findAllOptionGroups();
+            
             List<FavoriteMenuResponse.FavoriteMenuOptionDto> optionsDtoList = fav.getOptions().stream().map(opt -> {
-                OptionGroupJpaEntity group = optionGroupRepository.findById(opt.getOptionGroupId()).orElse(null);
-                OptionItemJpaEntity item = optionItemRepository.findById(opt.getOptionItemId()).orElse(null);
+                OptionGroup group = allGroups.stream()
+                        .filter(g -> g.getId().equals(opt.getOptionGroupId()))
+                        .findFirst().orElse(null);
+                OptionItem item = null;
+                if (group != null && group.getItems() != null) {
+                    item = group.getItems().stream()
+                            .filter(i -> i.getId().equals(opt.getOptionItemId()))
+                            .findFirst().orElse(null);
+                }
                 
                 return FavoriteMenuResponse.FavoriteMenuOptionDto.builder()
-                        .optionGroupId(group != null ? group.getId() : opt.getOptionGroupId())
+                        .optionGroupId(opt.getOptionGroupId())
                         .optionGroupName(group != null ? group.getName() : "Unknown Group")
-                        .optionItemId(item != null ? item.getId() : opt.getOptionItemId())
+                        .optionItemId(opt.getOptionItemId())
                         .optionItemName(item != null ? item.getName() : "Unknown Item")
-                        // Assume standardPrice is 0 or base price
                         .standardPrice(0L)
                         .additionalPrice(item != null && item.getPriceDelta() != null ? Long.valueOf(item.getPriceDelta()) : 0L)
                         .build();
@@ -144,7 +159,7 @@ public class FavoriteService implements ManageFavoriteUseCase {
             
             String imageSrcUrl = "";
             if (menu != null) {
-                List<MenuImageJpaEntity> images = menuImageRepository.findAllByMenuIdOrderBySortOrderAsc(menu.getId());
+                List<MenuImage> images = menuImageRepositoryPort.findAllByMenuId(menu.getId());
                 if (images != null && !images.isEmpty()) {
                     imageSrcUrl = images.get(0).getSrcUrl();
                 }
@@ -170,7 +185,7 @@ public class FavoriteService implements ManageFavoriteUseCase {
     public boolean isFavorite(String userId, Long menuId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        List<UserFavoriteMenu> favorites = favoriteMenuRepository.findAllByUserOrderByCreatedAtDesc(user);
+        List<UserFavoriteMenu> favorites = favoriteRepositoryPort.findAllByUser(user);
         return favorites.stream().anyMatch(f -> menuId.equals(f.getMenuId()));
     }
 }

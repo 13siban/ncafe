@@ -33,6 +33,7 @@ public interface GetOrderUseCase {
     @Builder
     class OrderDto {
         private Long id;
+        private String userId;
         private String orderDate;
         private Integer orderNumber;
         private String displayNumber;

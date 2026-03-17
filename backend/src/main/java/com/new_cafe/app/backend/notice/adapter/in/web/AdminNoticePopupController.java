@@ -1,9 +1,9 @@
 package com.new_cafe.app.backend.notice.adapter.in.web;
 
+import com.new_cafe.app.backend.notice.adapter.in.web.dto.NoticePopupRequest;
 import com.new_cafe.app.backend.notice.application.port.in.ManageNoticePopupUseCase;
 import com.new_cafe.app.backend.notice.domain.NoticePopup;
 import lombok.RequiredArgsConstructor;
-import lombok.Data;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -73,12 +73,4 @@ public class AdminNoticePopupController {
 
         return ResponseEntity.ok(Map.of("imageUrl", savedFilename));
     }
-}
-
-@Data
-class NoticePopupRequest {
-    private String title;
-    private String content;
-    private String imageUrl;
-    private Boolean isActive;
 }

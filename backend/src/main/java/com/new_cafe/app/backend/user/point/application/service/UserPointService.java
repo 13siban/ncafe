@@ -1,4 +1,4 @@
-package com.new_cafe.app.backend.auth.application.service;
+package com.new_cafe.app.backend.user.point.application.service;
 
 import com.new_cafe.app.backend.auth.adapter.out.persistence.UserJpaRepository;
 import com.new_cafe.app.backend.auth.adapter.out.persistence.UserPointJpaRepository;
@@ -29,7 +29,7 @@ public class UserPointService implements ManageUserPointUseCase {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         int newBalance = user.getPointBalance() + amount;
-        user.addPoints(amount); // Need to add this method in User entity
+        user.addPoints(amount);
         userRepository.save(user);
 
         UserPoint point = UserPoint.builder()
@@ -39,7 +39,7 @@ public class UserPointService implements ManageUserPointUseCase {
                 .type("EARN")
                 .balanceSnapshot(newBalance)
                 .description(description)
-                .expiresAt(LocalDateTime.now().plusYears(1)) // 1년 뒤 만료
+                .expiresAt(LocalDateTime.now().plusYears(1))
                 .build();
         userPointRepository.save(point);
     }
@@ -57,7 +57,7 @@ public class UserPointService implements ManageUserPointUseCase {
         }
 
         int newBalance = user.getPointBalance() - amount;
-        user.subtractPoints(amount); // Need to add this method in User entity
+        user.subtractPoints(amount);
         userRepository.save(user);
 
         UserPoint point = UserPoint.builder()
@@ -74,7 +74,6 @@ public class UserPointService implements ManageUserPointUseCase {
     @Override
     @Transactional
     public void cancelPoints(String userId, String orderId, int amount, String description) {
-        // 주문 취소 등으로 인한 포인트 환급 (사용했던 포인트 돌려줌)
         if (amount <= 0) return;
 
         User user = userRepository.findById(userId)
@@ -91,7 +90,6 @@ public class UserPointService implements ManageUserPointUseCase {
                 .type("CANCEL")
                 .balanceSnapshot(newBalance)
                 .description(description)
-                // CANCEL 된 포인트의 만료일은 적당히 다시 주거나, 기존 만료일을 따라야 하나 여기서는 단순화하여 1년 줌
                 .expiresAt(LocalDateTime.now().plusYears(1))
                 .build();
         userPointRepository.save(point);

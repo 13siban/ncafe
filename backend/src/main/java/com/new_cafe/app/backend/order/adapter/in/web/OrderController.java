@@ -50,8 +50,19 @@ public class OrderController {
     }
 
     @GetMapping("/{date}/{number}")
-    public ResponseEntity<GetOrderUseCase.OrderDto> getOrder(@PathVariable String date, @PathVariable Integer number) {
-        return ResponseEntity.ok(getOrderUseCase.getOrder(LocalDate.parse(date), number));
+    public ResponseEntity<GetOrderUseCase.OrderDto> getOrder(
+            @PathVariable String date,
+            @PathVariable Integer number,
+            @AuthenticationPrincipal User user) {
+        GetOrderUseCase.OrderDto order = getOrderUseCase.getOrder(LocalDate.parse(date), number);
+        // 비회원 주문은 누구나 조회 가능 (주문번호만 알면 됨)
+        // 회원 주문은 본인만 조회 가능
+        if (order.getUserId() != null) {
+            if (user == null || !order.getUserId().equals(user.getId())) {
+                return ResponseEntity.status(403).build();
+            }
+        }
+        return ResponseEntity.ok(order);
     }
 
     @PutMapping("/{date}/{number}/pickup")

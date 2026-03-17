@@ -5,6 +5,9 @@ import java.util.Map;
 
 import org.springframework.web.bind.annotation.*;
 
+import com.new_cafe.app.backend.menuoption.adapter.in.web.dto.CategoryOptionMapRequest;
+import com.new_cafe.app.backend.menuoption.adapter.in.web.dto.MenuOptionExclusionRequest;
+
 import com.new_cafe.app.backend.menuoption.application.command.CreateOptionGroupCommand;
 import com.new_cafe.app.backend.menuoption.application.command.CreateOptionItemCommand;
 import com.new_cafe.app.backend.menuoption.application.command.GetCategoryOptionsCommand;
@@ -59,12 +62,9 @@ public class AdminMenuOptionController {
     @PostMapping("/categories/{id}/options")
     public Map<String, String> addCategoryOptionMap(
             @PathVariable Long id,
-            @RequestBody Map<String, Object> body) {
-        Long optionGroupId = Long.valueOf(body.get("optionGroupId").toString());
-        Integer sortOrder = body.containsKey("sortOrder")
-                ? Integer.valueOf(body.get("sortOrder").toString())
-                : 1;
-        manageCategoryOptionMapUseCase.addCategoryOptionMap(id, optionGroupId, sortOrder);
+            @RequestBody CategoryOptionMapRequest request) {
+        Integer sortOrder = request.getSortOrder() != null ? request.getSortOrder() : 1;
+        manageCategoryOptionMapUseCase.addCategoryOptionMap(id, request.getOptionGroupId(), sortOrder);
         return Map.of("message", "Category option mapping added");
     }
 
@@ -88,9 +88,8 @@ public class AdminMenuOptionController {
     @PostMapping("/menus/{id}/option-exclusions")
     public Map<String, String> addMenuOptionExclusion(
             @PathVariable Long id,
-            @RequestBody Map<String, Object> body) {
-        Long optionGroupId = Long.valueOf(body.get("optionGroupId").toString());
-        manageMenuOptionExclusionUseCase.addExclusion(id, optionGroupId);
+            @RequestBody MenuOptionExclusionRequest request) {
+        manageMenuOptionExclusionUseCase.addExclusion(id, request.getOptionGroupId());
         return Map.of("message", "Menu option exclusion added");
     }
 

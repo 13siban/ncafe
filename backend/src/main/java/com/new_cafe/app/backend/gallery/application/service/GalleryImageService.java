@@ -32,15 +32,15 @@ public class GalleryImageService implements ManageGalleryImageUseCase, GetGaller
 
     @Override
     public GalleryImage updateGalleryImage(Long id, Integer sortOrder, Boolean isVisible) {
-        GalleryImage image = galleryImagePort.findById(id).orElseThrow(() -> new IllegalArgumentException("Image not found: " + id));
-        GalleryImage updated = GalleryImage.builder()
-                .id(image.getId())
-                .imageUrl(image.getImageUrl())
-                .sortOrder(sortOrder != null ? sortOrder : image.getSortOrder())
-                .isVisible(isVisible != null ? isVisible : image.getIsVisible())
-                .createdAt(image.getCreatedAt())
-                .build();
-        return galleryImagePort.save(updated);
+        GalleryImage image = galleryImagePort.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Image not found: " + id));
+        if (sortOrder != null) {
+            image.updateSort(sortOrder);
+        }
+        if (isVisible != null) {
+            image.updateVisibility(isVisible);
+        }
+        return galleryImagePort.save(image);
     }
 
     @Override
@@ -51,20 +51,15 @@ public class GalleryImageService implements ManageGalleryImageUseCase, GetGaller
     @Override
     public void updateImagesOrder(List<Long> orderedIds) {
         List<GalleryImage> all = galleryImagePort.findAll();
-        Map<Long, GalleryImage> imageMap = all.stream().collect(Collectors.toMap(GalleryImage::getId, img -> img));
+        Map<Long, GalleryImage> imageMap = all.stream()
+                .collect(Collectors.toMap(GalleryImage::getId, img -> img));
 
         for (int i = 0; i < orderedIds.size(); i++) {
-            Long id = orderedIds.get(i);
-            GalleryImage img = imageMap.get(id);
+            Long imgId = orderedIds.get(i);
+            GalleryImage img = imageMap.get(imgId);
             if (img != null && img.getSortOrder() != i) {
-                GalleryImage updated = GalleryImage.builder()
-                        .id(img.getId())
-                        .imageUrl(img.getImageUrl())
-                        .sortOrder(i)
-                        .isVisible(img.getIsVisible())
-                        .createdAt(img.getCreatedAt())
-                        .build();
-                galleryImagePort.save(updated);
+                img.updateSort(i);
+                galleryImagePort.save(img);
             }
         }
     }

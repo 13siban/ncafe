@@ -46,6 +46,8 @@ public class SecurityConfig {
                     .requestMatchers("/**/*.png", "/**/*.jpg", "/**/*.jpeg", "/**/*.gif", "/**/*.svg", "/**/*.webp").permitAll()
                     .requestMatchers("/upload/**").permitAll()
                     .requestMatchers("/store/status", "/api/store/status").permitAll()
+                    // 주문 API: 비회원 주문/조회가 필요하므로 permitAll 유지
+                    // 회원 주문 조회 시 본인 확인은 OrderController에서 런타임 체크
                     .requestMatchers("/orders/**", "/api/orders/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/users/me/restore", "/api/users/me/restore").permitAll()
 

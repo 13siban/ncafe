@@ -1,20 +1,17 @@
 package com.new_cafe.app.backend.order.application.service;
 
-import com.new_cafe.app.backend.menu.adapter.out.persistence.MenuJpaRepository;
 import com.new_cafe.app.backend.menu.application.port.out.MenuImageRepositoryPort;
+import com.new_cafe.app.backend.menu.application.port.out.MenuRepositoryPort;
+import com.new_cafe.app.backend.menu.domain.model.Menu;
 import com.new_cafe.app.backend.menu.domain.model.MenuImage;
-import com.new_cafe.app.backend.order.adapter.out.persistence.OrderItemJpaEntity;
-import com.new_cafe.app.backend.order.adapter.out.persistence.OrderItemJpaRepository;
-import com.new_cafe.app.backend.order.adapter.out.persistence.OrderJpaEntity;
-import com.new_cafe.app.backend.order.adapter.out.persistence.OrderJpaRepository;
-import com.new_cafe.app.backend.order.adapter.out.persistence.OrderOptionSelectionJpaEntity;
-import com.new_cafe.app.backend.order.adapter.out.persistence.OrderOptionSelectionJpaRepository;
 import com.new_cafe.app.backend.order.application.port.in.CreateOrderUseCase;
 import com.new_cafe.app.backend.order.application.port.in.GetOrderUseCase;
-import com.new_cafe.app.backend.order.domain.model.OrderStatus;
+import com.new_cafe.app.backend.order.application.port.out.OrderRepositoryPort;
+import com.new_cafe.app.backend.order.domain.model.Order;
+import com.new_cafe.app.backend.order.domain.model.OrderItem;
+import com.new_cafe.app.backend.order.domain.model.OrderOptionSelection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,24 +26,20 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class GetOrderService implements GetOrderUseCase {
 
-    private final OrderJpaRepository orderRepository;
-    private final OrderItemJpaRepository orderItemRepository;
-    private final OrderOptionSelectionJpaRepository orderOptionRepository;
-    private final MenuJpaRepository menuRepository;
+    private final OrderRepositoryPort orderRepository;
+    private final MenuRepositoryPort menuRepository;
     private final MenuImageRepositoryPort menuImageRepositoryPort;
 
     @Override
     public OrderDto getOrder(LocalDate date, Integer number) {
-        OrderJpaEntity order = orderRepository.findAll().stream()
-                .filter(o -> o.getOrderDate().equals(date) && o.getOrderNumber().equals(number))
-                .findFirst()
+        Order order = orderRepository.findByOrderDateAndOrderNumber(date, number)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
         return mapToDto(order);
     }
 
     @Override
     public OrderDto getOrderById(Long id) {
-        OrderJpaEntity order = orderRepository.findById(id)
+        Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
         return mapToDto(order);
     }
@@ -56,27 +49,28 @@ public class GetOrderService implements GetOrderUseCase {
         if (userId == null) {
             return List.of();
         }
-        return orderRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt")).stream()
-                .filter(o -> userId.equals(o.getUserId()))
+        return orderRepository.findByUserId(userId).stream()
                 .map(this::mapToListDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<OrderListDto> getAllOrders(String status, LocalDate date) {
-        return orderRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt")).stream()
-                .filter(o -> (status == null || o.getStatus().name().equalsIgnoreCase(status)))
-                .filter(o -> (date == null || o.getOrderDate().equals(date)))
+        return orderRepository.findByStatusAndOrderDate(status, date).stream()
                 .map(this::mapToListDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<OrderListDto> getOrdersByRange(String status, LocalDate start, LocalDate end) {
-        return orderRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt")).stream()
+        List<Order> orders;
+        if (start != null && end != null) {
+            orders = orderRepository.findByOrderDateBetween(start, end);
+        } else {
+            orders = orderRepository.findAll();
+        }
+        return orders.stream()
                 .filter(o -> (status == null || o.getStatus().name().equalsIgnoreCase(status)))
-                .filter(o -> (start == null || !o.getOrderDate().isBefore(start)))
-                .filter(o -> (end == null || !o.getOrderDate().isAfter(end)))
                 .map(this::mapToListDto)
                 .collect(Collectors.toList());
     }
@@ -86,16 +80,15 @@ public class GetOrderService implements GetOrderUseCase {
         if (keys == null || keys.isEmpty()) {
             return List.of();
         }
-        return orderRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt")).stream()
-                .filter(o -> keys.stream().anyMatch(k -> 
-                    k != null && 
-                    k.getDate() != null && 
-                    k.getNumber() != null &&
-                    LocalDate.parse(k.getDate()).equals(o.getOrderDate()) && 
-                    k.getNumber().equals(o.getOrderNumber())
-                ))
-                .map(this::mapToListDto)
-                .collect(Collectors.toList());
+        List<OrderListDto> result = new ArrayList<>();
+        for (OrderKey key : keys) {
+            if (key != null && key.getDate() != null && key.getNumber() != null) {
+                orderRepository.findByOrderDateAndOrderNumber(LocalDate.parse(key.getDate()), key.getNumber())
+                        .map(this::mapToListDto)
+                        .ifPresent(result::add);
+            }
+        }
+        return result;
     }
 
     @Override
@@ -103,46 +96,55 @@ public class GetOrderService implements GetOrderUseCase {
         if (userId == null) {
             return List.of();
         }
-        return orderRepository.findTopMenusByUserId(userId, PageRequest.of(0, limit))
-                .stream()
-                .map(proj -> {
+        // This still uses the JPA projection query via the adapter
+        // For now, delegate to the repository directly for this specialized query
+        return orderRepository.findByUserId(userId).stream()
+                .flatMap(o -> orderRepository.findItemsByOrderId(o.getId()).stream())
+                .collect(Collectors.groupingBy(OrderItem::getMenuId,
+                        Collectors.summingLong(OrderItem::getQuantity)))
+                .entrySet().stream()
+                .sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
+                .limit(limit)
+                .map(entry -> {
+                    Long menuId = entry.getKey();
+                    Long totalQuantity = entry.getValue();
+                    String menuName = "Unknown";
                     String engName = null;
                     String imageUrl = "placeholder.jpg";
-                    var optMenu = menuRepository.findById(proj.getMenuId());
-                    if (optMenu.isPresent()) {
-                        engName = optMenu.get().getEngName();
-                        // menu_images 테이블 우선 조회 (GetMenuListService와 동일 로직)
-                        List<MenuImage> images = menuImageRepositoryPort.findAllByMenuId(proj.getMenuId());
-                        if (!images.isEmpty()) {
-                            imageUrl = images.get(0).getSrcUrl();
-                        } else if (engName != null && !engName.trim().isEmpty()) {
-                            imageUrl = engName.toLowerCase().replaceAll("\\s+", "") + ".png";
-                        } else {
-                            imageUrl = "blank.png";
+                    
+                    try {
+                        Menu menu = menuRepository.findById(menuId);
+                        if (menu != null) {
+                            menuName = menu.getKorName();
+                            engName = menu.getEngName();
+                            List<MenuImage> images = menuImageRepositoryPort.findAllByMenuId(menuId);
+                            if (!images.isEmpty()) {
+                                imageUrl = images.get(0).getSrcUrl();
+                            } else if (engName != null && !engName.trim().isEmpty()) {
+                                imageUrl = engName.toLowerCase().replaceAll("\\s+", "") + ".png";
+                            } else {
+                                imageUrl = "blank.png";
+                            }
                         }
-                    }
+                    } catch (Exception ignored) {}
                     
                     return TopMenuDto.builder()
-                            .menuId(proj.getMenuId())
-                            .menuName(proj.getMenuName())
+                            .menuId(menuId)
+                            .menuName(menuName)
                             .engName(engName)
                             .imageUrl(imageUrl)
-                            .totalQuantity(proj.getTotalQuantity())
+                            .totalQuantity(totalQuantity)
                             .build();
                 })
                 .collect(Collectors.toList());
     }
 
-    private OrderDto mapToDto(OrderJpaEntity order) {
-        List<OrderItemJpaEntity> items = orderItemRepository.findAll().stream()
-                .filter(i -> i.getOrderId().equals(order.getId()))
-                .collect(Collectors.toList());
+    private OrderDto mapToDto(Order order) {
+        List<OrderItem> items = orderRepository.findItemsByOrderId(order.getId());
 
         List<CreateOrderUseCase.OrderItemResponse> itemResponses = new ArrayList<>();
-        for (OrderItemJpaEntity item : items) {
-            List<OrderOptionSelectionJpaEntity> options = orderOptionRepository.findAll().stream()
-                    .filter(opt -> opt.getOrderItemId().equals(item.getId()))
-                    .collect(Collectors.toList());
+        for (OrderItem item : items) {
+            List<OrderOptionSelection> options = orderRepository.findOptionsByOrderItemId(item.getId());
 
             List<CreateOrderUseCase.OrderOptionResponse> optionResponses = options.stream()
                     .map(opt -> CreateOrderUseCase.OrderOptionResponse.builder()
@@ -164,6 +166,7 @@ public class GetOrderService implements GetOrderUseCase {
 
         return OrderDto.builder()
                 .id(order.getId())
+                .userId(order.getUserId())
                 .orderDate(order.getOrderDate().toString())
                 .orderNumber(order.getOrderNumber())
                 .displayNumber("#" + order.getOrderNumber())
@@ -183,15 +186,12 @@ public class GetOrderService implements GetOrderUseCase {
                 .build();
     }
 
-    private OrderListDto mapToListDto(OrderJpaEntity order) {
-        List<OrderItemJpaEntity> items = orderItemRepository.findAll().stream()
-                .filter(i -> i.getOrderId().equals(order.getId()))
-                .collect(Collectors.toList());
+    private OrderListDto mapToListDto(Order order) {
+        List<OrderItem> items = orderRepository.findItemsByOrderId(order.getId());
 
         String summary = "";
         if (!items.isEmpty()) {
-            OrderItemJpaEntity firstItem = items.get(0);
-            summary = firstItem.getMenuName();
+            summary = items.get(0).getMenuName();
             if (items.size() > 1) {
                 summary += " 외 " + (items.size() - 1) + "건";
             }

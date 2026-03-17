@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { Image as ImageIcon, Trash2, Eye, EyeOff, Upload } from 'lucide-react';
+import { Image as ImageIcon, Trash2, Eye, EyeOff, Upload, ArrowUp, ArrowDown } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { galleryAPI } from '@/app/lib/api/adminAPI';
 import styles from './GallerySetting.module.css';
@@ -63,6 +63,20 @@ export function GallerySetting() {
         }
     };
 
+    const moveImage = async (index: number, direction: 'up' | 'down') => {
+        const newImages = [...images];
+        const targetIndex = direction === 'up' ? index - 1 : index + 1;
+        if (targetIndex < 0 || targetIndex >= newImages.length) return;
+        [newImages[index], newImages[targetIndex]] = [newImages[targetIndex], newImages[index]];
+        setImages(newImages);
+        try {
+            await galleryAPI.reorderImages(newImages.map(img => img.id));
+        } catch (error) {
+            console.error(error);
+            fetchImages();
+        }
+    };
+
     const handleDelete = async (id: number) => {
         if (confirm('정말 삭제하시겠습니까?')) {
             try {
@@ -104,11 +118,31 @@ export function GallerySetting() {
                     {images.length === 0 ? (
                         <p className={styles.emptyText}>등록된 이미지가 없습니다.</p>
                     ) : (
-                        images.map(img => (
+                        images.map((img, index) => (
                             <div key={img.id} className={styles.imageItem}>
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={`/images/${img.imageUrl}`} alt="Gallery" className={styles.imgPreview} />
                                 <div className={styles.actions}>
+                                    <div className={styles.sortBtns}>
+                                        <button
+                                            type="button"
+                                            className={styles.iconBtn}
+                                            onClick={() => moveImage(index, 'up')}
+                                            disabled={index === 0}
+                                            title="위로"
+                                        >
+                                            <ArrowUp size={16} color={index === 0 ? '#ccc' : '#555'} />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className={styles.iconBtn}
+                                            onClick={() => moveImage(index, 'down')}
+                                            disabled={index === images.length - 1}
+                                            title="아래로"
+                                        >
+                                            <ArrowDown size={16} color={index === images.length - 1 ? '#ccc' : '#555'} />
+                                        </button>
+                                    </div>
                                     <button
                                         type="button"
                                         className={styles.iconBtn}

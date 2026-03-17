@@ -1,14 +1,14 @@
 package com.new_cafe.app.backend.order.adapter.in.web;
 
+import com.new_cafe.app.backend.order.adapter.in.web.dto.RejectRequest;
+import com.new_cafe.app.backend.order.adapter.in.web.dto.StatusRequest;
 import com.new_cafe.app.backend.order.application.port.in.GetOrderUseCase;
 import com.new_cafe.app.backend.order.application.port.in.ManageOrderStatusUseCase;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.new_cafe.app.backend.order.application.service.OrderNotificationService;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,6 +21,7 @@ public class AdminOrderController {
     private final GetOrderUseCase getOrderUseCase;
     private final ManageOrderStatusUseCase manageOrderStatusUseCase;
     private final OrderNotificationService orderNotificationService;
+
     @GetMapping("/subscribe")
     public SseEmitter subscribe() {
         return orderNotificationService.subscribe();
@@ -49,15 +50,5 @@ public class AdminOrderController {
     public ResponseEntity<Void> rejectOrder(@PathVariable Long id, @RequestBody RejectRequest request) {
         manageOrderStatusUseCase.rejectOrder(id, request.getReason());
         return ResponseEntity.ok().build();
-    }
-
-    @Data
-    static class StatusRequest {
-        private String status;
-    }
-
-    @Data
-    static class RejectRequest {
-        private String reason;
     }
 }

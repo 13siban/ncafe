@@ -29,4 +29,15 @@ public class Order {
     private LocalDateTime updatedAt;
     
     private List<OrderItem> items;
+
+    public void changeStatus(OrderStatus newStatus) {
+        this.status = newStatus;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void reject(String reason) {
+        this.status = OrderStatus.REJECTED;
+        this.rejectReason = reason;
+        this.updatedAt = LocalDateTime.now();
+    }
 }

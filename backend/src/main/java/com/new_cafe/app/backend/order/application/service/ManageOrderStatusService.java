@@ -1,7 +1,5 @@
 package com.new_cafe.app.backend.order.application.service;
 
-import com.new_cafe.app.backend.order.adapter.out.persistence.OrderItemJpaEntity;
-import com.new_cafe.app.backend.order.adapter.out.persistence.OrderItemJpaRepository;
 import com.new_cafe.app.backend.order.application.port.in.ManageOrderStatusUseCase;
 import com.new_cafe.app.backend.order.application.port.out.OrderRepositoryPort;
 import com.new_cafe.app.backend.order.domain.model.Order;
@@ -26,7 +24,6 @@ import java.util.stream.Collectors;
 public class ManageOrderStatusService implements ManageOrderStatusUseCase {
 
     private final OrderRepositoryPort orderRepository;
-    private final OrderItemJpaRepository orderItemRepository; 
     private final DailyMenuSalesJpaRepository dailyMenuSalesRepository;
     private final AdminMenuJpaRepository menuRepository;
     private final CategoryJpaRepository categoryRepository;
@@ -36,47 +33,20 @@ public class ManageOrderStatusService implements ManageOrderStatusUseCase {
     @Override
     public void changeOrderStatus(Long id, String statusStr) {
         Order order = orderRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        OrderStatus previousStatus = order.getStatus();
         OrderStatus newStatus = OrderStatus.valueOf(statusStr.toUpperCase());
 
-        Order updatedOrder = Order.builder()
-                .id(order.getId())
-                .orderDate(order.getOrderDate())
-                .orderNumber(order.getOrderNumber())
-                .userId(order.getUserId())
-                .customerName(order.getCustomerName())
-                .status(newStatus)
-                .totalPrice(order.getTotalPrice())
-                .usedPoints(order.getUsedPoints())
-                .earnPoints(order.getEarnPoints())
-                .rejectReason(order.getRejectReason())
-                .memo(order.getMemo())
-                .paymentId(order.getPaymentId())
-                .paymentMethod(order.getPaymentMethod())
-                .paymentStatus(order.getPaymentStatus())
-                .createdAt(order.getCreatedAt())
-                .updatedAt(order.getUpdatedAt())
-                .build();
+        order.changeStatus(newStatus);
+        orderRepository.save(order);
 
-        orderRepository.save(updatedOrder);
-
-        // 결제 취소 처리: CANCELLED 상태로 변경될 때 (주문자 취소 등)
+        // 결제 취소 처리: CANCELLED 상태로 변경될 때
         if (newStatus == OrderStatus.CANCELLED) {
-            if (order.getPaymentId() != null) {
-                paymentVerificationService.cancelPayment(order.getPaymentId(), "고객 또는 관리자에 의한 주문 취소");
-            }
-            if (order.getUserId() != null) {
-                if (order.getUsedPoints() != null && order.getUsedPoints() > 0) {
-                    userPointUseCase.cancelPoints(order.getUserId(), order.getId().toString(), order.getUsedPoints(), "주문 취소 환급");
-                }
-                if (order.getEarnPoints() != null && order.getEarnPoints() > 0) {
-                    userPointUseCase.usePoints(order.getUserId(), order.getId().toString(), order.getEarnPoints(), "주문 취소 적립 회수");
-                }
-            }
+            handleCancellation(order);
         }
 
-        // When status moves to COMPLETED or PICKED_UP from a non-final state, aggregate daily sales
+        // 완료 상태로 전환 시 일일 매출 집계
         boolean isNowFinal = (newStatus == OrderStatus.COMPLETED || newStatus == OrderStatus.PICKED_UP);
-        boolean wasNotFinal = (order.getStatus() != OrderStatus.COMPLETED && order.getStatus() != OrderStatus.PICKED_UP);
+        boolean wasNotFinal = (previousStatus != OrderStatus.COMPLETED && previousStatus != OrderStatus.PICKED_UP);
         
         if (isNowFinal && wasNotFinal) {
             aggregateDailySales(order);
@@ -87,47 +57,37 @@ public class ManageOrderStatusService implements ManageOrderStatusUseCase {
     public void rejectOrder(Long id, String reason) {
         Order order = orderRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Order not found"));
         
-        Order updatedOrder = Order.builder()
-                .id(order.getId())
-                .orderDate(order.getOrderDate())
-                .orderNumber(order.getOrderNumber())
-                .userId(order.getUserId())
-                .customerName(order.getCustomerName())
-                .status(OrderStatus.REJECTED)
-                .totalPrice(order.getTotalPrice())
-                .usedPoints(order.getUsedPoints())
-                .earnPoints(order.getEarnPoints())
-                .rejectReason(reason) // required
-                .memo(order.getMemo())
-                .paymentId(order.getPaymentId())
-                .paymentMethod(order.getPaymentMethod())
-                .paymentStatus(order.getPaymentStatus())
-                .createdAt(order.getCreatedAt())
-                .updatedAt(order.getUpdatedAt())
-                .build();
-
-        orderRepository.save(updatedOrder);
+        order.reject(reason);
+        orderRepository.save(order);
 
         // 결제 취소 처리: 주문 거절 시 자동 환불
         if (order.getPaymentId() != null) {
             paymentVerificationService.cancelPayment(order.getPaymentId(), "주문 거절: " + reason);
         }
-        if (order.getUserId() != null) {
-            if (order.getUsedPoints() != null && order.getUsedPoints() > 0) {
-                userPointUseCase.cancelPoints(order.getUserId(), order.getId().toString(), order.getUsedPoints(), "주문 거절 환급");
-            }
-            if (order.getEarnPoints() != null && order.getEarnPoints() > 0) {
-                userPointUseCase.usePoints(order.getUserId(), order.getId().toString(), order.getEarnPoints(), "주문 거절 적립 회수");
-            }
+        handlePointRefund(order);
+    }
+
+    private void handleCancellation(Order order) {
+        if (order.getPaymentId() != null) {
+            paymentVerificationService.cancelPayment(order.getPaymentId(), "고객 또는 관리자에 의한 주문 취소");
+        }
+        handlePointRefund(order);
+    }
+
+    private void handlePointRefund(Order order) {
+        if (order.getUserId() == null) return;
+        if (order.getUsedPoints() != null && order.getUsedPoints() > 0) {
+            userPointUseCase.cancelPoints(order.getUserId(), order.getId().toString(), order.getUsedPoints(), "주문 취소/거절 환급");
+        }
+        if (order.getEarnPoints() != null && order.getEarnPoints() > 0) {
+            userPointUseCase.usePoints(order.getUserId(), order.getId().toString(), order.getEarnPoints(), "주문 취소/거절 적립 회수");
         }
     }
 
     private void aggregateDailySales(Order order) {
-        List<OrderItemJpaEntity> items = orderItemRepository.findAll().stream()
-                .filter(i -> i.getOrderId().equals(order.getId()))
-                .collect(Collectors.toList());
+        List<com.new_cafe.app.backend.order.domain.model.OrderItem> items = orderRepository.findItemsByOrderId(order.getId());
 
-        for (OrderItemJpaEntity item : items) {
+        for (com.new_cafe.app.backend.order.domain.model.OrderItem item : items) {
             DailyMenuSalesJpaEntity salesEntity = dailyMenuSalesRepository.findAll().stream()
                     .filter(s -> s.getSaleDate().equals(order.getOrderDate()) && s.getMenuId().equals(item.getMenuId()))
                     .findFirst()

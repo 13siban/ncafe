@@ -13,4 +13,12 @@ public class GalleryImage {
     private Integer sortOrder;
     private Boolean isVisible;
     private LocalDateTime createdAt;
+
+    public void updateSort(int sortOrder) {
+        this.sortOrder = sortOrder;
+    }
+
+    public void updateVisibility(boolean visible) {
+        this.isVisible = visible;
+    }
 }

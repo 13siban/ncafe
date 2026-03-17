@@ -2,6 +2,7 @@ package com.new_cafe.app.backend.admin.user.adapter.in.web;
 
 import com.new_cafe.app.backend.admin.user.application.port.in.DeleteAdminUserUseCase;
 import com.new_cafe.app.backend.admin.user.application.port.in.GetAdminUserListUseCase;
+import com.new_cafe.app.backend.admin.user.application.port.in.ToggleAdminUserLockUseCase;
 import com.new_cafe.app.backend.auth.domain.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +12,6 @@ import com.new_cafe.app.backend.admin.user.application.port.in.UpdateAdminUserGr
 import com.new_cafe.app.backend.admin.user.adapter.in.web.dto.UpdateUserRoleRequest;
 import com.new_cafe.app.backend.admin.user.adapter.in.web.dto.UpdateUserGradeRequest;
 import com.new_cafe.app.backend.admin.user.adapter.in.web.dto.AdminPointRequest;
-import com.new_cafe.app.backend.auth.adapter.out.persistence.UserJpaRepository;
 import com.new_cafe.app.backend.auth.application.port.in.ManageUserPointUseCase;
 import com.new_cafe.app.backend.auth.domain.model.UserPoint;
 import org.springframework.data.domain.Page;
@@ -33,8 +33,8 @@ public class AdminUserController {
     private final DeleteAdminUserUseCase deleteAdminUserUseCase;
     private final UpdateAdminUserRoleUseCase updateAdminUserRoleUseCase;
     private final UpdateAdminUserGradeUseCase updateAdminUserGradeUseCase;
+    private final ToggleAdminUserLockUseCase toggleAdminUserLockUseCase;
     private final ManageUserPointUseCase userPointUseCase;
-    private final UserJpaRepository userJpaRepository;
 
     @GetMapping
     public List<User> getUsers() {
@@ -67,19 +67,7 @@ public class AdminUserController {
     @PutMapping("/{id}/lock")
     @PreAuthorize("hasRole('ADMIN')")
     public Map<String, Object> toggleLock(@PathVariable String id) {
-        User user = userJpaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-        
-        if (user.isEnabled()) {
-            user.lock();
-        } else {
-            user.unlock();
-        }
-        userJpaRepository.save(user);
-        return Map.of(
-            "message", user.isEnabled() ? "계정이 잠금 해제되었습니다." : "계정이 잠금되었습니다.",
-            "isEnabled", user.isEnabled()
-        );
+        return toggleAdminUserLockUseCase.toggleLock(id);
     }
 
     @GetMapping("/{id}/points")
@@ -110,7 +98,6 @@ public class AdminUserController {
         if (request.getAmount() > 0) {
             userPointUseCase.earnPoints(id, null, request.getAmount(), desc);
         } else {
-            // Amount is negative, we need to pass positive value to usePoints
             userPointUseCase.usePoints(id, null, Math.abs(request.getAmount()), desc);
         }
         
