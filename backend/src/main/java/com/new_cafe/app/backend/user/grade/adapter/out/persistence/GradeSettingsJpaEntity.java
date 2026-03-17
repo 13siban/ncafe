@@ -41,10 +41,6 @@ public class GradeSettingsJpaEntity {
     @Column(name = "text_color", nullable = false, length = 7)
     private String textColor = "#FFFFFF";
 
-    @Column(name = "discount_rate", nullable = false)
-    @Builder.Default
-    private Integer discountRate = 0;
-
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
