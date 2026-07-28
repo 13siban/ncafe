@@ -4,10 +4,7 @@ name: ${COMPOSE_PROJECT_NAME}
 services:
   # ── 백엔드 (Spring Boot) ──
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    image: ${USER_ID}-ncafe-backend
+    image: ghcr.io/13siban/ncafe-backend:latest
     container_name: ${USER_ID}-backend
     volumes:
       - /home/young/dist/ncafe/upload:/app/upload
@@ -28,16 +25,7 @@ services:
 
   # ── 프론트엔드 (Next.js) ──
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        - NEXT_PUBLIC_PORTONE_STORE_ID=${NEXT_PUBLIC_PORTONE_STORE_ID}
-        - NEXT_PUBLIC_PORTONE_KAKAOPAY_CHANNEL_KEY=${NEXT_PUBLIC_PORTONE_KAKAOPAY_CHANNEL_KEY}
-        - NEXT_PUBLIC_PORTONE_NAVERPAY_CHANNEL_KEY=${NEXT_PUBLIC_PORTONE_NAVERPAY_CHANNEL_KEY}
-        - NEXT_PUBLIC_PORTONE_INICIS_CHANNEL_KEY=${NEXT_PUBLIC_PORTONE_INICIS_CHANNEL_KEY}
-        - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-    image: ${USER_ID}-ncafe-frontend
+    image: ghcr.io/13siban/ncafe-frontend:latest
     container_name: ${USER_ID}-frontend
     ports:
       - "${FRONTEND_PORT}:3000"
@@ -59,10 +47,7 @@ services:
 
   # ── AI 에이전트 (FastAPI) ──
   agent:
-    build:
-      context: ./agent-server
-      dockerfile: Dockerfile
-    image: ${USER_ID}-ncafe-agent
+    image: ghcr.io/13siban/ncafe-agent:latest
     container_name: ${USER_ID}-agent
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
@@ -79,11 +64,7 @@ services:
 
   # ── 데이터베이스 (PostgreSQL) ──
   db:
-    build:
-      context: ./db
-      dockerfile: Dockerfile
-    image: ${USER_ID}-ncafe-db
-
+    image: pgvector/pgvector:pg17
     container_name: ${USER_ID}-db
     restart: always
     env_file: .env

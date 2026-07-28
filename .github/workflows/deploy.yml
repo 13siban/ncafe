@@ -6,7 +6,60 @@ on:
   workflow_dispatch:
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ghcr.io/13siban/ncafe-backend:latest
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
+
+      - name: Build and push frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: ghcr.io/13siban/ncafe-frontend:latest
+          build-args: |
+            NEXT_PUBLIC_PORTONE_STORE_ID=${{ secrets.NEXT_PUBLIC_PORTONE_STORE_ID }}
+            NEXT_PUBLIC_PORTONE_KAKAOPAY_CHANNEL_KEY=${{ secrets.NEXT_PUBLIC_PORTONE_KAKAOPAY_CHANNEL_KEY }}
+            NEXT_PUBLIC_PORTONE_NAVERPAY_CHANNEL_KEY=${{ secrets.NEXT_PUBLIC_PORTONE_NAVERPAY_CHANNEL_KEY }}
+            NEXT_PUBLIC_PORTONE_INICIS_CHANNEL_KEY=${{ secrets.NEXT_PUBLIC_PORTONE_INICIS_CHANNEL_KEY }}
+            NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
+
+      - name: Build and push agent
+        uses: docker/build-push-action@v5
+        with:
+          context: ./agent-server
+          push: true
+          tags: ghcr.io/13siban/ncafe-agent:latest
+          cache-from: type=gha,scope=agent
+          cache-to: type=gha,mode=max,scope=agent
+
   deploy:
+    needs: build
     runs-on: self-hosted
     steps:
       - name: Checkout
@@ -48,11 +101,13 @@ jobs:
           echo "NEXT_PUBLIC_PORTONE_INICIS_CHANNEL_KEY=$PORTONE_INICIS_CHANNEL_KEY" >> .env
           echo "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" >> .env
 
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Build and Deploy
-        run: docker compose up --build -d
-        env:
-          COMPOSE_PARALLEL_LIMIT: 1
+      - name: Pull and Deploy
+        run: |
+          docker compose pull
+          docker compose up -d
 
       - name: Verify deployment
         run: |
