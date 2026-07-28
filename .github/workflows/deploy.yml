@@ -51,6 +51,8 @@ jobs:
 
       - name: Build and Deploy
         run: docker compose up --build -d
+        env:
+          COMPOSE_PARALLEL_LIMIT: 1
 
       - name: Verify deployment
         run: |
