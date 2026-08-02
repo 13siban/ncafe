@@ -9,6 +9,7 @@ import { userAPI } from '@/app/lib/api/userAPI';
 import { useAuthStore } from '@/store/useAuthStore';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
+import DemoLoginModal from '@/components/auth/DemoLoginModal/DemoLoginModal';
 
 const LoginForm = () => {
     const router = useRouter();
@@ -18,10 +19,37 @@ const LoginForm = () => {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    // 데모 안내 모달 (방문할 때마다 자동으로 열린다)
+    const [showDemoModal, setShowDemoModal] = useState(true);
+
     // 탈퇴 복구 모달
     const [showRestoreModal, setShowRestoreModal] = useState(false);
     const [deleteInfo, setDeleteInfo] = useState<{ deletedAt: string; daysRemaining: number } | null>(null);
     const [isRestoring, setIsRestoring] = useState(false);
+
+    /** 로그인 성공 후 공통 처리 (일반/구글/데모 로그인이 모두 같은 경로를 탄다) */
+    const finishLogin = (user: any) => {
+        if (user) {
+            useAuthStore.getState().setUser(user);
+        }
+        window.dispatchEvent(new Event('login'));
+
+        let redirect = searchParams.get('redirect') || '/';
+        if (redirect.startsWith('/login')) {
+            redirect = '/';
+        }
+        router.push(redirect);
+        router.refresh();
+    };
+
+    /** 데모(부관리자) 로그인 — 자격증명은 서버에만 있으므로 본문 없이 호출한다 */
+    const handleDemoLogin = async () => {
+        const res = await fetch('/api/auth/demo', { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || '데모 로그인에 실패했습니다.');
+
+        finishLogin(data.user);
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,20 +59,7 @@ const LoginForm = () => {
         try {
             const res = await authAPI.login(username, password);
 
-            if (res && res.user) {
-                useAuthStore.getState().setUser(res.user);
-            }
-
-            window.dispatchEvent(new Event('login'));
-
-            let redirect = searchParams.get('redirect') || '/';
-            if (redirect.startsWith('/login')) {
-                redirect = '/';
-            }
-
-            console.log(`[LoginForm] Success: redirecting to ${redirect}`);
-            router.push(redirect);
-            router.refresh();
+            finishLogin(res?.user);
         } catch (err: any) {
             const msg = err.message || '';
             if (msg.startsWith('ACCOUNT_DELETED|')) {
@@ -73,19 +88,11 @@ const LoginForm = () => {
 
             const res = await authAPI.googleLogin(accessToken);
 
-            if (res && res.user) {
-                useAuthStore.getState().setUser(res.user);
-            }
             if (res?.accountRestored) {
                 alert('탈퇴 요청이 취소되어 계정이 복구되었습니다.');
             }
-            window.dispatchEvent(new Event('login'));
-            let redirect = searchParams.get('redirect') || '/';
-            if (redirect.startsWith('/login')) {
-                redirect = '/';
-            }
-            router.push(redirect);
-            router.refresh();
+
+            finishLogin(res?.user);
         } catch (err: any) {
             setError(err.message || '구글 로그인 중 오류가 발생했습니다.');
         } finally {
@@ -153,6 +160,14 @@ const LoginForm = () => {
                 >
                     {isLoading ? '로그인 중...' : '로그인'}
                 </button>
+                <button
+                    type="button"
+                    className={styles.demoTrigger}
+                    onClick={() => setShowDemoModal(true)}
+                >
+                    데모 계정으로 둘러보기
+                </button>
+
                 <div style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.875rem' }}>
                     <span style={{ color: 'var(--color-gray-500)' }}>계정이 없으신가요? </span>
                     <Link href="/signup" style={{ color: 'var(--color-primary-600)', fontWeight: 600, textDecoration: 'underline' }}>
@@ -169,6 +184,13 @@ const LoginForm = () => {
                     </GoogleOAuthProvider>
                 </div>
             </form>
+
+            {/* 데모 로그인 안내 모달 */}
+            <DemoLoginModal
+                isOpen={showDemoModal}
+                onClose={() => setShowDemoModal(false)}
+                onDemoLogin={handleDemoLogin}
+            />
 
             {/* 탈퇴 복구 모달 */}
             {showRestoreModal && deleteInfo && (

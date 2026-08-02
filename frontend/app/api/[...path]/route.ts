@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getSession } from '@/app/lib/session';
-import { handleLogin, handleGoogleLogin, handleLogout, handleSession } from './handlers/authHandlers';
+import { handleLogin, handleGoogleLogin, handleDemoLogin, handleLogout, handleSession } from './handlers/authHandlers';
 import { handleProxy } from './handlers/proxyHandler';
 
 /**
@@ -19,6 +19,9 @@ async function unifiedHandler(req: NextRequest) {
     }
     if (pathname === '/api/auth/google' && req.method === 'POST') {
         return handleGoogleLogin(req, session);
+    }
+    if (pathname === '/api/auth/demo' && req.method === 'POST') {
+        return handleDemoLogin(session);
     }
     if (pathname === '/api/auth/logout' && req.method === 'POST') {
         return handleLogout(session);

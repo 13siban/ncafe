@@ -1,0 +1,146 @@
+/* 데모 로그인 안내 모달
+   오버레이/카드 스타일은 LoginForm의 탈퇴 복구 모달과 동일한 톤을 유지한다. */
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    padding: var(--space-4);
+}
+
+.modal {
+    position: relative;
+    background: white;
+    border-radius: 16px;
+    padding: var(--space-8);
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalIn 0.25s ease;
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.closeButton {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--color-gray-400);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.closeButton:hover {
+    background: var(--color-gray-100);
+    color: var(--color-gray-700);
+}
+
+.title {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-gray-900);
+}
+
+.subtitle {
+    margin: 0 0 var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
+    line-height: 1.5;
+}
+
+.demoButton {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-4);
+    text-align: left;
+    background: var(--color-gray-0);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.demoButton:hover:not(:disabled) {
+    border-color: var(--color-primary-600);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.demoButton:disabled {
+    cursor: progress;
+    opacity: 0.6;
+}
+
+.emoji {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    font-size: 1.4rem;
+    background: var(--color-primary-50);
+    border-radius: var(--radius-full);
+}
+
+.buttonBody {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.buttonTitle {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-gray-900);
+}
+
+.buttonDesc {
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+    line-height: 1.5;
+}
+
+.error {
+    margin: var(--space-4) 0 0;
+    font-size: var(--text-sm);
+    color: var(--color-error);
+    text-align: center;
+}
+
+.hint {
+    margin: var(--space-5) 0 0;
+    font-size: var(--text-xs);
+    color: var(--color-gray-400);
+    text-align: center;
+}

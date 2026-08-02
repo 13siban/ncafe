@@ -188,3 +188,26 @@
         padding: var(--space-4);
     }
 }
+/* 데모 로그인 모달 재오픈 버튼 (submitButton의 보조 변형) */
+.demoTrigger {
+    width: 100%;
+    padding: var(--space-4);
+    background-color: transparent;
+    color: var(--color-primary-600);
+    border: 1px solid var(--color-primary-600);
+    border-radius: 0;
+    font-weight: var(--font-semibold);
+    font-size: var(--text-base);
+    transition: var(--transition-base);
+    margin-top: var(--space-3);
+    cursor: pointer;
+}
+
+.demoTrigger:hover {
+    background-color: var(--color-primary-50);
+    transform: translateY(-1px);
+}
+
+.demoTrigger:active {
+    transform: translateY(0);
+}
